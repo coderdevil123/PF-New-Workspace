@@ -171,11 +171,11 @@
   }
 
   .shadow-card {
-    box-shadow: 0 2px 8px rgba(0 0 0 / 0.08), 0 1px 4px rgba(0 0 0 / 0.04);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.7), 0 0px 20px rgba(255, 255, 255, 0.1);
   }
   
   .shadow-card-hover {
-    box-shadow: 0 8px 24px rgba(0 0 0 / 0.12), 0 4px 8px rgba(0 0 0 / 0.08);
+    box-shadow: 0 8px 24px rgba(var(--shadow-color) / 0.12), 0 4px 8px rgba(var(--shadow-color) / 0.08);
   }
   
   .dark .shadow-card {
@@ -190,6 +190,31 @@
       0 8px 24px rgba(255 255 255 / 0.4), 
       0 4px 12px rgba(255 255 255 / 0.3),
       0 12px 32px rgba(255 255 255 / 0.3);
+  }
+
+  /* Match input text color with placeholder */
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    color: #9CA3AF;
+  }
+
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="text"]:focus {
+    color: #9CA3AF;
+  }
+
+  .dark input[type="email"],
+  .dark input[type="password"],
+  .dark input[type="text"] {
+    color: #A8BFB8;
+  }
+
+  .dark input[type="email"]:focus,
+  .dark input[type="password"]:focus,
+  .dark input[type="text"]:focus {
+    color: #A8BFB8;
   }
 }
 

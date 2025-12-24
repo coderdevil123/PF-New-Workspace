@@ -67,7 +67,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label htmlFor="email" className="font-ui mb-2 block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="font-ui mb-2 block text-m font-medium text-gray-200">
                 Email Address
               </label>
               <div className="relative">
@@ -78,15 +78,15 @@ export default function Login() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="you@example.com"
+                  className="h-12 w-full rounded-lg border border-gray-700 bg-white pl-10 pr-4 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="enter your mail"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="font-ui mb-2 block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="font-ui mb-2 block text-m font-medium text-gray-200">
                 Password
               </label>
               <div className="relative">
@@ -97,8 +97,8 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="••••••••"
+                  className="h-12 w-full rounded-lg border border-gray-700 bg-white pl-10 pr-4 text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="enter your password"
                 />
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function Login() {
             <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                <span className="ml-2 text-sm text-gray-200">Remember me</span>
               </label>
               <button type="button" className="text-sm font-medium text-primary hover:text-primary/80">
                 Forgot password?
