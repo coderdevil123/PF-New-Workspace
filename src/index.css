@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.cdnfonts.com/css/canela?styles=144935,144936,144937,144938');
+@import url('https://fonts.cdnfonts.com/css/neue-montreal');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html,
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, .heading {
+    font-family: 'Canela', serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-weight: 600;
+  }
+
+  h2 {
+    font-weight: 600;
+  }
+
+  h3 {
+    font-weight: 500;
+  }
+
+  button, nav, .ui-text, label {
+    font-family: 'Neue Montreal', sans-serif;
+    font-weight: 500;
+  }
+
+  body {
+    background: #FFFFFF;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    background: linear-gradient(180deg, #0B0F0E 0%, #0E1614 25%, #141C1A 50%, #0E1614 75%, #0B0F0E 100%);
+    background-attachment: fixed;
+  }
+
+  .dark body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.05"/%3E%3C/svg%3E');
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .dark body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(79, 209, 181, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.3;
+    }
+    90% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(-120vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  :root {
+    --shadow-color: 0 0 0;
+    --shadow-alpha: 0.1;
+  }
+
+  .dark {
+    --shadow-color: 255 255 255;
+    --shadow-alpha: 0.1;
+  }
+}
+
+@layer utilities {
+  .mint-corner-accent {
+    position: relative;
+  }
+
+  .mint-corner-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, transparent 50%, #E9F7F4 50%);
+    border-radius: 0 14px 0 0;
+  }
+
+  .dark .mint-corner-accent::before {
+    background: linear-gradient(135deg, transparent 50%, rgba(79, 209, 181, 0.1) 50%);
+  }
+
+  .text-gradient-forest {
+    background: linear-gradient(135deg, #1E5E56 0%, #4FD1B5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Dark Mode Utilities */
+  .dark .bg-white {
+    background: linear-gradient(135deg, #141C1A 0%, #1A2420 100%);
+  }
+
+  .dark .bg-light-gray {
+    background: linear-gradient(135deg, #1A2420 0%, #1F2D28 100%);
+  }
+
+  .dark .border-border {
+    border-color: rgba(79, 209, 181, 0.15);
+  }
+
+  .dark .border-gray-200 {
+    border-color: rgba(79, 209, 181, 0.15);
+  }
+
+  .dark .text-heading-dark {
+    color: #F5FAF8;
+  }
+
+  .dark .text-body-text {
+    color: #D4E3DE;
+  }
+
+  .dark .text-muted-text {
+    color: #A8BFB8;
+  }
+
+  .dark .shadow-card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba(79, 209, 181, 0.05);
+  }
+
+  .dark .shadow-card-hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(79, 209, 181, 0.1);
+  }
+
+  .dark .glass-effect {
+    background: linear-gradient(135deg, rgba(20, 28, 26, 0.8) 0%, rgba(26, 36, 32, 0.6) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(79, 209, 181, 0.12);
+  }
+
+  .shadow-card {
+    box-shadow: 0 2px 8px rgba(0 0 0 / 0.08), 0 1px 4px rgba(0 0 0 / 0.04);
+  }
+  
+  .shadow-card-hover {
+    box-shadow: 0 8px 24px rgba(0 0 0 / 0.12), 0 4px 8px rgba(0 0 0 / 0.08);
+  }
+  
+  .dark .shadow-card {
+    box-shadow: 
+      0 2px 8px rgba(255 255 255 / 0.3), 
+      0 1px 4px rgba(255 255 255 / 0.2),
+      0 4px 12px rgba(255 255 255 / 0.2);
+  }
+  
+  .dark .shadow-card-hover {
+    box-shadow: 
+      0 8px 24px rgba(255 255 255 / 0.4), 
+      0 4px 12px rgba(255 255 255 / 0.3),
+      0 12px 32px rgba(255 255 255 / 0.3);
+  }
+}
+
