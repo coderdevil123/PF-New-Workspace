@@ -11,6 +11,7 @@ import Announcements from './pages/Announcements';
 import Team from './pages/Team';
 import Login from './pages/Login';
 // import Signup from './pages/Signup';
+import OAuthSuccess from './pages/OAuthSuccess';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/team" element={<Team />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/oauth/success" element={<OAuthSuccess />} />
           </Routes>
           </AppLayout>
           <Toaster />
