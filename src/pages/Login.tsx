@@ -36,7 +36,7 @@ export default function Login() {
   const handleSocialLogin = (provider: string) => {
     if (provider === 'Google') {
       // Redirect to Google OAuth with callback to Vercel app
-      window.location.href = 'https://pf-workspace.vercel.app/workspace';
+      window.location.href = 'https://backend-for-testing-9h8v.onrender.com/auth/google';
       return;
     }
 
