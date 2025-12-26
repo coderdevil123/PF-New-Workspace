@@ -9,36 +9,52 @@ export default function OAuthSuccess() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Extract token and user data from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const email = urlParams.get('email');
-    const name = urlParams.get('name');
+    // Extract token from URL hash (Google OAuth returns token in hash)
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
 
-    if (token && email) {
-      // Store token in localStorage
-      localStorage.setItem('authToken', token);
+    if (accessToken) {
+      // Fetch user info from Google
+      fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then(res => res.json())
+        .then(userData => {
+          // Store token
+          localStorage.setItem('authToken', accessToken);
 
-      // Log the user in
-      login({
-        name: name || email.split('@')[0],
-        email: email,
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-      });
+          // Log the user in
+          login({
+            name: userData.name || userData.email.split('@')[0],
+            email: userData.email,
+            phone: '+1 (555) 123-4567',
+            location: 'San Francisco, CA',
+          });
 
-      toast({
-        title: 'Welcome!',
-        description: 'You have successfully logged in with Google.',
-      });
+          toast({
+            title: 'Welcome!',
+            description: 'You have successfully logged in with Google.',
+          });
 
-      // Redirect to workspace
-      navigate('/workspace');
+          // Redirect to workspace
+          navigate('/workspace');
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+          toast({
+            title: 'Authentication Failed',
+            description: 'Unable to fetch user data. Please try again.',
+            variant: 'destructive',
+          });
+          navigate('/login');
+        });
     } else {
-      // If no token, redirect to login
       toast({
         title: 'Authentication Failed',
-        description: 'Unable to authenticate. Please try again.',
+        description: 'No access token found. Please try again.',
         variant: 'destructive',
       });
       navigate('/login');

@@ -28,7 +28,7 @@ function App() {
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/team" element={<Team />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/oauth/callback" element={<OAuthSuccess />} />
+            <Route path="/oauth/success" element={<OAuthSuccess />} />
           </Routes>
           </AppLayout>
           <Toaster />
