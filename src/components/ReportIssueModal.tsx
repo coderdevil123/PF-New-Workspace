@@ -66,7 +66,7 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text sm:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-normal">
             Report Issue with {tool.name}
@@ -75,18 +75,18 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
             Help us improve by reporting any issues or bugs you've encountered
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
           {/* Name & Email */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="name" className="font-ui mb-2 block text-sm font-medium">
+              <label htmlFor="name" className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
                 Your Name
               </label>
               <input
                 id="name"
                 type="text"
                 {...register('name')}
-                className="h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                className="h-10 sm:h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-3 sm:px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
                 placeholder="John Doe"
               />
               {errors.name && (
@@ -95,14 +95,14 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
             </div>
 
             <div>
-              <label htmlFor="email" className="font-ui mb-2 block text-sm font-medium">
+              <label htmlFor="email" className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
                 {...register('email')}
-                className="h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                className="h-10 sm:h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-3 sm:px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
                 placeholder="you@example.com"
               />
               {errors.email && (
@@ -113,14 +113,14 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
 
           {/* Issue Title */}
           <div>
-            <label htmlFor="title" className="font-ui mb-2 block text-sm font-medium">
+            <label htmlFor="title" className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
               Issue Title
             </label>
             <input
               id="title"
               type="text"
               {...register('title')}
-              className="h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+              className="h-10 sm:h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-3 sm:px-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
               placeholder="Brief description of the issue"
             />
             {errors.title && (
@@ -130,14 +130,14 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="font-ui mb-2 block text-sm font-medium">
+            <label htmlFor="description" className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
               Detailed Description
             </label>
             <textarea
               id="description"
               {...register('description')}
-              rows={5}
-              className="w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 py-3 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+              rows={4}
+              className="w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-3 sm:px-4 py-2 sm:py-3 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
               placeholder="Please provide as much detail as possible about the issue..."
             />
             {errors.description && (
@@ -146,15 +146,15 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
           </div>
 
           {/* Priority & File Upload */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="priority" className="font-ui mb-2 block text-sm font-medium">
+              <label htmlFor="priority" className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
                 Priority Level
               </label>
               <select
                 id="priority"
                 {...register('priority')}
-                className="h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 text-sm text-heading-dark dark:text-dark-text focus:border-mint-accent focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                className="h-10 sm:h-11 w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-3 sm:px-4 text-sm text-heading-dark dark:text-dark-text focus:border-mint-accent focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
               >
                 <option value="low" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">Low - Minor inconvenience</option>
                 <option value="medium" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">Medium - Affects workflow</option>
@@ -163,7 +163,7 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
             </div>
 
             <div>
-              <label className="font-ui mb-2 block text-sm font-medium">
+              <label className="font-ui mb-1.5 sm:mb-2 block text-xs sm:text-sm font-medium">
                 Attach Screenshot/Video
               </label>
               <div className="relative">
@@ -176,10 +176,10 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
                 />
                 <label
                   htmlFor="file-upload"
-                  className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-light-gray dark:bg-dark-hover text-sm text-body-text dark:text-dark-muted transition-all hover:border-mint-accent hover:bg-soft-mint dark:hover:bg-mint-accent/10 hover:text-forest-green dark:hover:text-mint-accent"
+                  className="flex h-10 sm:h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-light-gray dark:bg-dark-hover text-xs sm:text-sm text-body-text dark:text-dark-muted transition-all hover:border-mint-accent hover:bg-soft-mint dark:hover:bg-mint-accent/10 hover:text-forest-green dark:hover:text-mint-accent"
                 >
-                  <Upload className="h-4 w-4" />
-                  {uploadedFile ? uploadedFile.name : 'Upload file'}
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">{uploadedFile ? uploadedFile.name : 'Upload file'}</span>
                 </label>
                 {uploadedFile && (
                   <button
@@ -195,7 +195,7 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 border-t border-border pt-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 border-t border-border pt-4 sm:pt-6">
             <Button
               type="button"
               onClick={() => {
@@ -204,13 +204,13 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
                 onOpenChange(false);
               }}
               variant="outline"
-              className="rounded-full border-border dark:border-dark-border"
+              className="rounded-full border-border dark:border-dark-border h-10 sm:h-auto"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="rounded-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+              className="rounded-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90 h-10 sm:h-auto"
             >
               Submit Issue Report
             </Button>

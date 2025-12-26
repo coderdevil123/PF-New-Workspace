@@ -54,7 +54,7 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text sm:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl font-normal">
             {tool.name} Tutorials
@@ -63,9 +63,9 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
             Learn how to use {tool.name} effectively with our comprehensive guides
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4 space-y-6">
+        <div className="mt-4 space-y-4 sm:space-y-6">
           {/* Video Player */}
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-light-gray dark:bg-dark-hover shadow-lg">
+          <div className="aspect-video w-full overflow-hidden rounded-lg sm:rounded-xl bg-light-gray dark:bg-dark-hover shadow-lg">
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
               title={`${tool.name} Tutorial`}
@@ -77,9 +77,9 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
           </div>
 
           {/* Additional Resources */}
-          <div className="rounded-xl border border-border bg-light-gray dark:bg-dark-hover p-6">
-            <h4 className="font-display mb-4 text-lg font-normal text-heading-dark dark:text-dark-text">Additional Resources</h4>
-            <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg sm:rounded-xl border border-border bg-light-gray dark:bg-dark-hover p-4 sm:p-6">
+            <h4 className="font-display mb-3 sm:mb-4 text-base sm:text-lg font-normal text-heading-dark dark:text-dark-text">Additional Resources</h4>
+            <div className="grid gap-2 sm:gap-3 sm:grid-cols-2">
               {[
                 { title: 'Getting Started Guide', description: 'Learn the basics' },
                 { title: 'Advanced Features', description: 'Master advanced tools' },
@@ -88,13 +88,13 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
               ].map((resource, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 rounded-lg border border-border bg-white dark:bg-dark-card p-4 transition-all hover:border-mint-accent/50 hover:shadow-md"
+                  className="flex items-start gap-2 sm:gap-3 rounded-lg border border-border bg-white dark:bg-dark-card p-3 sm:p-4 transition-all hover:border-mint-accent/50 hover:shadow-md"
                 >
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
-                    <ExternalLink className="h-4 w-4 text-forest-green dark:text-mint-accent" />
+                  <div className="flex h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
+                    <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4 text-forest-green dark:text-mint-accent" />
                   </div>
                   <div>
-                    <p className="font-ui font-medium text-heading-dark dark:text-dark-text">{resource.title}</p>
+                    <p className="font-ui text-xs sm:text-sm font-medium text-heading-dark dark:text-dark-text">{resource.title}</p>
                     <p className="font-sans text-xs text-body-text dark:text-dark-muted">{resource.description}</p>
                   </div>
                 </div>
@@ -103,17 +103,17 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
             <Button
               onClick={() => onOpenChange(false)}
               variant="outline"
-              className="rounded-full border-border dark:border-dark-border"
+              className="rounded-full border-border dark:border-dark-border h-10 sm:h-auto"
             >
               Close
             </Button>
             <Button
               onClick={() => window.open(tool.url, '_blank')}
-              className="rounded-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+              className="rounded-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90 h-10 sm:h-auto"
             >
               Open {tool.name}
               <ExternalLink className="ml-2 h-4 w-4" />

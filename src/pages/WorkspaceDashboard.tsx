@@ -347,18 +347,23 @@ export default function WorkspaceDashboard() {
                           {category.description}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {category.allTools.map((toolName, idx) => (
-                            <span
-                              key={idx}
-                              onClick={(e) => {
-                                const tool = category.tools.find(t => t.name === toolName);
-                                if (tool) handleToolClick(tool.url, e);
-                              }}
-                              className="font-ui cursor-pointer rounded-full border border-mint-accent/30 bg-soft-mint dark:bg-mint-accent/10 px-2.5 py-1 text-xs font-medium text-forest-green dark:text-mint-accent transition-all hover:scale-105 hover:bg-mint-accent hover:text-white hover:border-mint-accent"
-                            >
-                              {toolName}
-                            </span>
-                          ))}
+                          {category.allTools.map((toolName, idx) => {
+                            const tool = [...toolsData.productivity.tools, ...toolsData.content.tools, ...toolsData.design.tools, ...toolsData.marketing.tools, ...toolsData.operations.tools].find(t => t.name === toolName);
+                            return (
+                              <span
+                                key={idx}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (tool) {
+                                    window.open(tool.url, '_blank');
+                                  }
+                                }}
+                                className="font-ui cursor-pointer rounded-full border border-mint-accent/30 bg-soft-mint dark:bg-mint-accent/10 px-2.5 py-1 text-xs font-medium text-forest-green dark:text-mint-accent transition-all hover:scale-105 hover:bg-mint-accent hover:text-white hover:border-mint-accent"
+                              >
+                                {toolName}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
 
