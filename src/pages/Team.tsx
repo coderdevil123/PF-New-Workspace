@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Users, Mail, MessageSquare, Phone, X } from 'lucide-react';
+import { ArrowLeft, Users, Mail, MessageSquare, Phone, X, Circle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent } from '../components/ui/dialog';

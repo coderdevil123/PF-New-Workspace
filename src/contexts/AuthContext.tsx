@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   name: string;
@@ -18,30 +18,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem('userProfile');
-    const authToken = localStorage.getItem('authToken');
-    
-    if (storedUser && authToken) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const isAuthenticated = !!user;
 
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
+
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('userProfile', JSON.stringify(userData));
+    // Update profile data in localStorage
+    const currentProfile = localStorage.getItem('profileData');
+    if (currentProfile) {
+      const profile = JSON.parse(currentProfile);
+      const updatedProfile = {
+        ...profile,
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone || profile.phone,
+        location: userData.location || profile.location,
+      };
+      localStorage.setItem('profileData', JSON.stringify(updatedProfile));
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('authToken');
   };
 
   return (
