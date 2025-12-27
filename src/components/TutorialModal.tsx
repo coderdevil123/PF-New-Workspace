@@ -26,24 +26,28 @@ const getTutorialVideo = (toolId: string): string => {
     vaultwarden: 'KLwmCfGN7e0',
     librechat: 'pNIOs1ovsXw',
     // Content
-    opencut: 'dQw4w9WgXcQ',
-    languagetool: 'dQw4w9WgXcQ',
-    pulse: 'dQw4w9WgXcQ',
-    opensign: 'dQw4w9WgXcQ',
+    opencut: '9CYK2fuTuFM',
+    languagetool: 'thZQPrn2wZ8',
+    pulse: '',
+    opensign: 'GY_OP697EiU',
     // Design
     penpot: 'To9lZhP7084',
-    adobecreative: 'z5TCSAsKK_Y',
+    'adobe-creative': 'z5TCSAsKK_Y',
+    'canva-pro': 'ivFqEuo2-eE',
+    freepik: 'Mhd_UqZAAFk',
+    flaticon: '16CdIEfItwM',
+    affinity: 'lTeperbIZBc',
     // Marketing
-    twentycrm: 'dQw4w9WgXcQ',
+    twentycrm: 'vPm8glMIkI8',
     'odoo-marketing': '_sI-HH1C8XQ',
-    superset: 'Yg6WGWRHfhE',
+    superset: '4G5xqGMCpgg',
     // Operations
-    ollama: 'Hh_yr_3YZkQ',
+    ollama: 'UtSSMs6ObqY',
     supabase: 'dU7GwCOgvNY',
     nifi: 'fblkgr1PJ0o',
     airbyte: 'Rcpt5SVsMpk',
     n8n: 'RpjQTGKm-ok',
-    'odoo-erp': 'Yg6WGWRHfhE',
+    'odoo-erp': 'pSZaXjFrgBE',
   };
   return videos[toolId] || 'dQw4w9WgXcQ';
 };
