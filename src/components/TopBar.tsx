@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, User, LogOut, Settings, Users } from 'lucide-react';
+import { Search, Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/button';
 import {
   DropdownMenu,
@@ -19,9 +20,11 @@ interface TopBarProps {
 
 export default function TopBar({ onMenuClick }: TopBarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, logout } = useAuth();
+  const { theme, setTheme, effectiveTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -31,6 +34,41 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     });
     navigate('/workspace');
   };
+
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    setTheme(newTheme);
+    toast({
+      title: 'Theme updated',
+      description: `Theme changed to ${newTheme}.`,
+    });
+  };
+
+  // Get unread announcements from localStorage
+  const getUnreadCount = () => {
+    const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+    const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
+    return announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
+  };
+
+  const getLatestAnnouncements = () => {
+    const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+    const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
+    return announcements
+      .filter((a: any) => !readAnnouncements.includes(a.id))
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 3);
+  };
+
+  const unreadCount = getUnreadCount();
+  const latestAnnouncements = getLatestAnnouncements();
+
+  const themeIcons = {
+    light: Sun,
+    dark: Moon,
+    system: Monitor,
+  };
+
+  const ThemeIcon = themeIcons[theme];
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-white dark:bg-dark-bg px-6 shadow-sm">
@@ -66,6 +104,44 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <Search className="h-5 w-5" strokeWidth={1.5} />
         </Button>
 
+        {/* Theme Toggle Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+            >
+              <ThemeIcon className="h-5 w-5" strokeWidth={1.5} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40 bg-popover text-popover-foreground">
+            <DropdownMenuLabel className="text-popover-foreground">Theme</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => handleThemeChange('light')}
+              className={`cursor-pointer ${theme === 'light' ? 'bg-accent' : ''}`}
+            >
+              <Sun className="mr-2 h-4 w-4" />
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleThemeChange('dark')}
+              className={`cursor-pointer ${theme === 'dark' ? 'bg-accent' : ''}`}
+            >
+              <Moon className="mr-2 h-4 w-4" />
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleThemeChange('system')}
+              className={`cursor-pointer ${theme === 'system' ? 'bg-accent' : ''}`}
+            >
+              <Monitor className="mr-2 h-4 w-4" />
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <Button
           onClick={() => navigate('/team')}
           variant="ghost"
@@ -75,15 +151,86 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <Users className="h-5 w-5" strokeWidth={1.5} />
         </Button>
 
-        <Button
-          onClick={() => navigate('/announcements')}
-          variant="ghost"
-          size="sm"
-          className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-        >
-          <Bell className="h-5 w-5" strokeWidth={1.5} />
-          <span className="absolute right-1 top-1 h-2 w-2 animate-pulse rounded-full bg-mint-accent"></span>
-        </Button>
+        {/* Notifications with Preview */}
+        <DropdownMenu open={notificationOpen} onOpenChange={setNotificationOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+            >
+              <Bell className="h-5 w-5" strokeWidth={1.5} />
+              {unreadCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-mint-accent text-xs font-bold text-white shadow-lg">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 bg-popover text-popover-foreground">
+            <DropdownMenuLabel className="flex items-center justify-between text-popover-foreground">
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="rounded-full bg-mint-accent/20 px-2 py-0.5 text-xs font-semibold text-mint-accent">
+                  {unreadCount} new
+                </span>
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {latestAnnouncements.length > 0 ? (
+              <>
+                {latestAnnouncements.map((announcement: any) => (
+                  <DropdownMenuItem 
+                    key={announcement.id}
+                    onClick={() => navigate('/announcements')}
+                    className="cursor-pointer flex-col items-start gap-1 p-3 hover:bg-accent"
+                  >
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <p className="font-semibold text-sm text-popover-foreground line-clamp-1">
+                        {announcement.title}
+                      </p>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(announcement.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {announcement.content}
+                    </p>
+                    <span className={`mt-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                      announcement.category === 'Tool Update' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300' :
+                      announcement.category === 'Holiday' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' :
+                      announcement.category === 'Company Update' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' :
+                      'bg-gray-100 text-gray-700 dark:bg-gray-500/20 dark:text-gray-300'
+                    }`}>
+                      {announcement.category}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => navigate('/announcements')}
+                  className="cursor-pointer justify-center text-mint-accent hover:bg-accent"
+                >
+                  View all announcements
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <>
+                <div className="p-8 text-center">
+                  <Bell className="mx-auto mb-2 h-8 w-8 text-muted-foreground opacity-50" />
+                  <p className="text-sm text-muted-foreground">No new notifications</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => navigate('/announcements')}
+                  className="cursor-pointer justify-center text-mint-accent hover:bg-accent"
+                >
+                  View all announcements
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

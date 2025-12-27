@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Bell, Calendar, User, Pin, TrendingUp, Plus, X, Users as UsersIcon } from 'lucide-react';
+import { ArrowLeft, Bell, Calendar, User, Pin, TrendingUp, Plus, X, Users as UsersIcon, Trash2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -53,9 +53,18 @@ export default function Announcements() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [filter, setFilter] = useState<string>('all');
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [userRole] = useState<'admin' | 'user'>('admin'); // Simulated role
+  const [userRole] = useState<'admin' | 'user'>('admin');
+  
+  const [announcements, setAnnouncements] = useState(() => {
+    const saved = localStorage.getItem('announcements');
+    return saved ? JSON.parse(saved) : initialAnnouncements;
+  });
+
+  const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
+    const saved = localStorage.getItem('readAnnouncements');
+    return saved ? JSON.parse(saved) : [];
+  });
   
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
@@ -70,11 +79,26 @@ export default function Announcements() {
     document.title = 'Announcements | Pristine Forests';
   }, []);
 
-  const filteredAnnouncements = filter === 'all' 
-    ? announcements 
-    : announcements.filter(a => a.category === filter);
+  useEffect(() => {
+    localStorage.setItem('announcements', JSON.stringify(announcements));
+  }, [announcements]);
 
-  const categories = ['all', ...Array.from(new Set(announcements.map(a => a.category)))];
+  useEffect(() => {
+    localStorage.setItem('readAnnouncements', JSON.stringify(readAnnouncements));
+  }, [readAnnouncements]);
+
+  // Sort announcements: pinned first, then by date
+  const sortedAnnouncements = [...announcements].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
+  const filteredAnnouncements = filter === 'all' 
+    ? sortedAnnouncements 
+    : sortedAnnouncements.filter((a: any) => a.category === filter);
+
+  const categories = ['all', ...Array.from(new Set(announcements.map((a: any) => a.category)))];
 
   const categoryColors: Record<string, string> = {
     'Tool Update': 'from-purple-500 to-pink-500',
@@ -104,7 +128,7 @@ export default function Announcements() {
     }
 
     const announcement = {
-      id: announcements.length + 1,
+      id: Date.now(),
       title: newAnnouncement.title,
       author: user?.name || 'Anonymous',
       date: new Date().toISOString().split('T')[0],
@@ -126,9 +150,46 @@ export default function Announcements() {
       taggedUsers: [],
     });
 
+    // Show notification toast
+    const recipientText = announcement.recipients === 'all' 
+      ? 'all team members' 
+      : `${announcement.taggedUsers.length} tagged user${announcement.taggedUsers.length > 1 ? 's' : ''}`;
+
     toast({
       title: 'Announcement Created',
-      description: 'Your announcement has been published successfully.',
+      description: `Your announcement has been sent to ${recipientText}.`,
+    });
+  };
+
+  const handleDeleteAnnouncement = (id: number) => {
+    setAnnouncements(announcements.filter((a: any) => a.id !== id));
+    setReadAnnouncements(readAnnouncements.filter((readId: number) => readId !== id));
+    toast({
+      title: 'Announcement Deleted',
+      description: 'The announcement has been removed.',
+    });
+  };
+
+  const handleMarkAsRead = (id: number) => {
+    if (!readAnnouncements.includes(id)) {
+      setReadAnnouncements([...readAnnouncements, id]);
+      toast({
+        title: 'Marked as read',
+        description: 'Announcement marked as read.',
+      });
+    }
+  };
+
+  const handleTogglePin = (id: number) => {
+    setAnnouncements(announcements.map((a: any) => 
+      a.id === id ? { ...a, isPinned: !a.isPinned } : a
+    ));
+    const announcement = announcements.find((a: any) => a.id === id);
+    toast({
+      title: announcement?.isPinned ? 'Unpinned' : 'Pinned',
+      description: announcement?.isPinned 
+        ? 'Announcement unpinned successfully.' 
+        : 'Announcement pinned to top.',
     });
   };
 
@@ -153,26 +214,26 @@ export default function Announcements() {
         </div>
 
         <div className="relative mx-auto max-w-5xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Button
                 onClick={() => navigate('/workspace')}
                 variant="ghost"
                 className="group -ml-3 rounded-lg text-white/90 transition-all hover:bg-white/10 hover:text-white animate-slide-down"
               >
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Back
+                <span className="hidden sm:inline">Back</span>
               </Button>
               
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
-                  <Bell className="h-7 w-7 text-white" />
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
+                  <Bell className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                 </div>
                 <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  <h1 className="font-display mb-1 text-4xl font-normal text-white">
+                  <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
                     Announcements
                   </h1>
-                  <p className="font-sans text-lg text-white/80">
+                  <p className="font-sans text-sm sm:text-lg text-white/80">
                     Stay updated with the latest news
                   </p>
                 </div>
@@ -181,11 +242,12 @@ export default function Announcements() {
 
             <Button
               onClick={() => setCreateModalOpen(true)}
-              className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90 animate-slide-up"
+              className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90 animate-slide-up whitespace-nowrap"
               style={{ animationDelay: '0.2s' }}
             >
-              <Plus className="mr-2 h-5 w-5" />
-              Create Announcement
+              <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Create Announcement</span>
+              <span className="sm:hidden">Create</span>
             </Button>
           </div>
         </div>
@@ -215,63 +277,112 @@ export default function Announcements() {
       {/* Announcements List */}
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-5xl space-y-6">
-          {filteredAnnouncements.map((announcement, index) => (
-            <div
-              key={announcement.id}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-dark-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className={`h-2 bg-gradient-to-r ${announcement.color}`} />
+          {filteredAnnouncements.map((announcement: any, index: number) => {
+            const isRead = readAnnouncements.includes(announcement.id);
+            
+            return (
+              <div
+                key={announcement.id}
+                className={`group relative overflow-hidden rounded-2xl border bg-white dark:bg-dark-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover animate-slide-up ${
+                  isRead ? 'border-border opacity-60' : 'border-mint-accent/30'
+                }`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className={`h-2 bg-gradient-to-r ${announcement.color}`} />
 
-              <div className="p-8">
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-3">
-                      {announcement.isPinned && (
-                        <div className="flex items-center gap-1 rounded-full bg-mint-accent/10 border border-mint-accent/30 px-3 py-1 text-xs font-medium text-mint-accent">
-                          <Pin className="h-3 w-3" />
-                          Pinned
-                        </div>
-                      )}
-                      <span className={`rounded-full bg-gradient-to-r ${announcement.color} px-3 py-1 text-xs font-medium text-white`}>
-                        {announcement.category}
-                      </span>
-                      {announcement.recipients !== 'all' && (
-                        <div className="flex items-center gap-1 rounded-full bg-soft-mint dark:bg-mint-accent/20 px-3 py-1 text-xs font-medium text-forest-green dark:text-mint-accent">
-                          <UsersIcon className="h-3 w-3" />
-                          Tagged
-                        </div>
-                      )}
+                <div className="p-8">
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="mb-2 flex items-center gap-3">
+                        {announcement.isPinned && (
+                          <div className="flex items-center gap-1 rounded-full bg-mint-accent/10 border border-mint-accent/30 px-3 py-1 text-xs font-medium text-mint-accent">
+                            <Pin className="h-3 w-3" />
+                            Pinned
+                          </div>
+                        )}
+                        <span className={`rounded-full bg-gradient-to-r ${announcement.color} px-3 py-1 text-xs font-medium text-white`}>
+                          {announcement.category}
+                        </span>
+                        {announcement.recipients !== 'all' && (
+                          <div className="flex items-center gap-1 rounded-full bg-soft-mint dark:bg-mint-accent/20 px-3 py-1 text-xs font-medium text-forest-green dark:text-mint-accent">
+                            <UsersIcon className="h-3 w-3" />
+                            Tagged
+                          </div>
+                        )}
+                        {isRead && (
+                          <div className="flex items-center gap-1 rounded-full bg-green-100 dark:bg-green-500/20 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-300">
+                            <Check className="h-3 w-3" />
+                            Read
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="font-display mb-2 text-2xl font-normal text-heading-dark dark:text-dark-text transition-colors group-hover:text-forest-green dark:group-hover:text-mint-accent">
+                        {announcement.title}
+                      </h3>
                     </div>
-                    <h3 className="font-display mb-2 text-2xl font-normal text-heading-dark dark:text-dark-text transition-colors group-hover:text-forest-green dark:group-hover:text-mint-accent">
-                      {announcement.title}
-                    </h3>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleTogglePin(announcement.id)}
+                        variant="ghost"
+                        size="sm"
+                        className={`h-8 w-8 rounded-lg p-0 transition-colors ${
+                          announcement.isPinned 
+                            ? 'text-mint-accent hover:bg-mint-accent/10' 
+                            : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }`}
+                        title={announcement.isPinned ? 'Unpin' : 'Pin to top'}
+                      >
+                        <Pin className="h-4 w-4" />
+                      </Button>
+                      {!isRead && (
+                        <Button
+                          onClick={() => handleMarkAsRead(announcement.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 rounded-lg p-0 text-green-600 hover:bg-green-100 dark:hover:bg-green-500/20"
+                          title="Mark as read"
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => handleDeleteAnnouncement(announcement.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 rounded-lg p-0 text-destructive hover:bg-destructive/10"
+                        title="Delete announcement"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <p className="font-sans mb-6 leading-relaxed text-body-text dark:text-dark-text-secondary">
+                    {announcement.content}
+                  </p>
+
+                  <div className="flex items-center gap-6 text-sm text-muted-text dark:text-dark-muted">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span>{announcement.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(announcement.date).toLocaleDateString('en-US', { 
+                        month: 'long', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}</span>
+                    </div>
                   </div>
                 </div>
 
-                <p className="font-sans mb-6 leading-relaxed text-body-text dark:text-dark-text-secondary">
-                  {announcement.content}
-                </p>
-
-                <div className="flex items-center gap-6 text-sm text-muted-text dark:text-dark-muted">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{announcement.author}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>{new Date(announcement.date).toLocaleDateString('en-US', { 
-                      month: 'long', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}</span>
-                  </div>
-                </div>
+                <div className={`absolute inset-0 bg-gradient-to-r ${announcement.color} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
               </div>
-
-              <div className={`absolute inset-0 bg-gradient-to-r ${announcement.color} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -281,8 +392,8 @@ export default function Announcements() {
           <div className="grid gap-6 sm:grid-cols-3">
             {[
               { icon: Bell, label: 'Total Announcements', value: announcements.length, color: 'from-blue-500 to-cyan-500' },
-              { icon: Pin, label: 'Pinned', value: announcements.filter(a => a.isPinned).length, color: 'from-purple-500 to-pink-500' },
-              { icon: TrendingUp, label: 'This Month', value: announcements.filter(a => new Date(a.date).getMonth() === new Date().getMonth()).length, color: 'from-green-500 to-emerald-500' },
+              { icon: Pin, label: 'Pinned', value: announcements.filter((a: any) => a.isPinned).length, color: 'from-purple-500 to-pink-500' },
+              { icon: TrendingUp, label: 'Unread', value: announcements.length - readAnnouncements.length, color: 'from-green-500 to-emerald-500' },
             ].map((stat, index) => {
               const Icon = stat.icon;
               return (
