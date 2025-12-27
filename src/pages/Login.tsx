@@ -35,17 +35,10 @@ export default function Login() {
 
   const handleSocialLogin = (provider: string) => {
     if (provider === 'Google') {
-      // Google OAuth configuration
-      const clientId = 'YOUR_GOOGLE_CLIENT_ID'; // Replace with your actual Google Client ID
-      const redirectUri = 'https://pf-workspace.vercel.app/oauth/success';
-      const scope = 'email profile';
-      
-      // Construct Google OAuth URL
-      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}`;
-      
-      // Redirect to Google OAuth
-      window.location.href = googleAuthUrl;
-      return;
+    // Redirect to YOUR BACKEND, not Google
+    window.location.href =
+      'https://backend-for-testing-9h8v.onrender.com/auth/google';
+    return;
     }
 
     // Simulate social login for other providers
