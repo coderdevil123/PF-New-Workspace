@@ -379,7 +379,7 @@ export default function Announcements() {
                   </div>
                 </div>
 
-                <div className={`absolute inset-0 bg-gradient-to-r ${announcement.color} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
+                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${announcement.color} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
               </div>
             );
           })}
