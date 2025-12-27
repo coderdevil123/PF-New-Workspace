@@ -20,11 +20,11 @@ const getTutorialVideo = (toolId: string): string => {
     // Productivity
     nextcloud: 'Ro4V4cvIi4M',
     mattermost: 'FuDvrkrqRzg',
-    focalboard: 'YMdLXw7zHHM',
-    docmost: 'dQw4w9WgXcQ',
-    karakeep: 'dQw4w9WgXcQ',
-    vaultwarden: 'SQZM_W-KYvU',
-    librechat: 'dQw4w9WgXcQ',
+    focalboard: 'v6hG91_WvhY',
+    docmost: 'm8xizxoluCs',
+    karakeep: 'CVHpcJVwpcY',
+    vaultwarden: 'KLwmCfGN7e0',
+    librechat: 'pNIOs1ovsXw',
     // Content
     opencut: 'dQw4w9WgXcQ',
     languagetool: 'dQw4w9WgXcQ',
