@@ -178,7 +178,7 @@ export const toolsData = {
         tutorialVideo: 'YMdLXw7zHHM',
       },
       {
-        id: 'adobecreative',
+        id: 'adobe-creative',
         name: 'Adobe Creative Suite',
         description: 'Complete suite of creative applications for design professionals',
         url: 'https://www.adobe.com/creativecloud.html',

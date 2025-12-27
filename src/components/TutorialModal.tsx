@@ -35,7 +35,7 @@ const getTutorialVideo = (toolId: string): string => {
     adobecreative: 'z5TCSAsKK_Y',
     // Marketing
     twentycrm: 'dQw4w9WgXcQ',
-    'odoo-marketing': 'Yg6WGWRHfhE',
+    'odoo-marketing': '_sI-HH1C8XQ',
     superset: 'Yg6WGWRHfhE',
     // Operations
     ollama: 'Hh_yr_3YZkQ',
