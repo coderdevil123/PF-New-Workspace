@@ -32,7 +32,7 @@ const getTutorialVideo = (toolId: string): string => {
     opensign: 'dQw4w9WgXcQ',
     // Design
     penpot: 'To9lZhP7084',
-    'adobe-creative': 'z5TCSAsKK_Y',
+    adobecreative: 'z5TCSAsKK_Y',
     // Marketing
     twentycrm: 'dQw4w9WgXcQ',
     'odoo-marketing': 'Yg6WGWRHfhE',
