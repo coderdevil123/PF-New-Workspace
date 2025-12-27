@@ -32,7 +32,7 @@ const getTutorialVideo = (toolId: string): string => {
     opensign: 'GY_OP697EiU',
     // Design
     penpot: 'To9lZhP7084',
-    'adobe-creative': 'z5TCSAsKK_Y',
+    'adobe-creative': 'f2K1jmjj5pM',
     'canva-pro': 'ivFqEuo2-eE',
     freepik: 'Mhd_UqZAAFk',
     flaticon: '16CdIEfItwM',

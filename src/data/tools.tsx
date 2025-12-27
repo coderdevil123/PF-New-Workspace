@@ -188,7 +188,7 @@ export const toolsData = {
         imageDark: 'https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxrnN1XxpyhjxfzopzwjJ02cuEjAzioaZGpU35vwQQWbjhMeDmNvujkyJvY96ZoJngmjDbwy2W7YTa8_TKxJj4fA-&format=source',
         rating: 4.9,
         users: 150,
-        tutorialVideo: 'z5TCSAsKK_Y',
+        tutorialVideo: 'dQw4w9WgXcQ',
       },
       {
         id: 'canva-pro',
