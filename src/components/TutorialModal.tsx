@@ -31,7 +31,8 @@ const getTutorialVideo = (toolId: string): string => {
     pulse: 'dQw4w9WgXcQ',
     opensign: 'dQw4w9WgXcQ',
     // Design
-    penpot: 'YMdLXw7zHHM',
+    penpot: 'To9lZhP7084',
+    'adobe-creative': 'z5TCSAsKK_Y',
     // Marketing
     twentycrm: 'dQw4w9WgXcQ',
     'odoo-marketing': 'Yg6WGWRHfhE',
