@@ -9,41 +9,66 @@ export default function OAuthSuccess() {
   const { toast } = useToast();
 
   useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
 
-  if (!token) {
-    toast({
-      title: 'Authentication Failed',
-      description: 'No token received',
-      variant: 'destructive',
-    });
-    navigate('/login');
-    return;
-  }
+    if (accessToken) {
+      fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then(res => res.json())
+        .then(userData => {
+          localStorage.setItem('authToken', accessToken);
+          
+          // Store complete user data
+          const userProfile = {
+            name: userData.name || userData.given_name || userData.email.split('@')[0],
+            email: userData.email,
+            phone: userData.phone || '+1 (555) 123-4567',
+            location: userData.location || 'San Francisco, CA',
+            picture: userData.picture, // Google profile picture
+          };
+          
+          // Store user profile in localStorage for persistence
+          localStorage.setItem('userProfile', JSON.stringify(userProfile));
 
-  // Save JWT
-  localStorage.setItem('authToken', token);
+          login(userProfile);
 
-  // OPTIONAL: decode JWT later if needed
-  login({
-    name: 'Google User',
-    email: 'user@gmail.com',
-    phone: '',
-    location: '',
-  });
+          toast({
+            title: 'Welcome!',
+            description: `You have successfully logged in as ${userProfile.name}.`,
+          });
 
-  toast({
-    title: 'Welcome!',
-    description: 'Logged in successfully with Google',
-  });
-
-  navigate('/workspace');
-}, []);
+          navigate('/workspace');
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+          toast({
+            title: 'Authentication Failed',
+            description: 'Unable to fetch user data. Please try again.',
+            variant: 'destructive',
+          });
+          navigate('/login');
+        });
+    } else {
+      toast({
+        title: 'Authentication Failed',
+        description: 'No access token found. Please try again.',
+        variant: 'destructive',
+      });
+      navigate('/login');
+    }
+  }, [login, navigate, toast]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p>Completing authentication...</p>
+      <div className="text-center">
+        <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+        <p className="text-gray-600">Completing authentication...</p>
+      </div>
     </div>
   );
 }

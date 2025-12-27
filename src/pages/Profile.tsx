@@ -137,6 +137,15 @@ export default function Profile() {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Profile</h1>
+        <p>Please log in to view your profile.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
       {/* Header */}
