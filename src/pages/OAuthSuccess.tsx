@@ -12,33 +12,38 @@ export default function OAuthSuccess() {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
 
-  if (token) {
-    localStorage.setItem('authToken', token);
-
-    login({
-      name: 'Google User',
-      email: 'google-user',
-      phone: '',
-      location: '',
-    });
-
+  if (!token) {
     toast({
-      title: 'Welcome!',
-      description: 'Logged in with Google',
+      title: 'Authentication Failed',
+      description: 'No token received',
+      variant: 'destructive',
     });
-
-    navigate('/workspace');
-  } else {
     navigate('/login');
+    return;
   }
+
+  // Save JWT
+  localStorage.setItem('authToken', token);
+
+  // OPTIONAL: decode JWT later if needed
+  login({
+    name: 'Google User',
+    email: 'user@gmail.com',
+    phone: '',
+    location: '',
+  });
+
+  toast({
+    title: 'Welcome!',
+    description: 'Logged in successfully with Google',
+  });
+
+  navigate('/workspace');
 }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-        <p className="text-gray-600">Completing authentication...</p>
-      </div>
+      <p>Completing authentication...</p>
     </div>
   );
 }
