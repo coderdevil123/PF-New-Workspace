@@ -18,7 +18,7 @@ interface TutorialModalProps {
 const getTutorialVideo = (toolId: string): string => {
   const videos: Record<string, string> = {
     // Productivity
-    nextcloud: 'Rb9flAoRGQo',
+    nextcloud: 'Ro4V4cvIi4M',
     mattermost: 'FuDvrkrqRzg',
     focalboard: 'YMdLXw7zHHM',
     docmost: 'dQw4w9WgXcQ',
