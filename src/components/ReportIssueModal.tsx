@@ -13,6 +13,7 @@ import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { Upload, X } from 'lucide-react';
 
+
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
@@ -39,11 +40,15 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
     formState: { errors },
     reset,
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      priority: 'medium',
-    },
-  });
+  resolver: zodResolver(formSchema),
+  defaultValues: {
+    name: '',
+    email: '',
+    priority: 'medium',
+    title: '',
+    description: '',
+  },
+});
 
   const onSubmit = async (data: FormData) => {
   try {
