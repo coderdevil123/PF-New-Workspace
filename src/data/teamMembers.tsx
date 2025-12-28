@@ -35,7 +35,7 @@ export const teamMembers = [
     phone: '+1 (555) 200-0001',
     mattermost: '@chayan',
     bio: 'Leading the technology team with expertise in full-stack development and system architecture. Passionate about building scalable and efficient solutions.',
-    image: 'src/logo/chayan_roy.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/chayan_roy.jpg',
     order: 3,
   },
   {
@@ -47,7 +47,7 @@ export const teamMembers = [
     phone: '+1 (555) 200-0002',
     mattermost: '@yogita',
     bio: 'Strategic marketing leader specializing in content creation and social media engagement. Driving brand awareness and customer engagement initiatives.',
-    image: 'src/logo/Yogita Nagpal.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Yogita.jpg',
     order: 4,
   },
   {
@@ -59,7 +59,7 @@ export const teamMembers = [
     phone: '+1 (555) 200-0003',
     mattermost: '@dhruvik',
     bio: 'Creative design professional with expertise in visual communication and brand identity. Crafting beautiful and functional design solutions.',
-    image: 'src/logo/Dhruvik Bamniya.jpeg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Dhruvik.jpeg',
     order: 5,
   },
   {
@@ -97,7 +97,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0002',
     mattermost: '@seema',
     bio: 'Enthusiastic marketing intern with a focus on social media and brand communication. Bringing fresh perspectives to marketing campaigns.',
-    image: 'src/logo/Seema Samanta .jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Seema.jpg',
     order: 8,
   },
   {
@@ -121,7 +121,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0004',
     mattermost: '@shivapriya',
     bio: 'Creative marketing intern with expertise in content strategy and audience engagement. Passionate about storytelling.',
-    image: 'src/logo/Shivapriya.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Shivapriya.jpg',
     order: 10,
   },
   {
@@ -133,7 +133,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0005',
     mattermost: '@sameera',
     bio: 'Marketing intern focused on digital campaigns and customer engagement. Bringing innovative ideas to the team.',
-    image: 'src/logo/Sameera Parveen.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Sameera.jpg',
     order: 11,
   },
 
@@ -147,7 +147,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0006',
     mattermost: '@ginish',
     bio: 'Tech intern with strong programming skills and enthusiasm for learning new technologies. Contributing to development projects.',
-    image: 'src/logo/Ginish Garg.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Ginish.jpg',
     order: 12,
   },
   {
@@ -171,7 +171,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0008',
     mattermost: '@aditya',
     bio: 'Technology intern passionate about backend development and database systems. Eager to build robust applications.',
-    image: 'src/logo/Aditya_Raj.jpeg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Aditya_Raj.jpeg',
     order: 14,
   },
   {
@@ -183,7 +183,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0009',
     mattermost: '@ayush',
     bio: 'Tech intern specializing in frontend development and user interface design. Creating engaging user experiences.',
-    image: 'src/logo/Ayush_Anand.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Ayush_Anand.jpg',
     order: 15,
   },
   {
@@ -195,7 +195,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0010',
     mattermost: '@shubhang',
     bio: 'Software development intern with interest in cloud technologies and DevOps practices. Building scalable solutions.',
-    image: 'src/logo/Shubhang.jpeg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Shubhang.jpeg',
     order: 16,
   },
   {
@@ -219,7 +219,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0012',
     mattermost: '@esha',
     bio: 'Technology intern with expertise in data analysis and machine learning. Exploring AI-driven solutions.',
-    image: 'src/logo/Esha_Joshi.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Esha_Joshi.jpg',
     order: 18,
   },
 
@@ -257,7 +257,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0015',
     mattermost: '@aakarshi',
     bio: 'Design intern with focus on brand identity and graphic design. Bringing fresh creative perspectives to projects.',
-    image: 'src/logo/aakarshi.bhawsar.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/aakarshi.jpg',
     order: 21,
   },
   {
@@ -281,7 +281,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0016',
     mattermost: '@anika',
     bio: 'Design intern specializing in motion graphics and interactive design. Creating engaging visual experiences.',
-    image: 'src/logo/Anika_Kuruvathy.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Anika_Kuruvathy.jpg',
     order: 23,
   },
   {
@@ -293,7 +293,7 @@ export const teamMembers = [
     phone: '+1 (555) 300-0015',
     mattermost: '@vedikavani',
     bio: 'Design intern with focus on brand identity and graphic design. Bringing fresh creative perspectives to projects.',
-    image: 'src/logo/Vedikavani .jpeg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Vedikavani%20.jpeg',
     order: 24,
   },
 ];
