@@ -13,6 +13,13 @@ import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { Upload, X } from 'lucide-react';
 
+type ReportIssueForm = {
+  name: string;
+  email: string;
+  title: string;
+  description: string;
+  priority: string;
+};
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -40,17 +47,17 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
     formState: { errors },
     reset,
   } = useForm<FormData>({
-  resolver: zodResolver(formSchema),
-  defaultValues: {
-    name: '',
-    email: '',
-    priority: 'medium',
-    title: '',
-    description: '',
-  },
-});
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      priority: 'medium',
+      title: '',
+      description: '',
+    },
+  });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: ReportIssueForm) => {
   try {
     const formData = new FormData();
 
@@ -84,6 +91,7 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
     setUploadedFile(null);
     onOpenChange(false);
   } catch (err) {
+    console.error(err);
     toast({
       title: 'Submission Failed',
       description: 'Please try again later.',
@@ -91,6 +99,7 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
     });
   }
 };
+
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
