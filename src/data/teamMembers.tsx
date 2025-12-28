@@ -9,7 +9,7 @@ export const teamMembers = [
     phone: '+1 (555) 100-0001',
     mattermost: '@rohan',
     bio: 'Visionary entrepreneur with a passion for building innovative workspace solutions. Leading Pristine Forests with a focus on empowering teams through integrated technology.',
-    image: '/team/Rohan.jpg',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Rohan.jpg',
     order: 1,
   },
   {
