@@ -12,8 +12,6 @@ import {
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { Upload, X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-const { user } = useAuth();
 
 
 const formSchema = z.object({
@@ -44,8 +42,8 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
   } = useForm<FormData>({
   resolver: zodResolver(formSchema),
   defaultValues: {
-    name: user?.name || '',
-    email: user?.email || '',
+    name: '',
+    email: '',
     priority: 'medium',
     title: '',
     description: '',
