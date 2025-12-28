@@ -45,16 +45,48 @@ export default function ReportIssueModal({ open, onOpenChange, tool }: ReportIss
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log('Issue reported:', { tool: tool?.name, ...data, file: uploadedFile?.name });
+  const onSubmit = async (data: FormData) => {
+  try {
+    const formData = new FormData();
+
+    formData.append('tool', tool?.name || 'Unknown');
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('priority', data.priority);
+
+    if (uploadedFile) {
+      formData.append('file', uploadedFile);
+    }
+
+    const res = await fetch(
+      'https://backend-for-testing-9h8v.onrender.com/api/report-issue',
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!res.ok) throw new Error('Failed');
+
     toast({
       title: 'Issue Reported Successfully',
-      description: 'Our team will review your issue and get back to you soon.',
+      description: 'Our team has been notified via email.',
     });
+
     reset();
     setUploadedFile(null);
     onOpenChange(false);
-  };
+  } catch (err) {
+    toast({
+      title: 'Submission Failed',
+      description: 'Please try again later.',
+      variant: 'destructive',
+    });
+  }
+};
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
