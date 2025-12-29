@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
   google_id: string;
@@ -10,36 +10,33 @@ interface User {
   role?: 'admin' | 'user';
 }
 
-
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (jwtToken: string) => void;
+  login: (userData: User) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-const [token, setToken] = useState<string | null>(
-  () => localStorage.getItem('authToken')
-);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const isAuthenticated = !!user;
 
-  const login = (jwtToken: string) => {
-  localStorage.setItem('authToken', jwtToken);
-  setToken(jwtToken);
-};
-
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
 
   const logout = () => {
-  localStorage.removeItem('authToken');
-  setUser(null);
-  setToken(null);
-};
-
+    setUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+  };
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
@@ -50,19 +47,8 @@ const [token, setToken] = useState<string | null>(
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
-//     </AuthContext.Provider>
-//   );
-// }
-
-// export function useAuth() {
-//   const context = useContext(AuthContext);
-//   if (context === undefined) {
-//     throw new Error('useAuth must be used within an AuthProvider');
-//   }
-//   return context;
-// }
