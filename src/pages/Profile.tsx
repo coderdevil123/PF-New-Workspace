@@ -1,499 +1,513 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { useToast } from '../hooks/use-toast';
-import { useAuth } from '../contexts/AuthContext';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../components/ui/dialog';
-import { supabase } from '../lib/supabase';
+// import { useEffect, useState } from 'react';
+// import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X } from 'lucide-react';
+// import { useNavigate, useLocation } from 'react-router-dom';
+// import { Button } from '../components/ui/button';
+// import { useToast } from '../hooks/use-toast';
+// import { useAuth } from '../contexts/AuthContext';
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+// } from '../components/ui/dialog';
+// import { supabase } from '../lib/supabase';
 
+
+// export default function Profile() {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { toast } = useToast();
+//   const { user } = useAuth();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+//   const [showDialog, setShowDialog] = useState(false);
+
+//   const [profileData, setProfileData] = useState<any>(null);
+//   const [editData, setEditData] = useState<any>(null);
+
+//   useEffect(() => {
+//     window.scrollTo(0, 0);
+//     document.title = 'Profile | Pristine Forests';
+//   }, []);
+
+//   // Handle browser back/forward and link clicks
+//   useEffect(() => {
+//     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+//       if (hasUnsavedChanges) {
+//         e.preventDefault();
+//         e.returnValue = '';
+//       }
+//     };
+
+//     window.addEventListener('beforeunload', handleBeforeUnload);
+//     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+//   }, [hasUnsavedChanges]);
+
+//   // Intercept navigation attempts
+//   useEffect(() => {
+//     const handleClick = (e: MouseEvent) => {
+//       if (!hasUnsavedChanges) return;
+      
+//       const target = e.target as HTMLElement;
+//       const link = target.closest('a');
+      
+//       if (link && link.href && !link.href.includes(location.pathname)) {
+//         e.preventDefault();
+//         setShowDialog(true);
+//       }
+//     };
+
+//     document.addEventListener('click', handleClick, true);
+//     return () => document.removeEventListener('click', handleClick, true);
+//   }, [hasUnsavedChanges, location.pathname]);
+
+//   useEffect(() => {
+//   const loadProfile = async () => {
+//     if (!user?.email) return;
+
+//     // 1️⃣ Fetch by EMAIL (always exists)
+//     const { data, error } = await supabase
+//       .from('profiles')
+//       .select('*')
+//       .eq('email', user.email)
+//       .maybeSingle(); // 👈 IMPORTANT (no crash)
+
+//     if (error) {
+//       console.error('Profile fetch error:', error);
+//       return;
+//     }
+
+//     if (!data) {
+//       console.warn('No profile found');
+//       return;
+//     }
+
+//     // 2️⃣ If google_id missing, PATCH it
+//     if (!data.google_id && user.google_id) {
+//       await supabase
+//         .from('profiles')
+//         .update({ google_id: user.google_id })
+//         .eq('email', user.email);
+//     }
+
+//     const mappedProfile = {
+//       name: data.name,
+//       email: data.email,
+//       phone: data.phone || '',
+//       location: data.location || '',
+//       bio: data.bio || '',
+//       avatar: data.avatar_url || '',
+//     };
+
+//     setProfileData(mappedProfile);
+//     setEditData(mappedProfile);
+//   };
+
+//   loadProfile();
+// }, [user]);
+
+
+// if (!profileData || !editData) {
+//   return (
+//     <div className="flex items-center justify-center min-h-screen text-gray-400">
+//       Loading profile...
+//     </div>
+//   );
+// }
+
+//   useEffect(() => {
+//     const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
+//     setHasUnsavedChanges(isDifferent && isEditing);
+//   }, [editData, profileData, isEditing]);
+
+//   const handleSave = async () => {
+//   if (!user?.google_id) return;
+
+//   const { error } = await supabase
+//     .from('profiles')
+//     .update({
+//       name: editData.name,
+//       phone: editData.phone,
+//       location: editData.location,
+//       bio: editData.bio,
+//       avatar_url: editData.avatar,
+//     })
+//     .eq('google_id', user.google_id);
+
+//   if (error) {
+//     toast({
+//       title: 'Update failed',
+//       description: error.message,
+//       variant: 'destructive',
+//     });
+//     return;
+//   }
+
+//   setProfileData(editData);
+//   setIsEditing(false);
+//   setHasUnsavedChanges(false);
+
+//   toast({
+//     title: 'Profile updated',
+//     description: 'Your profile has been successfully updated.',
+//   });
+// };
+
+
+//   const handleCancel = () => {
+//     setEditData(profileData);
+//     setIsEditing(false);
+//     setHasUnsavedChanges(false);
+//   };
+
+//   const handleSaveAndNavigate = () => {
+//     handleSave();
+//     setShowDialog(false);
+//   };
+
+//   const handleDiscardAndNavigate = () => {
+//     setEditData(profileData);
+//     setIsEditing(false);
+//     setHasUnsavedChanges(false);
+//     setShowDialog(false);
+//   };
+
+//   const handleCancelNavigation = () => {
+//     setShowDialog(false);
+//   };
+
+//   const handleNavigateAway = () => {
+//     if (hasUnsavedChanges) {
+//       setShowDialog(true);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-full bg-white dark:bg-dark-bg">
+//       {/* Header */}
+//       <section className="relative overflow-hidden bg-forest-gradient px-6 py-8 lg:px-12">
+//         {/* Subtle Pattern Overlay */}
+//         <div className="absolute inset-0 opacity-10">
+//           <div className="absolute inset-0" style={{
+//             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+//             backgroundSize: '60px 60px',
+//           }} />
+//         </div>
+
+//         <div className="relative mx-auto max-w-4xl">
+//           <Button
+//             onClick={() => {
+//               if (hasUnsavedChanges) {
+//                 setShowDialog(true);
+//               } else {
+//                 navigate('/workspace');
+//               }
+//             }}
+//             variant="ghost"
+//             className="group mb-6 -ml-3 rounded-lg text-white/90 transition-all hover:bg-white/10 hover:text-white animate-slide-down"
+//           >
+//             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+//             Back to Dashboard
+//           </Button>
+          
+//           <div className="flex items-center justify-between">
+//             <div>
+//               <h1 className="font-display mb-2 text-4xl font-normal text-white animate-slide-up">
+//                 My Profile
+//               </h1>
+//               <p className="font-sans text-lg text-white/80 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+//                 Manage your account information and preferences
+//               </p>
+//             </div>
+            
+//             {!isEditing ? (
+//               <Button
+//                 onClick={() => setIsEditing(true)}
+//                 className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90 animate-slide-up"
+//                 style={{ animationDelay: '0.2s' }}
+//               >
+//                 <Edit3 className="mr-2 h-4 w-4" />
+//                 Edit Profile
+//               </Button>
+//             ) : (
+//               <div className="flex gap-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+//                 <Button
+//                   onClick={handleCancel}
+//                   variant="outline"
+//                   className="rounded-full border-2 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50"
+//                 >
+//                   <X className="mr-2 h-4 w-4" />
+//                   Cancel
+//                 </Button>
+//                 <Button
+//                   onClick={handleSave}
+//                   className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90"
+//                 >
+//                   <Save className="mr-2 h-4 w-4" />
+//                   Save Changes
+//                 </Button>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Profile Content */}
+//       <section className="px-6 py-12 lg:px-12">
+//         <div className="mx-auto max-w-4xl">
+//           <div className="grid gap-8 lg:grid-cols-3">
+//             {/* Profile Card */}
+//             <div className="lg:col-span-1">
+//               <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up">
+//                 <div className="text-center">
+//                   {/* Avatar */}
+//                   <div className="relative mx-auto mb-6 h-32 w-32">
+//                     {profileData.avatar ? (
+//                       <img
+//                         src={profileData.avatar}
+//                         alt={profileData.name}
+//                         className="h-full w-full rounded-full object-cover shadow-lg"
+//                       />
+//                     ) : (
+//                       <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent text-4xl font-bold text-white shadow-lg">
+//                         {profileData.name.split(' ').map((n: string) => n[0]).join('')}
+//                       </div>
+//                     )}
+//                     {isEditing && (
+//                       <>
+//                         <input
+//                           type="file"
+//                           accept="image/*"
+//                           id="avatar-upload"
+//                           className="hidden"
+//                           onChange={(e) => {
+//                             const file = e.target.files?.[0];
+//                             if (file) {
+//                               const reader = new FileReader();
+//                               reader.onloadend = () => {
+//                                 setEditData({ ...editData, avatar: reader.result as string });
+//                               };
+//                               reader.readAsDataURL(file);
+//                             }
+//                           }}
+//                         />
+//                         <label
+//                           htmlFor="avatar-upload"
+//                           className="absolute bottom-2 right-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:scale-110"
+//                         >
+//                           <Camera className="h-5 w-5 text-gray-600" />
+//                         </label>
+//                       </>
+//                     )}
+//                   </div>
+
+//                   <h2 className="font-display mb-2 text-2xl font-normal text-heading-dark dark:text-dark-text">
+//                     {profileData.name}
+//                   </h2>
+//                   <p className="font-ui mb-1 text-mint-accent font-medium">
+//                     {profileData.role}
+//                   </p>
+//                   <p className="font-sans text-body-text dark:text-dark-muted">
+//                     {profileData.department}
+//                   </p>
+//                 </div>
+
+//                 {/* Quick Stats */}
+//                 <div className="mt-8 space-y-4 border-t border-border pt-6">
+//                   <div className="flex items-center gap-3 text-sm">
+//                     <Calendar className="h-4 w-4 text-muted-text" />
+//                     <span className="text-body-text">Joined {profileData.joinDate}</span>
+//                   </div>
+//                   <div className="flex items-center gap-3 text-sm">
+//                     <MapPin className="h-4 w-4 text-muted-text" />
+//                     <span className="text-body-text">{profileData.location}</span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* Profile Details */}
+//             <div className="lg:col-span-2">
+//               <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
+//                 <h3 className="font-display mb-6 text-xl font-normal text-heading-dark dark:text-dark-text">
+//                   Profile Information
+//                 </h3>
+
+//                 <div className="space-y-6">
+//                   {/* Name */}
+//                   <div>
+//                     <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+//                       Full Name
+//                     </label>
+//                     {isEditing ? (
+//                       <input
+//                         type="text"
+//                         value={editData.name}
+//                         onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+//                         className="w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 py-3 text-heading-dark dark:text-dark-text transition-all focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+//                       />
+//                     ) : (
+//                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 py-3">
+//                         <User className="h-5 w-5 text-muted-text dark:text-dark-muted" />
+//                         <span className="text-heading-dark dark:text-dark-text">{profileData.name}</span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   {/* Email */}
+//                   <div>
+//                     <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+//                       Email Address
+//                     </label>
+//                     {isEditing ? (
+//                       <input
+//                         type="email"
+//                         value={profileData.email}
+//                         disabled
+//                         className="opacity-60 cursor-not-allowed"
+//                       />
+//                     ) : (
+//                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
+//                         <Mail className="h-5 w-5 text-muted-text" />
+//                         <span className="text-heading-dark">{profileData.email}</span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   {/* Phone */}
+//                   <div>
+//                     <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+//                       Phone Number
+//                     </label>
+//                     {isEditing ? (
+//                       <input
+//                         type="tel"
+//                         value={editData.phone}
+//                         onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+//                         className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+//                       />
+//                     ) : (
+//                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
+//                         <Phone className="h-5 w-5 text-muted-text" />
+//                         <span className="text-heading-dark">{profileData.phone}</span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   {/* Location */}
+//                   <div>
+//                     <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+//                       Location
+//                     </label>
+//                     {isEditing ? (
+//                       <input
+//                         type="text"
+//                         value={editData.location}
+//                         onChange={(e) => setEditData({ ...editData, location: e.target.value })}
+//                         className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+//                       />
+//                     ) : (
+//                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
+//                         <MapPin className="h-5 w-5 text-muted-text" />
+//                         <span className="text-heading-dark">{profileData.location}</span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   {/* Bio */}
+//                   <div>
+//                     <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+//                       Bio
+//                     </label>
+//                     {isEditing ? (
+//                       <textarea
+//                         value={editData.bio}
+//                         onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
+//                         rows={4}
+//                         className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+//                       />
+//                     ) : (
+//                       <div className="rounded-lg border border-border bg-light-gray px-4 py-3">
+//                         <p className="text-heading-dark leading-relaxed">{profileData.bio}</p>
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+
+//               {/* Activity Stats */}
+//               <div className="mt-8 grid gap-6 sm:grid-cols-3">
+//                 {[
+//                   { label: 'Tools Used', value: '24' },
+//                   { label: 'Projects', value: '12' },
+//                   { label: 'Team Size', value: '8' },
+//                 ].map((stat, index) => (
+//                   <div
+//                     key={index}
+//                     className="rounded-xl border border-border bg-white dark:bg-dark-card p-6 text-center shadow-card transition-all hover:shadow-card-hover animate-slide-up"
+//                     style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+//                   >
+//                     <div className="mx-auto mb-3 h-12 w-12 rounded-lg bg-soft-mint dark:bg-mint-accent/20 flex items-center justify-center text-forest-green dark:text-mint-accent font-bold text-lg">
+//                       {stat.value}
+//                     </div>
+//                     <p className="font-ui text-sm font-medium text-body-text dark:text-dark-muted">{stat.label}</p>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Unsaved Changes Dialog */}
+//       <Dialog open={showDialog} onOpenChange={setShowDialog}>
+//         <DialogContent className="bg-popover text-popover-foreground">
+//           <DialogHeader>
+//             <DialogTitle>Unsaved Changes</DialogTitle>
+//             <DialogDescription className="text-muted-foreground">
+//               You have unsaved changes. Do you want to save them before leaving?
+//             </DialogDescription>
+//           </DialogHeader>
+//           <DialogFooter className="gap-2 sm:gap-0">
+//             <Button
+//               variant="outline"
+//               onClick={handleCancelNavigation}
+//               className="border-gray-300"
+//             >
+//               Cancel
+//             </Button>
+//             <Button
+//               variant="outline"
+//               onClick={handleDiscardAndNavigate}
+//               className="border-gray-300 text-destructive hover:bg-destructive/10"
+//             >
+//               Discard Changes
+//             </Button>
+//             <Button
+//               onClick={handleSaveAndNavigate}
+//               className="bg-primary text-primary-foreground hover:bg-primary/90"
+//             >
+//               Save Changes
+//             </Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+//     </div>
+//   );
+// }
+
+import { useEffect } from 'react';
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-
-  const [profileData, setProfileData] = useState<any>(null);
-  const [editData, setEditData] = useState<any>(null);
-  
   useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = 'Profile | Pristine Forests';
+    console.log('Profile mounted');
   }, []);
 
-  // Handle browser back/forward and link clicks
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
-
-  // Intercept navigation attempts
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (!hasUnsavedChanges) return;
-      
-      const target = e.target as HTMLElement;
-      const link = target.closest('a');
-      
-      if (link && link.href && !link.href.includes(location.pathname)) {
-        e.preventDefault();
-        setShowDialog(true);
-      }
-    };
-
-    document.addEventListener('click', handleClick, true);
-    return () => document.removeEventListener('click', handleClick, true);
-  }, [hasUnsavedChanges, location.pathname]);
-
-  useEffect(() => {
-  const loadProfile = async () => {
-    if (!user?.email) return;
-
-    // 1️⃣ Fetch by EMAIL (always exists)
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('email', user.email)
-      .maybeSingle(); // 👈 IMPORTANT (no crash)
-
-    if (error) {
-      console.error('Profile fetch error:', error);
-      return;
-    }
-
-    if (!data) {
-      console.warn('No profile found');
-      return;
-    }
-
-    // 2️⃣ If google_id missing, PATCH it
-    if (!data.google_id && user.google_id) {
-      await supabase
-        .from('profiles')
-        .update({ google_id: user.google_id })
-        .eq('email', user.email);
-    }
-
-    const mappedProfile = {
-      name: data.name,
-      email: data.email,
-      phone: data.phone || '',
-      location: data.location || '',
-      bio: data.bio || '',
-      avatar: data.avatar_url || '',
-    };
-
-    setProfileData(mappedProfile);
-    setEditData(mappedProfile);
-  };
-
-  loadProfile();
-}, [user]);
-
-
-if (!profileData || !editData) {
   return (
-    <div className="flex items-center justify-center min-h-screen text-gray-400">
-      Loading profile...
-    </div>
-  );
-}
-
-  useEffect(() => {
-    const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
-    setHasUnsavedChanges(isDifferent && isEditing);
-  }, [editData, profileData, isEditing]);
-
-  const handleSave = async () => {
-  if (!user?.google_id) return;
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      name: editData.name,
-      phone: editData.phone,
-      location: editData.location,
-      bio: editData.bio,
-      avatar_url: editData.avatar,
-    })
-    .eq('google_id', user.google_id);
-
-  if (error) {
-    toast({
-      title: 'Update failed',
-      description: error.message,
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  setProfileData(editData);
-  setIsEditing(false);
-  setHasUnsavedChanges(false);
-
-  toast({
-    title: 'Profile updated',
-    description: 'Your profile has been successfully updated.',
-  });
-};
-
-
-  const handleCancel = () => {
-    setEditData(profileData);
-    setIsEditing(false);
-    setHasUnsavedChanges(false);
-  };
-
-  const handleSaveAndNavigate = () => {
-    handleSave();
-    setShowDialog(false);
-  };
-
-  const handleDiscardAndNavigate = () => {
-    setEditData(profileData);
-    setIsEditing(false);
-    setHasUnsavedChanges(false);
-    setShowDialog(false);
-  };
-
-  const handleCancelNavigation = () => {
-    setShowDialog(false);
-  };
-
-  const handleNavigateAway = () => {
-    if (hasUnsavedChanges) {
-      setShowDialog(true);
-    }
-  };
-
-  return (
-    <div className="min-h-full bg-white dark:bg-dark-bg">
-      {/* Header */}
-      <section className="relative overflow-hidden bg-forest-gradient px-6 py-8 lg:px-12">
-        {/* Subtle Pattern Overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px',
-          }} />
-        </div>
-
-        <div className="relative mx-auto max-w-4xl">
-          <Button
-            onClick={() => {
-              if (hasUnsavedChanges) {
-                setShowDialog(true);
-              } else {
-                navigate('/workspace');
-              }
-            }}
-            variant="ghost"
-            className="group mb-6 -ml-3 rounded-lg text-white/90 transition-all hover:bg-white/10 hover:text-white animate-slide-down"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back to Dashboard
-          </Button>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-display mb-2 text-4xl font-normal text-white animate-slide-up">
-                My Profile
-              </h1>
-              <p className="font-sans text-lg text-white/80 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                Manage your account information and preferences
-              </p>
-            </div>
-            
-            {!isEditing ? (
-              <Button
-                onClick={() => setIsEditing(true)}
-                className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90 animate-slide-up"
-                style={{ animationDelay: '0.2s' }}
-              >
-                <Edit3 className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Button>
-            ) : (
-              <div className="flex gap-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className="rounded-full border-2 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50"
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  className="rounded-full bg-mint-accent text-forest-dark font-semibold shadow-lg shadow-mint hover:bg-mint-accent/90"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Changes
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Profile Content */}
-      <section className="px-6 py-12 lg:px-12">
-        <div className="mx-auto max-w-4xl">
-          <div className="grid gap-8 lg:grid-cols-3">
-            {/* Profile Card */}
-            <div className="lg:col-span-1">
-              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up">
-                <div className="text-center">
-                  {/* Avatar */}
-                  <div className="relative mx-auto mb-6 h-32 w-32">
-                    {profileData.avatar ? (
-                      <img
-                        src={profileData.avatar}
-                        alt={profileData.name}
-                        className="h-full w-full rounded-full object-cover shadow-lg"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent text-4xl font-bold text-white shadow-lg">
-                        {profileData.name.split(' ').map((n: string) => n[0]).join('')}
-                      </div>
-                    )}
-                    {isEditing && (
-                      <>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          id="avatar-upload"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setEditData({ ...editData, avatar: reader.result as string });
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor="avatar-upload"
-                          className="absolute bottom-2 right-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:scale-110"
-                        >
-                          <Camera className="h-5 w-5 text-gray-600" />
-                        </label>
-                      </>
-                    )}
-                  </div>
-
-                  <h2 className="font-display mb-2 text-2xl font-normal text-heading-dark dark:text-dark-text">
-                    {profileData.name}
-                  </h2>
-                  <p className="font-ui mb-1 text-mint-accent font-medium">
-                    {profileData.role}
-                  </p>
-                  <p className="font-sans text-body-text dark:text-dark-muted">
-                    {profileData.department}
-                  </p>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="mt-8 space-y-4 border-t border-border pt-6">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-text" />
-                    <span className="text-body-text">Joined {profileData.joinDate}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-text" />
-                    <span className="text-body-text">{profileData.location}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Profile Details */}
-            <div className="lg:col-span-2">
-              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <h3 className="font-display mb-6 text-xl font-normal text-heading-dark dark:text-dark-text">
-                  Profile Information
-                </h3>
-
-                <div className="space-y-6">
-                  {/* Name */}
-                  <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Full Name
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editData.name}
-                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                        className="w-full rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 py-3 text-heading-dark dark:text-dark-text transition-all focus:border-mint-accent focus:bg-white dark:focus:bg-dark-card focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray dark:bg-dark-hover px-4 py-3">
-                        <User className="h-5 w-5 text-muted-text dark:text-dark-muted" />
-                        <span className="text-heading-dark dark:text-dark-text">{profileData.name}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Email Address
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        value={profileData.email}
-                        disabled
-                        className="opacity-60 cursor-not-allowed"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
-                        <Mail className="h-5 w-5 text-muted-text" />
-                        <span className="text-heading-dark">{profileData.email}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Phone Number
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={editData.phone}
-                        onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                        className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
-                        <Phone className="h-5 w-5 text-muted-text" />
-                        <span className="text-heading-dark">{profileData.phone}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Location */}
-                  <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Location
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editData.location}
-                        onChange={(e) => setEditData({ ...editData, location: e.target.value })}
-                        className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
-                        <MapPin className="h-5 w-5 text-muted-text" />
-                        <span className="text-heading-dark">{profileData.location}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Bio */}
-                  <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Bio
-                    </label>
-                    {isEditing ? (
-                      <textarea
-                        value={editData.bio}
-                        onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
-                        rows={4}
-                        className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-                      />
-                    ) : (
-                      <div className="rounded-lg border border-border bg-light-gray px-4 py-3">
-                        <p className="text-heading-dark leading-relaxed">{profileData.bio}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Activity Stats */}
-              <div className="mt-8 grid gap-6 sm:grid-cols-3">
-                {[
-                  { label: 'Tools Used', value: '24' },
-                  { label: 'Projects', value: '12' },
-                  { label: 'Team Size', value: '8' },
-                ].map((stat, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl border border-border bg-white dark:bg-dark-card p-6 text-center shadow-card transition-all hover:shadow-card-hover animate-slide-up"
-                    style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-                  >
-                    <div className="mx-auto mb-3 h-12 w-12 rounded-lg bg-soft-mint dark:bg-mint-accent/20 flex items-center justify-center text-forest-green dark:text-mint-accent font-bold text-lg">
-                      {stat.value}
-                    </div>
-                    <p className="font-ui text-sm font-medium text-body-text dark:text-dark-muted">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Unsaved Changes Dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-popover text-popover-foreground">
-          <DialogHeader>
-            <DialogTitle>Unsaved Changes</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              You have unsaved changes. Do you want to save them before leaving?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              onClick={handleCancelNavigation}
-              className="border-gray-300"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDiscardAndNavigate}
-              className="border-gray-300 text-destructive hover:bg-destructive/10"
-            >
-              Discard Changes
-            </Button>
-            <Button
-              onClick={handleSaveAndNavigate}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+    <div style={{ padding: 40, color: 'white' }}>
+      PROFILE PAGE WORKING
     </div>
   );
 }
