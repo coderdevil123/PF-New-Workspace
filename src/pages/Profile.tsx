@@ -26,7 +26,11 @@ export default function Profile() {
 
   const [profileData, setProfileData] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
-
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = 'Profile | Pristine Forests';
+  }, []);
 
   // Handle browser back/forward and link clicks
   useEffect(() => {
@@ -112,10 +116,6 @@ if (!profileData || !editData) {
     </div>
   );
 }
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.title = 'Profile | Pristine Forests';
-  }, []);
 
   useEffect(() => {
     const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
