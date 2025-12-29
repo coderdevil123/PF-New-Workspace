@@ -12,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
+import { supabase } from '../lib/supabase';
+
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -74,19 +76,43 @@ export default function Profile() {
   }, [hasUnsavedChanges, location.pathname]);
 
   useEffect(() => {
-    if (user) {
-      const updatedData = {
-        ...profileData,
-        name: user.name,
-        email: user.email,
-        phone: user.phone || profileData.phone,
-        location: user.location || profileData.location,
-      };
-      setProfileData(updatedData);
-      setEditData(updatedData);
-      localStorage.setItem('profileData', JSON.stringify(updatedData));
+  const loadProfile = async () => {
+    if (!user?.email) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', user.email)
+      .single();
+
+    if (error) {
+      console.error('Profile fetch error:', error);
+      return;
     }
-  }, [user]);
+
+    if (data) {
+      const mappedProfile = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || '',
+        location: data.location || '',
+        bio: data.bio || '',
+        avatar: data.avatar_url || '',
+        joinDate: 'January 2023',
+        department: 'Engineering',
+        role: 'Member',
+      };
+
+      setProfileData(mappedProfile);
+      setEditData(mappedProfile);
+
+      // optional
+      localStorage.setItem('profileData', JSON.stringify(mappedProfile));
+    }
+  };
+
+  loadProfile();
+}, [user]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
