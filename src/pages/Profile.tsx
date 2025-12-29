@@ -95,6 +95,14 @@ export default function Profile() {
   loadProfile();
 }, [user]);
 
+
+if (!profileData || !editData) {
+  return (
+    <div className="flex items-center justify-center min-h-screen text-gray-400">
+      Loading profile...
+    </div>
+  );
+}
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = 'Profile | Pristine Forests';
