@@ -24,25 +24,9 @@ export default function Profile() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
-  const [profileData, setProfileData] = useState(() => {
-    const saved = localStorage.getItem('profileData');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    return {
-      name: user?.name || 'John Doe',
-      email: user?.email || 'john.doe@pristineforests.com',
-      phone: user?.phone || '+1 (555) 123-4567',
-      location: user?.location || 'San Francisco, CA',
-      joinDate: 'January 2023',
-      department: 'Engineering',
-      role: 'Senior Developer',
-      bio: 'Passionate software engineer with 5+ years of experience in building scalable web applications. Love working with modern technologies and contributing to open source projects.',
-      avatar: '',
-    };
-  });
+  const [profileData, setProfileData] = useState<any>(null);
+  const [editData, setEditData] = useState<any>(null);
 
-  const [editData, setEditData] = useState(profileData);
 
   // Handle browser back/forward and link clicks
   useEffect(() => {
@@ -105,9 +89,6 @@ export default function Profile() {
 
       setProfileData(mappedProfile);
       setEditData(mappedProfile);
-
-      // optional
-      localStorage.setItem('profileData', JSON.stringify(mappedProfile));
     }
   };
 

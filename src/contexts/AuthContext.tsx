@@ -36,19 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (userData: User) => {
     setUser(userData);
-    // Update profile data in localStorage
-    const currentProfile = localStorage.getItem('profileData');
-    if (currentProfile) {
-      const profile = JSON.parse(currentProfile);
-      const updatedProfile = {
-        ...profile,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone || profile.phone,
-        location: userData.location || profile.location,
-      };
-      localStorage.setItem('profileData', JSON.stringify(updatedProfile));
-    }
   };
 
   const logout = () => {
