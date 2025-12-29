@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
@@ -14,24 +14,24 @@ export default function Login() {
     password: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
     
-    // Simulate login
-    login({
-      name: formData.email.split('@')[0],
-      email: formData.email,
-      phone: '+1 (555) 123-4567',
-      location: 'San Francisco, CA',
-    });
+  //   // Simulate login
+  //   login({
+  //     name: formData.email.split('@')[0],
+  //     email: formData.email,
+  //     phone: '+1 (555) 123-4567',
+  //     location: 'San Francisco, CA',
+  //   });
 
-    toast({
-      title: 'Welcome back!',
-      description: 'You have successfully logged in.',
-    });
+  //   toast({
+  //     title: 'Welcome back!',
+  //     description: 'You have successfully logged in.',
+  //   });
 
-    navigate('/workspace');
-  };
+  //   navigate('/workspace');
+  // };
 
   const handleSocialLogin = (provider: string) => {
     if (provider === 'Google') {
@@ -42,12 +42,12 @@ export default function Login() {
     }
 
     // Simulate social login for other providers
-    login({
-      name: `User from ${provider}`,
-      email: `user@${provider.toLowerCase()}.com`,
-      phone: '+1 (555) 123-4567',
-      location: 'San Francisco, CA',
-    });
+    // login({
+    //   name: `User from ${provider}`,
+    //   email: `user@${provider.toLowerCase()}.com`,
+    //   phone: '+1 (555) 123-4567',
+    //   location: 'San Francisco, CA',
+    // });
 
     toast({
       title: 'Welcome!',
@@ -56,6 +56,11 @@ export default function Login() {
 
     navigate('/workspace');
   };
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <div className="flex min-h-full items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-50 px-6 py-12">

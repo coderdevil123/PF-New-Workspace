@@ -25,13 +25,8 @@ export default function OAuthSuccess() {
   // Save JWT
   localStorage.setItem('authToken', token);
 
-  // OPTIONAL: decode JWT later if needed
-  login({
-    name: 'Google User',
-    email: 'user@gmail.com',
-    phone: '',
-    location: '',
-  });
+  // Login with token
+  login(token);
 
   toast({
     title: 'Welcome!',

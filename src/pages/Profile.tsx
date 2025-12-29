@@ -61,12 +61,12 @@ export default function Profile() {
 
   useEffect(() => {
   const loadProfile = async () => {
-    if (!user?.email) return;
+    if (!user?.google_id) return;
 
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('email', user.email)
+      .eq('google_id', user.google_id)
       .single();
 
     if (error) {
@@ -76,16 +76,13 @@ export default function Profile() {
 
     if (data) {
       const mappedProfile = {
-        name: data.name,
-        email: data.email,
-        phone: data.phone || '',
-        location: data.location || '',
-        bio: data.bio || '',
-        avatar: data.avatar_url || '',
-        joinDate: 'January 2023',
-        department: 'Engineering',
-        role: 'Member',
-      };
+      name: data.name,
+      email: data.email,
+      phone: data.phone || '',
+      location: data.location || '',
+      bio: data.bio || '',
+      avatar: data.avatar_url || '',
+    };
 
       setProfileData(mappedProfile);
       setEditData(mappedProfile);
@@ -113,16 +110,39 @@ if (!profileData || !editData) {
     setHasUnsavedChanges(isDifferent && isEditing);
   }, [editData, profileData, isEditing]);
 
-  const handleSave = () => {
-    setProfileData(editData);
-    localStorage.setItem('profileData', JSON.stringify(editData));
-    setIsEditing(false);
-    setHasUnsavedChanges(false);
+  const handleSave = async () => {
+  if (!user?.google_id) return;
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      name: editData.name,
+      phone: editData.phone,
+      location: editData.location,
+      bio: editData.bio,
+      avatar_url: editData.avatar,
+    })
+    .eq('google_id', user.google_id);
+
+  if (error) {
     toast({
-      title: 'Profile updated',
-      description: 'Your profile has been successfully updated.',
+      title: 'Update failed',
+      description: error.message,
+      variant: 'destructive',
     });
-  };
+    return;
+  }
+
+  setProfileData(editData);
+  setIsEditing(false);
+  setHasUnsavedChanges(false);
+
+  toast({
+    title: 'Profile updated',
+    description: 'Your profile has been successfully updated.',
+  });
+};
+
 
   const handleCancel = () => {
     setEditData(profileData);
@@ -332,9 +352,9 @@ if (!profileData || !editData) {
                     {isEditing ? (
                       <input
                         type="email"
-                        value={editData.email}
-                        onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                        className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                        value={profileData.email}
+                        disabled
+                        className="opacity-60 cursor-not-allowed"
                       />
                     ) : (
                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">

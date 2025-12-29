@@ -1,46 +1,45 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
+  google_id: string;
   name: string;
   email: string;
+  avatar_url?: string;
   phone?: string;
   location?: string;
-  avatar?: string;
   role?: 'admin' | 'user';
 }
+
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (userData: User) => void;
+  login: (jwtToken: string) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+const [token, setToken] = useState<string | null>(
+  () => localStorage.getItem('authToken')
+);
 
   const isAuthenticated = !!user;
 
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
+  const login = (jwtToken: string) => {
+  localStorage.setItem('authToken', jwtToken);
+  setToken(jwtToken);
+};
 
-  const login = (userData: User) => {
-    setUser(userData);
-  };
 
   const logout = () => {
-    setUser(null);
-  };
+  localStorage.removeItem('authToken');
+  setUser(null);
+  setToken(null);
+};
+
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
