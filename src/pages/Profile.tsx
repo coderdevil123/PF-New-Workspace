@@ -61,21 +61,34 @@ export default function Profile() {
 
   useEffect(() => {
   const loadProfile = async () => {
-    if (!user?.google_id) return;
+    if (!user?.email) return;
 
+    // 1️⃣ Fetch by EMAIL (always exists)
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('google_id', user.google_id)
-      .single();
+      .eq('email', user.email)
+      .maybeSingle(); // 👈 IMPORTANT (no crash)
 
     if (error) {
       console.error('Profile fetch error:', error);
       return;
     }
 
-    if (data) {
-      const mappedProfile = {
+    if (!data) {
+      console.warn('No profile found');
+      return;
+    }
+
+    // 2️⃣ If google_id missing, PATCH it
+    if (!data.google_id && user.google_id) {
+      await supabase
+        .from('profiles')
+        .update({ google_id: user.google_id })
+        .eq('email', user.email);
+    }
+
+    const mappedProfile = {
       name: data.name,
       email: data.email,
       phone: data.phone || '',
@@ -84,9 +97,8 @@ export default function Profile() {
       avatar: data.avatar_url || '',
     };
 
-      setProfileData(mappedProfile);
-      setEditData(mappedProfile);
-    }
+    setProfileData(mappedProfile);
+    setEditData(mappedProfile);
   };
 
   loadProfile();
