@@ -109,7 +109,7 @@ export const toolsData = {
         id: 'opencut',
         name: 'OpenCut',
         description: 'Video editing and media cutting tool',
-        url: 'https://opencut.org',
+        url: 'https://opencut.pristineforests.com/',
         category: 'content',
         image: 'https://opencut.app/open-graph/default.jpg',
         imageLight: 'https://opencut.app/open-graph/default.jpg',
