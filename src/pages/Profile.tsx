@@ -114,19 +114,18 @@ export default function Profile() {
   loadProfile();
 }, [user]);
 
+  useEffect(() => {
+    const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
+    setHasUnsavedChanges(isDifferent && isEditing);
+  }, [editData, profileData, isEditing]);
 
-if (!profileData || !editData) {
+  if (!profileData || !editData) {
   return (
     <div className="flex items-center justify-center min-h-screen text-gray-400">
       Loading profile...
     </div>
   );
 }
-
-  useEffect(() => {
-    const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
-    setHasUnsavedChanges(isDifferent && isEditing);
-  }, [editData, profileData, isEditing]);
 
   const handleSave = async () => {
   if (!user?.google_id) return;
@@ -504,16 +503,4 @@ if (!profileData || !editData) {
   );
 }
 
-// import { useEffect } from 'react';
 
-// export default function Profile() {
-//   useEffect(() => {
-//     console.log('Profile mounted');
-//   }, []);
-
-//   return (
-//     <div style={{ padding: 40, color: 'white' }}>
-//       PROFILE PAGE WORKING
-//     </div>
-//   );
-// }
