@@ -119,13 +119,13 @@ export default function Profile() {
     setHasUnsavedChanges(isDifferent && isEditing);
   }, [editData, profileData, isEditing]);
 
-  if (!profileData || !editData) {
-  return (
-    <div className="flex items-center justify-center min-h-screen text-gray-400">
-      Loading profile...
-    </div>
-  );
-}
+//   if (!profileData || !editData) {
+//   return (
+//     <div className="flex items-center justify-center min-h-screen text-gray-400">
+//       Loading profile...
+//     </div>
+//   );
+// }
 
   const handleSave = async () => {
   if (!user?.google_id) return;
