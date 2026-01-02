@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
-
+const { user } = useAuth();
 const initialAnnouncements = [
   {
     id: 1,
@@ -115,7 +115,15 @@ export default function Announcements() {
 
   const availableCategories = userRole === 'admin' ? adminCategories : userCategories;
 
-  const teamMembers = ['John Doe', 'Sarah Johnson', 'Michael Chen', 'Emily Rodriguez', 'David Kim'];
+  const [teamMembers, setTeamMembers] = useState<
+      { name: string; email: string }[]
+    >([]);
+
+    useEffect(() => {
+      fetch('/api/team')
+        .then(res => res.json())
+        .then(data => setTeamMembers(data));
+    }, []);
 
   const handleCreateAnnouncement = () => {
     if (!newAnnouncement.title || !newAnnouncement.content) {
@@ -193,14 +201,15 @@ export default function Announcements() {
     });
   };
 
-  const toggleTaggedUser = (userName: string) => {
+  const toggleTaggedUser = (email: string) => {
     setNewAnnouncement(prev => ({
       ...prev,
-      taggedUsers: prev.taggedUsers.includes(userName)
-        ? prev.taggedUsers.filter(u => u !== userName)
-        : [...prev.taggedUsers, userName],
+      taggedUsers: prev.taggedUsers.includes(email)
+        ? prev.taggedUsers.filter(e => e !== email)
+        : [...prev.taggedUsers, email],
     }));
   };
+
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -508,15 +517,15 @@ export default function Announcements() {
                     <div className="flex flex-wrap gap-2">
                       {teamMembers.map(member => (
                         <button
-                          key={member}
-                          onClick={() => toggleTaggedUser(member)}
+                          key={member.email}
+                          onClick={() => toggleTaggedUser(member.email)}
                           className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                            newAnnouncement.taggedUsers.includes(member)
+                            newAnnouncement.taggedUsers.includes(member.email)
                               ? 'bg-mint-accent text-white'
                               : 'bg-white dark:bg-dark-card border border-border text-body-text dark:text-dark-muted hover:border-mint-accent/50'
                           }`}
                         >
-                          {member}
+                          {member.name}
                         </button>
                       ))}
                     </div>
