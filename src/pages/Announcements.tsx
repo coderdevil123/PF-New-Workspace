@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
-const { user } = useAuth();
+
 const initialAnnouncements = [
   {
     id: 1,
