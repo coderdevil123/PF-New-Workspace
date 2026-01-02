@@ -63,7 +63,14 @@ export default function Announcements() {
       if (!res.ok) throw new Error('Unauthorized');
       return res.json();
     })
-    .then(data => setAnnouncements(data))
+    .then(data => {
+      if (Array.isArray(data)) {
+        setAnnouncements(data);
+      } else {
+        console.error('Announcements API did not return array:', data);
+        setAnnouncements([]);
+      }
+    })
     .catch(err => {
       console.error('Announcement fetch error:', err);
       toast({
@@ -81,17 +88,30 @@ export default function Announcements() {
   }, [readAnnouncements]);
 
   // Sort announcements: pinned first, then by date
-  const sortedAnnouncements = [...announcements].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+  const sortedAnnouncements = Array.isArray(announcements)
+  ? [...announcements].sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return new Date(b.created_at || b.date).getTime() -
+             new Date(a.created_at || a.date).getTime();
+    })
+  : [];
 
   const filteredAnnouncements = filter === 'all' 
     ? sortedAnnouncements 
     : sortedAnnouncements.filter((a: any) => a.category === filter);
 
-  const categories = ['all', ...Array.from(new Set(announcements.map((a: any) => a.category)))];
+  const categories = [
+    'all',
+    ...Array.from(
+      new Set(
+        Array.isArray(announcements)
+          ? announcements.map((a: any) => a.category)
+          : []
+      )
+    ),
+  ];
+
 
   const categoryColors: Record<string, string> = {
     'Tool Update': 'from-purple-500 to-pink-500',
