@@ -317,35 +317,34 @@ export default function Announcements() {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => handleTogglePin(announcement.id)}
+                        onClick={handleTogglePin}
+                        disabled
                         variant="ghost"
                         size="sm"
-                        className={`h-8 w-8 rounded-lg p-0 transition-colors ${
-                          announcement.isPinned 
-                            ? 'text-mint-accent hover:bg-mint-accent/10' 
-                            : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                        }`}
-                        title={announcement.isPinned ? 'Unpin' : 'Pin to top'}
+                        className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
+                        title="Pin (Coming soon)"
                       >
                         <Pin className="h-4 w-4" />
                       </Button>
                       {!isRead && (
                         <Button
-                          onClick={() => handleMarkAsRead(announcement.id)}
+                          onClick={handleMarkAsRead}
+                          disabled
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 rounded-lg p-0 text-green-600 hover:bg-green-100 dark:hover:bg-green-500/20"
-                          title="Mark as read"
+                          className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
+                          title="Mark as read (Coming soon)"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
                       )}
                       <Button
-                        onClick={() => handleDeleteAnnouncement(announcement.id)}
+                        onClick={handleDeleteAnnouncement}
+                        disabled
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 rounded-lg p-0 text-destructive hover:bg-destructive/10"
-                        title="Delete announcement"
+                        className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
+                        title="Delete (Coming soon)"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
