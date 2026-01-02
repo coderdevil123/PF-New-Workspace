@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowLeft, Users, Mail, MessageSquare, Phone, X, Circle } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { ArrowLeft, Users, Mail, MessageSquare, Phone, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent } from '../components/ui/dialog';
@@ -8,6 +8,7 @@ import { teamMembers } from '../data/teamMembers';
 export default function Team() {
   const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<typeof teamMembers[0] | null>(null);
+  const tiltRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -123,113 +124,119 @@ export default function Team() {
 
       {/* Member Detail Modal */}
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 bg-white dark:bg-dark-card border-border">
+        <DialogContent className="max-w-3xl w-[95vw] sm:w-[90vw] max-h-[90vh] overflow-hidden p-0 bg-white dark:bg-dark-card border-border">
           {selectedMember && (
             <div className="relative">
               {/* Close Button */}
               <button
                 onClick={() => setSelectedMember(null)}
-                className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm shadow-lg transition-all hover:scale-110 hover:bg-white dark:hover:bg-dark-card"
+                className="absolute right-3 top-3 md:right-4 md:top-4 z-20 flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm shadow-lg transition-all hover:scale-110 hover:bg-white dark:hover:bg-dark-card"
               >
-                <X className="h-5 w-5 text-heading-dark dark:text-dark-text" />
+                <X className="h-4 w-4 md:h-5 md:w-5 text-heading-dark dark:text-dark-text" />
               </button>
 
-              <div className="grid md:grid-cols-5">
-                {/* Member Image - 3D Hover Effect */}
-                <div className="md:col-span-2 relative group">
-                  <div 
-                    className="relative h-64 md:h-full md:min-h-[500px] overflow-hidden bg-light-gray dark:bg-dark-hover transition-all duration-500"
-                    style={{
-                      perspective: '1000px',
-                    }}
-                  >
-                    <img
-                      src={selectedMember.image}
-                      alt={selectedMember.name}
-                      className="h-full w-full object-cover object-top transition-all duration-500 group-hover:scale-105"
+              <div className="grid grid-cols-5">
+                {/* Member Image - Left Side */}
+                <div className="col-span-2 relative group">
+                  <div
+                      ref={tiltRef}
+                      className="relative h-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] overflow-hidden bg-light-gray dark:bg-dark-hover transition-transform duration-300 ease-out"
                       style={{
+                        perspective: '1000px',
                         transformStyle: 'preserve-3d',
                       }}
                       onMouseMove={(e) => {
-                        if (window.innerWidth >= 768) {
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          const x = e.clientX - rect.left;
-                          const y = e.clientY - rect.top;
-                          const centerX = rect.width / 2;
-                          const centerY = rect.height / 2;
-                          const rotateX = (y - centerY) / 20;
-                          const rotateY = (centerX - x) / 20;
-                          e.currentTarget.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                        }
+                        if (!tiltRef.current) return;
+
+                        const rect = tiltRef.current.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width / 2;
+                        const y = e.clientY - rect.top - rect.height / 2;
+
+                        const rotateX = y / 25;
+                        const rotateY = -x / 25;
+
+                        tiltRef.current.style.transform = `
+                          rotateX(${rotateX}deg)
+                          rotateY(${rotateY}deg)
+                          scale(1.05)
+                        `;
                       }}
-                      onMouseLeave={(e) => {
-                        if (window.innerWidth >= 768) {
-                          e.currentTarget.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
-                        }
+                      onMouseLeave={() => {
+                        if (!tiltRef.current) return;
+
+                        tiltRef.current.style.transform =
+                          'rotateX(0deg) rotateY(0deg) scale(1)';
                       }}
+                    >
+
+                    <img
+                      src={selectedMember.image}
+                      alt={selectedMember.name}
+                      className="h-full w-full object-cover object-top pointer-events-none"
                     />
+
                     <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/80 via-transparent to-transparent" />
                   </div>
                 </div>
 
-                {/* Member Details */}
-                <div className="md:col-span-3 p-6 md:p-8 flex flex-col justify-center">
-                  <div className="space-y-4 md:space-y-6">
+                {/* Member Details - Right Side */}
+                <div className="col-span-3 p-4 sm:p-5 md:p-8 flex flex-col justify-center">
+                  <div className="space-y-3 sm:space-y-4 md:space-y-6">
                     <div>
-                      <h2 className="font-display mb-2 text-2xl md:text-3xl font-normal text-heading-dark dark:text-dark-text">
+                      <h2 className="font-display mb-1 sm:mb-2 text-lg sm:text-xl md:text-3xl font-normal text-heading-dark dark:text-dark-text">
                         {selectedMember.name}
                       </h2>
-                      <p className="font-ui mb-1 text-base md:text-lg font-medium text-mint-accent">
+                      <p className="font-ui mb-0.5 sm:mb-1 text-sm sm:text-base md:text-lg font-medium text-mint-accent">
                         {selectedMember.role}
                       </p>
-                      <p className="font-ui text-sm text-body-text dark:text-dark-muted">
+                      <p className="font-ui text-xs sm:text-sm text-body-text dark:text-dark-muted">
                         {selectedMember.department}
                       </p>
                     </div>
 
-                    <p className="font-sans text-sm md:text-base leading-relaxed text-body-text dark:text-dark-text-secondary">
+                    <p className="font-sans text-xs sm:text-sm md:text-base leading-relaxed text-body-text dark:text-dark-text-secondary line-clamp-4 sm:line-clamp-none">
                       {selectedMember.bio}
                     </p>
 
                     {/* Contact Information */}
-                    <div className="space-y-3 border-t border-border pt-4 md:pt-6">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
-                          <Mail className="h-5 w-5 text-forest-green dark:text-mint-accent" />
+                    <div className="space-y-2 sm:space-y-3 border-t border-border pt-3 sm:pt-4 md:pt-6">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
+                          <Mail className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5 text-forest-green dark:text-mint-accent" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-ui text-xs text-muted-text dark:text-dark-muted">Email</p>
+                          <p className="font-ui text-[10px] sm:text-xs text-muted-text dark:text-dark-muted">Email</p>
                           <a 
                             href={`mailto:${selectedMember.email}`}
-                            className="font-sans text-sm text-heading-dark dark:text-dark-text hover:text-mint-accent transition-colors truncate block"
+                            className="font-sans text-xs sm:text-sm text-heading-dark dark:text-dark-text hover:text-mint-accent transition-colors truncate block"
                           >
                             {selectedMember.email}
                           </a>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
-                          <Phone className="h-5 w-5 text-forest-green dark:text-mint-accent" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
+                          <Phone className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5 text-forest-green dark:text-mint-accent" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-ui text-xs text-muted-text dark:text-dark-muted">Phone</p>
+                          <p className="font-ui text-[10px] sm:text-xs text-muted-text dark:text-dark-muted">Phone</p>
                           <a 
                             href={`tel:${selectedMember.phone}`}
-                            className="font-sans text-sm text-heading-dark dark:text-dark-text hover:text-mint-accent transition-colors"
+                            className="font-sans text-xs sm:text-sm text-heading-dark dark:text-dark-text hover:text-mint-accent transition-colors"
                           >
                             {selectedMember.phone}
                           </a>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
-                          <MessageSquare className="h-5 w-5 text-forest-green dark:text-mint-accent" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-soft-mint dark:bg-mint-accent/20">
+                          <MessageSquare className="h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5 text-forest-green dark:text-mint-accent" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-ui text-xs text-muted-text dark:text-dark-muted">Mattermost</p>
-                          <p className="font-sans text-sm text-heading-dark dark:text-dark-text">
+                          <p className="font-ui text-[10px] sm:text-xs text-muted-text dark:text-dark-muted">Mattermost</p>
+                          <p className="font-sans text-xs sm:text-sm text-heading-dark dark:text-dark-text">
                             {selectedMember.mattermost}
                           </p>
                         </div>
@@ -239,9 +246,9 @@ export default function Team() {
                     {/* Chat Button */}
                     <Button
                       onClick={() => handleMattermostClick(selectedMember.mattermost)}
-                      className="w-full rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90"
+                      className="w-full h-9 sm:h-10 md:h-11 rounded-full bg-mint-accent text-forest-dark text-xs sm:text-sm md:text-base font-semibold hover:bg-mint-accent/90"
                     >
-                      <MessageSquare className="mr-2 h-5 w-5" />
+                      <MessageSquare className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5" />
                       Chat on Mattermost
                     </Button>
                   </div>
