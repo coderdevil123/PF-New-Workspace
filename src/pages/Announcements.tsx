@@ -13,6 +13,7 @@ import {
 } from '../components/ui/dialog';
 
 export default function Announcements() {
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -51,10 +52,17 @@ export default function Announcements() {
   }, [readAnnouncements, readKey]);
 
   useEffect(() => {
+  if (!token) return;
+
   fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
-    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error('Unauthorized');
+      return res.json();
+    })
     .then(data => setAnnouncements(data))
     .catch(err => {
       console.error('Announcement fetch error:', err);
@@ -64,7 +72,8 @@ export default function Announcements() {
         variant: 'destructive',
       });
     });
-  }, []);
+  }, [token]);
+
 
 
   useEffect(() => {
@@ -104,13 +113,21 @@ export default function Announcements() {
     >([]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
-      credentials: 'include',
+  if (!token) return;
+
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Unauthorized');
+      return res.json();
     })
-      .then(res => res.json())
-      .then(data => setTeamMembers(data))
-      .catch(err => console.error('Team fetch error:', err));
-  }, []);
+    .then(data => setTeamMembers(data))
+    .catch(err => console.error('Team fetch error:', err));
+  }, [token]);
+
 
   const handleCreateAnnouncement = () => {
     if (!newAnnouncement.title || !newAnnouncement.content) {
@@ -137,9 +154,9 @@ export default function Announcements() {
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         title: newAnnouncement.title,
@@ -149,13 +166,7 @@ export default function Announcements() {
         taggedEmails: newAnnouncement.taggedUsers,
       }),
     })
-    .then(res => res.json())
-    .then(() => {
-      // 🔄 re-fetch announcements
-      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
-        credentials: 'include',
-      });
-    })
+
     .then(res => res.json())
     .then(data => setAnnouncements(data))
     .catch(err => {
