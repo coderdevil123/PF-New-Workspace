@@ -27,6 +27,7 @@ export default function Announcements() {
     });
   };
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
   const readKey = `readAnnouncements_${user?.email}`;
 
   const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
@@ -83,13 +84,13 @@ export default function Announcements() {
 
 
 
-  useEffect(() => {
-    const storageKey = `readAnnouncements_${user?.email}`;
-  }, [readAnnouncements]);
+  // useEffect(() => {
+  //   const storageKey = `readAnnouncements_${user?.email}`;
+  // }, [readAnnouncements]);
 
   // Sort announcements: pinned first, then by date
-  const sortedAnnouncements = Array.isArray(announcements)
-  ? [...announcements].sort((a, b) => {
+  const sortedAnnouncements = Array.isArray(safeAnnouncements)
+  ? [...safeAnnouncements].sort((a, b) => {
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
       return new Date(b.created_at || b.date).getTime() -
@@ -105,8 +106,8 @@ export default function Announcements() {
     'all',
     ...Array.from(
       new Set(
-        Array.isArray(announcements)
-          ? announcements.map((a: any) => a.category)
+        Array.isArray(safeAnnouncements)
+          ? safeAnnouncements.map((a: any) => a.category)
           : []
       )
     ),
@@ -159,18 +160,18 @@ export default function Announcements() {
       return;
     }
 
-    const announcement = {
-      id: Date.now(),
-      title: newAnnouncement.title,
-      author: user?.name || 'Anonymous',
-      date: new Date().toISOString().split('T')[0],
-      category: newAnnouncement.category,
-      isPinned: false,
-      content: newAnnouncement.content,
-      color: categoryColors[newAnnouncement.category] || 'from-gray-500 to-gray-600',
-      recipients: newAnnouncement.recipients,
-      taggedUsers: newAnnouncement.taggedUsers,
-    };
+    // const announcement = {
+    //   id: Date.now(),
+    //   title: newAnnouncement.title,
+    //   author: user?.name || 'Anonymous',
+    //   date: new Date().toISOString().split('T')[0],
+    //   category: newAnnouncement.category,
+    //   isPinned: false,
+    //   content: newAnnouncement.content,
+    //   color: categoryColors[newAnnouncement.category] || 'from-gray-500 to-gray-600',
+    //   recipients: newAnnouncement.recipients,
+    //   taggedUsers: newAnnouncement.taggedUsers,
+    // };
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
       method: 'POST',
@@ -187,8 +188,41 @@ export default function Announcements() {
       }),
     })
 
+    .then(res => {
+      if (!res.ok) throw new Error('Create failed');
+      return res.json();
+    })
+    .then(() => {
+      toast({
+        title: 'Announcement Created',
+        description: 'Your announcement has been published.',
+      });
+
+      setCreateModalOpen(false);
+      setNewAnnouncement({
+        title: '',
+        category: 'Tool Update',
+        content: '',
+        recipients: 'all',
+        taggedUsers: [],
+      });
+
+      // 🔥 RE-FETCH announcements
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    })
     .then(res => res.json())
-    .then(data => setAnnouncements(data))
+    .then(data => {
+      if (Array.isArray(data)) {
+        setAnnouncements(data);
+      } else {
+        setAnnouncements([]);
+      }
+    })
+
     .catch(err => {
       console.error(err);
       toast({
@@ -199,9 +233,9 @@ export default function Announcements() {
     });
 
     // Show notification toast
-    const recipientText = announcement.recipients === 'all' 
-      ? 'all team members' 
-      : `${announcement.taggedUsers.length} tagged user${announcement.taggedUsers.length > 1 ? 's' : ''}`;
+    // const recipientText = announcement.recipients === 'all' 
+    //   ? 'all team members' 
+    //   : `${announcement.taggedUsers.length} tagged user${announcement.taggedUsers.length > 1 ? 's' : ''}`;
   };
 
   const handleDeleteAnnouncement = () => {
@@ -414,9 +448,9 @@ export default function Announcements() {
         <div className="mx-auto max-w-5xl">
           <div className="grid gap-6 sm:grid-cols-3">
             {[
-              { icon: Bell, label: 'Total Announcements', value: announcements.length, color: 'from-blue-500 to-cyan-500' },
-              { icon: Pin, label: 'Pinned', value: announcements.filter((a: any) => a.isPinned).length, color: 'from-purple-500 to-pink-500' },
-              { icon: TrendingUp, label: 'Unread', value: announcements.length - readAnnouncements.length, color: 'from-green-500 to-emerald-500' },
+              { icon: Bell, label: 'Total Announcements', value: safeAnnouncements.length, color: 'from-blue-500 to-cyan-500' },
+              { icon: Pin, label: 'Pinned', value: safeAnnouncements.filter((a: any) => a.isPinned).length, color: 'from-purple-500 to-pink-500' },
+              { icon: TrendingUp, label: 'Unread', value: safeAnnouncements.length - readAnnouncements.length, color: 'from-green-500 to-emerald-500' },
             ].map((stat, index) => {
               const Icon = stat.icon;
               return (
