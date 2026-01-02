@@ -12,42 +12,6 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 
-const initialAnnouncements = [
-  {
-    id: 1,
-    title: 'New Design Tool Added: Framer',
-    author: 'Design Team',
-    date: '2024-01-15',
-    category: 'Tool Update',
-    isPinned: true,
-    content: 'We\'re excited to announce that Framer has been added to our design tools collection. This powerful prototyping tool will help our team create more interactive and dynamic designs.',
-    color: 'from-purple-500 to-pink-500',
-    recipients: 'all',
-  },
-  {
-    id: 2,
-    title: 'Holiday Schedule - Winter Break',
-    author: 'HR Team',
-    date: '2024-01-10',
-    category: 'Holiday',
-    isPinned: true,
-    content: 'Our office will be closed from December 24th to January 2nd for the winter holidays. Emergency support will be available via email. Happy holidays to everyone!',
-    color: 'from-blue-500 to-cyan-500',
-    recipients: 'all',
-  },
-  {
-    id: 3,
-    title: 'Q1 2024 Goals and Objectives',
-    author: 'Leadership Team',
-    date: '2024-01-08',
-    category: 'Company Update',
-    isPinned: false,
-    content: 'As we kick off the new year, here are our key objectives for Q1: Expand our tool library by 20%, improve user onboarding experience, and launch the mobile app beta.',
-    color: 'from-green-500 to-emerald-500',
-    recipients: 'all',
-  },
-];
-
 export default function Announcements() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -55,14 +19,17 @@ export default function Announcements() {
   const [filter, setFilter] = useState<string>('all');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [userRole] = useState<'admin' | 'user'>('admin');
-  
-  const [announcements, setAnnouncements] = useState(() => {
-    const saved = localStorage.getItem('announcements');
-    return saved ? JSON.parse(saved) : initialAnnouncements;
-  });
+  const showDisabledToast = () => {
+    toast({
+      title: 'Currently Disabled',
+      description: 'This feature will be available soon.',
+    });
+  };
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const readKey = `readAnnouncements_${user?.email}`;
 
   const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
-    const saved = localStorage.getItem('readAnnouncements');
+    const saved = localStorage.getItem(readKey);
     return saved ? JSON.parse(saved) : [];
   });
   
@@ -80,11 +47,28 @@ export default function Announcements() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('announcements', JSON.stringify(announcements));
-  }, [announcements]);
+    localStorage.setItem(readKey, JSON.stringify(readAnnouncements));
+  }, [readAnnouncements, readKey]);
 
   useEffect(() => {
-    localStorage.setItem('readAnnouncements', JSON.stringify(readAnnouncements));
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+    credentials: 'include',
+  })
+    .then(res => res.json())
+    .then(data => setAnnouncements(data))
+    .catch(err => {
+      console.error('Announcement fetch error:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to load announcements',
+        variant: 'destructive',
+      });
+    });
+  }, []);
+
+
+  useEffect(() => {
+    const storageKey = `readAnnouncements_${user?.email}`;
   }, [readAnnouncements]);
 
   // Sort announcements: pinned first, then by date
@@ -119,11 +103,14 @@ export default function Announcements() {
       { name: string; email: string }[]
     >([]);
 
-    useEffect(() => {
-      fetch('/api/team')
-        .then(res => res.json())
-        .then(data => setTeamMembers(data));
-    }, []);
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => setTeamMembers(data))
+      .catch(err => console.error('Team fetch error:', err));
+  }, []);
 
   const handleCreateAnnouncement = () => {
     if (!newAnnouncement.title || !newAnnouncement.content) {
@@ -148,57 +135,54 @@ export default function Announcements() {
       taggedUsers: newAnnouncement.taggedUsers,
     };
 
-    setAnnouncements([announcement, ...announcements]);
-    setCreateModalOpen(false);
-    setNewAnnouncement({
-      title: '',
-      category: userRole === 'admin' ? 'Tool Update' : 'Issue',
-      content: '',
-      recipients: 'all',
-      taggedUsers: [],
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: newAnnouncement.title,
+        content: newAnnouncement.content,
+        category: newAnnouncement.category,
+        recipients: newAnnouncement.recipients,
+        taggedEmails: newAnnouncement.taggedUsers,
+      }),
+    })
+    .then(res => res.json())
+    .then(() => {
+      // 🔄 re-fetch announcements
+      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+        credentials: 'include',
+      });
+    })
+    .then(res => res.json())
+    .then(data => setAnnouncements(data))
+    .catch(err => {
+      console.error(err);
+      toast({
+        title: 'Error',
+        description: 'Failed to create announcement',
+        variant: 'destructive',
+      });
     });
 
     // Show notification toast
     const recipientText = announcement.recipients === 'all' 
       ? 'all team members' 
       : `${announcement.taggedUsers.length} tagged user${announcement.taggedUsers.length > 1 ? 's' : ''}`;
-
-    toast({
-      title: 'Announcement Created',
-      description: `Your announcement has been sent to ${recipientText}.`,
-    });
   };
 
-  const handleDeleteAnnouncement = (id: number) => {
-    setAnnouncements(announcements.filter((a: any) => a.id !== id));
-    setReadAnnouncements(readAnnouncements.filter((readId: number) => readId !== id));
-    toast({
-      title: 'Announcement Deleted',
-      description: 'The announcement has been removed.',
-    });
+  const handleDeleteAnnouncement = () => {
+    showDisabledToast();
   };
 
-  const handleMarkAsRead = (id: number) => {
-    if (!readAnnouncements.includes(id)) {
-      setReadAnnouncements([...readAnnouncements, id]);
-      toast({
-        title: 'Marked as read',
-        description: 'Announcement marked as read.',
-      });
-    }
+  const handleMarkAsRead = () => {
+    showDisabledToast();
   };
 
-  const handleTogglePin = (id: number) => {
-    setAnnouncements(announcements.map((a: any) => 
-      a.id === id ? { ...a, isPinned: !a.isPinned } : a
-    ));
-    const announcement = announcements.find((a: any) => a.id === id);
-    toast({
-      title: announcement?.isPinned ? 'Unpinned' : 'Pinned',
-      description: announcement?.isPinned 
-        ? 'Announcement unpinned successfully.' 
-        : 'Announcement pinned to top.',
-    });
+  const handleTogglePin = () => {
+    showDisabledToast();
   };
 
   const toggleTaggedUser = (email: string) => {
@@ -379,7 +363,7 @@ export default function Announcements() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      <span>{new Date(announcement.date).toLocaleDateString('en-US', { 
+                      <span>{new Date(announcement.created_at || announcement.date).toLocaleDateString('en-US', { 
                         month: 'long', 
                         day: 'numeric', 
                         year: 'numeric' 
