@@ -13,6 +13,18 @@ import {
 } from '../components/ui/dialog';
 
 export default function Announcements() {
+  const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'Company Update':
+      return 'from-blue-500 to-blue-600';
+    case 'Holiday':
+      return 'from-green-500 to-green-600';
+    case 'Tool Update':
+      return 'from-purple-500 to-purple-600';
+    default:
+      return 'from-gray-500 to-gray-600';
+  }
+};
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -114,15 +126,15 @@ export default function Announcements() {
   ];
 
 
-  const categoryColors: Record<string, string> = {
-    'Tool Update': 'from-purple-500 to-pink-500',
-    'Holiday': 'from-blue-500 to-cyan-500',
-    'Company Update': 'from-green-500 to-emerald-500',
-    'Security': 'from-red-500 to-orange-500',
-    'Event': 'from-indigo-500 to-purple-500',
-    'Issue': 'from-orange-500 to-red-500',
-    'Message': 'from-cyan-500 to-blue-500',
-  };
+  // const categoryColors: Record<string, string> = {
+  //   'Tool Update': 'from-purple-500 to-pink-500',
+  //   'Holiday': 'from-blue-500 to-cyan-500',
+  //   'Company Update': 'from-green-500 to-emerald-500',
+  //   'Security': 'from-red-500 to-orange-500',
+  //   'Event': 'from-indigo-500 to-purple-500',
+  //   'Issue': 'from-orange-500 to-red-500',
+  //   'Message': 'from-cyan-500 to-blue-500',
+  // };
 
   const adminCategories = ['Tool Update', 'Holiday', 'Company Update', 'Security', 'Event'];
   const userCategories = ['Issue', 'Message'];
@@ -151,6 +163,17 @@ export default function Announcements() {
 
 
   const handleCreateAnnouncement = () => {
+    if (
+      newAnnouncement.recipients === 'specific' &&
+      newAnnouncement.taggedUsers.length === 0
+    ) {
+      toast({
+        title: 'Select users',
+        description: 'Please select at least one user.',
+        variant: 'destructive',
+      });
+      return;
+    }
     if (!newAnnouncement.title || !newAnnouncement.content) {
       toast({
         title: 'Missing Information',
@@ -184,7 +207,9 @@ export default function Announcements() {
         content: newAnnouncement.content,
         category: newAnnouncement.category,
         recipients: newAnnouncement.recipients,
-        taggedEmails: newAnnouncement.taggedUsers,
+        taggedEmails: newAnnouncement.recipients === 'specific'
+                    ? newAnnouncement.taggedUsers
+                    : null,
       }),
     })
 
@@ -346,7 +371,7 @@ export default function Announcements() {
                 }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className={`h-2 bg-gradient-to-r ${announcement.color}`} />
+                <div className={`h-2 bg-gradient-to-r ${getCategoryColor(announcement.category)}`} />
 
                 <div className="p-8">
                   <div className="mb-4 flex items-start justify-between">
@@ -358,7 +383,7 @@ export default function Announcements() {
                             Pinned
                           </div>
                         )}
-                        <span className={`rounded-full bg-gradient-to-r ${announcement.color} px-3 py-1 text-xs font-medium text-white`}>
+                        <span className={`rounded-full bg-gradient-to-r ${getCategoryColor(announcement.category)} px-3 py-1 text-xs font-medium text-white`}>
                           {announcement.category}
                         </span>
                         {announcement.recipients !== 'all' && (
@@ -423,7 +448,9 @@ export default function Announcements() {
                   <div className="flex items-center gap-6 text-sm text-muted-text dark:text-dark-muted">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      <span>{announcement.author}</span>
+                      <span>
+                        {announcement.created_by_name || announcement.created_by}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
@@ -436,7 +463,7 @@ export default function Announcements() {
                   </div>
                 </div>
 
-                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${announcement.color} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
+                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${getCategoryColor(announcement.category)} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
               </div>
             );
           })}
@@ -560,24 +587,22 @@ export default function Announcements() {
                 </div>
 
                 {newAnnouncement.recipients === 'specific' && (
-                  <div className="rounded-lg border border-border bg-light-gray dark:bg-dark-hover p-4">
-                    <p className="mb-3 text-sm font-medium text-body-text dark:text-dark-text">Tag Users:</p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="mt-3 grid grid-cols-2 gap-2">
                       {teamMembers.map(member => (
                         <button
                           key={member.email}
+                          type="button"
                           onClick={() => toggleTaggedUser(member.email)}
-                          className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                          className={`rounded-md border px-3 py-2 text-sm ${
                             newAnnouncement.taggedUsers.includes(member.email)
-                              ? 'bg-mint-accent text-white'
-                              : 'bg-white dark:bg-dark-card border border-border text-body-text dark:text-dark-muted hover:border-mint-accent/50'
+                              ? 'border-primary bg-primary/10'
+                              : 'border-border'
                           }`}
                         >
                           {member.name}
                         </button>
                       ))}
                     </div>
-                  </div>
                 )}
               </div>
             </div>
