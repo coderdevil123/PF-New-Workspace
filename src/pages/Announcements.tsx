@@ -438,7 +438,7 @@ export default function Announcements() {
                           onClick={() => handleMarkAsRead(announcement.id)}
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 rounded-lg p-0"
+                          className="h-8 w-8 rounded-lg p-0 opacity-100"
                           title="Mark as read (Coming soon)"
                         >
                           <Check className="h-4 w-4" />
