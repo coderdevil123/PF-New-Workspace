@@ -34,7 +34,7 @@ export default function OAuthSuccess() {
     const decoded = jwtDecode<JwtPayload>(token);
 
     // ✅ Store token
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('token', token);
 
     // ✅ LOGIN WITH USER DATA (NOT TOKEN)
     login(decoded);
