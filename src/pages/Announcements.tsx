@@ -410,8 +410,11 @@ export default function Announcements() {
                           </div>
                         )}
                         {isRead && (
-                          <div className="flex items-center gap-1 rounded-full bg-green-600 dark:bg-green-500/20 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-300">
-                            <Check className="h-3 w-3" />
+                          <div className="flex items-center gap-1.5 rounded-full 
+                  bg-green-600 dark:bg-green-500 
+                  px-3 py-1 text-xs font-semibold text-white
+                  animate-fade-in">
+                            <Check className="h-3 w-3 stroke-[2.5]" />
                             Read
                           </div>
                         )}
