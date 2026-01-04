@@ -40,12 +40,12 @@ export default function Announcements() {
   };
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
-  const readKey = `readAnnouncements_${user?.email}`;
+  // const readKey = `readAnnouncements_${user?.email}`;
 
-  const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
-    const saved = localStorage.getItem(readKey);
-    return saved ? JSON.parse(saved) : [];
-  });
+  // const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
+  //   const saved = localStorage.getItem(readKey);
+  //   return saved ? JSON.parse(saved) : [];
+  // });
   
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
@@ -60,9 +60,9 @@ export default function Announcements() {
     document.title = 'Announcements | Pristine Forests';
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(readKey, JSON.stringify(readAnnouncements));
-  }, [readAnnouncements, readKey]);
+  // useEffect(() => {
+  //   localStorage.setItem(readKey, JSON.stringify(readAnnouncements));
+  // }, [readAnnouncements, readKey]);
 
   useEffect(() => {
   if (!token) return;
@@ -103,10 +103,10 @@ export default function Announcements() {
   // Sort announcements: pinned first, then by date
   const sortedAnnouncements = Array.isArray(safeAnnouncements)
   ? [...safeAnnouncements].sort((a, b) => {
-      if (a.isPinned && !b.isPinned) return -1;
-      if (!a.isPinned && b.isPinned) return 1;
-      return new Date(b.created_at || b.date).getTime() -
-             new Date(a.created_at || a.date).getTime();
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      return new Date(b.created_at).getTime() -
+             new Date(a.created_at).getTime();
     })
   : [];
 
@@ -267,9 +267,26 @@ export default function Announcements() {
     showDisabledToast();
   };
 
-  const handleMarkAsRead = () => {
-    showDisabledToast();
-  };
+  const handleMarkAsRead = async (id: string) => {
+  if (!token) return;
+
+  await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/api/announcements/${id}/read`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  // Optimistic update
+  setAnnouncements(prev =>
+    prev.map(a =>
+      a.id === id ? { ...a, is_read: true } : a
+    )
+  );
+};
 
   const handleTogglePin = () => {
     showDisabledToast();
@@ -361,7 +378,7 @@ export default function Announcements() {
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-5xl space-y-6">
           {filteredAnnouncements.map((announcement: any, index: number) => {
-            const isRead = readAnnouncements.includes(announcement.id);
+            const isRead = announcement.is_read;
             
             return (
               <div
@@ -418,11 +435,10 @@ export default function Announcements() {
                       </Button>
                       {!isRead && (
                         <Button
-                          onClick={handleMarkAsRead}
-                          disabled
+                          onClick={() => handleMarkAsRead(announcement.id)}
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
+                          className="h-8 w-8 rounded-lg p-0"
                           title="Mark as read (Coming soon)"
                         >
                           <Check className="h-4 w-4" />
@@ -476,8 +492,8 @@ export default function Announcements() {
           <div className="grid gap-6 sm:grid-cols-3">
             {[
               { icon: Bell, label: 'Total Announcements', value: safeAnnouncements.length, color: 'from-blue-500 to-cyan-500' },
-              { icon: Pin, label: 'Pinned', value: safeAnnouncements.filter((a: any) => a.isPinned).length, color: 'from-purple-500 to-pink-500' },
-              { icon: TrendingUp, label: 'Unread', value: safeAnnouncements.length - readAnnouncements.length, color: 'from-green-500 to-emerald-500' },
+              { icon: Pin, label: 'Pinned', value: safeAnnouncements.filter((a: any) => a.is_pinned).length, color: 'from-purple-500 to-pink-500' },
+              { icon: TrendingUp, label: 'Unread', value: safeAnnouncements.filter(a => !a.is_read).length, color: 'from-green-500 to-emerald-500' },
             ].map((stat, index) => {
               const Icon = stat.icon;
               return (
