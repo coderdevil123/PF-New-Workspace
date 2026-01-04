@@ -410,11 +410,8 @@ export default function Announcements() {
                           </div>
                         )}
                         {isRead && (
-                          <div className="flex items-center gap-1.5 rounded-full 
-                  bg-green-600 dark:bg-green-500 
-                  px-3 py-1 text-xs font-semibold text-white
-                  animate-fade-in">
-                            <Check className="h-3 w-3 stroke-[2.5]" />
+                          <div className="flex items-center gap-1 rounded-full bg-green-600 dark:bg-green-500/20 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-300">
+                            <Check className="h-3 w-3" />
                             Read
                           </div>
                         )}
@@ -441,8 +438,8 @@ export default function Announcements() {
                           onClick={() => handleMarkAsRead(announcement.id)}
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 rounded-lg p-0 opacity-100"
-                          title="Mark as read (Coming soon)"
+                          className="h-8 w-8 rounded-lg p-0 text-green-600 hover:bg-green-100 dark:hover:bg-green-500/20"
+                          title="Mark as read"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
