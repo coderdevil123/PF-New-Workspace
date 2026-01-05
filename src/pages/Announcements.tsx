@@ -40,12 +40,6 @@ export default function Announcements() {
   };
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
-  // const readKey = `readAnnouncements_${user?.email}`;
-
-  // const [readAnnouncements, setReadAnnouncements] = useState<number[]>(() => {
-  //   const saved = localStorage.getItem(readKey);
-  //   return saved ? JSON.parse(saved) : [];
-  // });
   
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
@@ -59,10 +53,6 @@ export default function Announcements() {
     window.scrollTo(0, 0);
     document.title = 'Announcements | Pristine Forests';
   }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem(readKey, JSON.stringify(readAnnouncements));
-  // }, [readAnnouncements, readKey]);
 
   useEffect(() => {
   if (!token) return;
@@ -94,12 +84,6 @@ export default function Announcements() {
     });
   }, [token]);
 
-
-
-  // useEffect(() => {
-  //   const storageKey = `readAnnouncements_${user?.email}`;
-  // }, [readAnnouncements]);
-
   // Sort announcements: pinned first, then by date
   const sortedAnnouncements = Array.isArray(safeAnnouncements)
   ? [...safeAnnouncements].sort((a, b) => {
@@ -124,17 +108,6 @@ export default function Announcements() {
       )
     ),
   ];
-
-
-  // const categoryColors: Record<string, string> = {
-  //   'Tool Update': 'from-purple-500 to-pink-500',
-  //   'Holiday': 'from-blue-500 to-cyan-500',
-  //   'Company Update': 'from-green-500 to-emerald-500',
-  //   'Security': 'from-red-500 to-orange-500',
-  //   'Event': 'from-indigo-500 to-purple-500',
-  //   'Issue': 'from-orange-500 to-red-500',
-  //   'Message': 'from-cyan-500 to-blue-500',
-  // };
 
   const adminCategories = ['Tool Update', 'Holiday', 'Company Update', 'Security', 'Event'];
   const userCategories = ['Issue', 'Message'];
@@ -182,19 +155,6 @@ export default function Announcements() {
       });
       return;
     }
-
-    // const announcement = {
-    //   id: Date.now(),
-    //   title: newAnnouncement.title,
-    //   author: user?.name || 'Anonymous',
-    //   date: new Date().toISOString().split('T')[0],
-    //   category: newAnnouncement.category,
-    //   isPinned: false,
-    //   content: newAnnouncement.content,
-    //   color: categoryColors[newAnnouncement.category] || 'from-gray-500 to-gray-600',
-    //   recipients: newAnnouncement.recipients,
-    //   taggedUsers: newAnnouncement.taggedUsers,
-    // };
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
       method: 'POST',
@@ -256,11 +216,6 @@ export default function Announcements() {
         variant: 'destructive',
       });
     });
-
-    // Show notification toast
-    // const recipientText = announcement.recipients === 'all' 
-    //   ? 'all team members' 
-    //   : `${announcement.taggedUsers.length} tagged user${announcement.taggedUsers.length > 1 ? 's' : ''}`;
   };
 
   const handleDeleteAnnouncement = () => {
@@ -288,8 +243,25 @@ export default function Announcements() {
   );
 };
 
-  const handleTogglePin = () => {
-    showDisabledToast();
+  const handleTogglePin = async (id: string) => {
+    if (!token) return;
+
+    await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/announcements/${id}/pin`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Optimistic update
+    setAnnouncements(prev =>
+      prev.map(a =>
+        a.id === id ? { ...a, is_pinned: !a.is_pinned } : a
+      )
+    );
   };
 
   const toggleTaggedUser = (email: string) => {
@@ -424,12 +396,15 @@ export default function Announcements() {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <Button
-                        onClick={handleTogglePin}
-                        disabled
+                        onClick={() => handleTogglePin(announcement.id)}
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
-                        title="Pin (Coming soon)"
+                        className={`h-8 w-8 rounded-lg p-0 transition ${
+                          announcement.is_pinned
+                            ? 'text-mint-accent'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                        title="Pin / Unpin"
                       >
                         <Pin className="h-4 w-4" />
                       </Button>
