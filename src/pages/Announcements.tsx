@@ -218,9 +218,45 @@ export default function Announcements() {
     });
   };
 
-  const handleDeleteAnnouncement = () => {
-    showDisabledToast();
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!token) return;
+
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this announcement?'
+    );
+
+    if (!confirmDelete) return;
+
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/announcements/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      toast({
+        title: 'Delete failed',
+        description: 'You are not allowed to delete this announcement.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Optimistic UI update
+    setAnnouncements(prev =>
+      prev.filter(a => a.id !== id)
+    );
+
+    toast({
+      title: 'Announcement deleted',
+      description: 'The announcement has been removed.',
+    });
   };
+
 
   const handleMarkAsRead = async (id: string) => {
   if (!token) return;
@@ -419,16 +455,17 @@ export default function Announcements() {
                           <Check className="h-4 w-4" />
                         </Button>
                       )}
+                    {announcement.created_by === user?.email && (
                       <Button
-                        onClick={handleDeleteAnnouncement}
-                        disabled
+                        onClick={() => handleDeleteAnnouncement(announcement.id)}
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 rounded-lg p-0 opacity-50 cursor-not-allowed"
-                        title="Delete (Coming soon)"
+                        className="h-8 w-8 rounded-lg p-0 text-destructive hover:bg-destructive/10"
+                        title="Delete announcement"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                    )}
                     </div>
                   </div>
 
