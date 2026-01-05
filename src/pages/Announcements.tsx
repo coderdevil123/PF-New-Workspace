@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Announcements() {
   const getCategoryColor = (category: string) => {
@@ -134,6 +135,123 @@ export default function Announcements() {
     .catch(err => console.error('Team fetch error:', err));
   }, [token]);
 
+  //this is to listen for new announcements
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const channel = supabase
+      .channel('realtime-announcements')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'announcements' },
+        payload => {
+          if (payload.eventType === 'INSERT') {
+            const newAnnouncement = payload.new;
+
+            // visibility check
+            if (
+              newAnnouncement.recipients === 'all' ||
+              newAnnouncement.tagged_emails?.includes(user.email)
+            ) {
+              setAnnouncements(prev => [
+                { ...newAnnouncement, is_read: false, is_pinned: false },
+                ...prev,
+              ]);
+
+              toast({
+                title: 'New announcement',
+                description: newAnnouncement.title,
+              });
+            }
+          }
+
+          if (payload.eventType === 'DELETE') {
+            setAnnouncements(prev =>
+              prev.filter(a => a.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.email]);
+
+  // this is to listen for read status updates
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const channel = supabase
+      .channel('realtime-reads')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'announcement_reads',
+          filter: `user_email=eq.${user.email}`,
+        },
+        payload => {
+          setAnnouncements(prev =>
+            prev.map(a =>
+              a.id === payload.new.announcement_id
+                ? { ...a, is_read: true }
+                : a
+            )
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.email]);
+
+  // this is for real time pin/unpin updates
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const channel = supabase
+      .channel('realtime-pins')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'announcement_pins',
+          filter: `user_email=eq.${user.email}`,
+        },
+        payload => {
+          if (payload.eventType === 'INSERT') {
+            setAnnouncements(prev =>
+              prev.map(a =>
+                a.id === payload.new.announcement_id
+                  ? { ...a, is_pinned: true }
+                  : a
+              )
+            );
+          }
+
+          if (payload.eventType === 'DELETE') {
+            setAnnouncements(prev =>
+              prev.map(a =>
+                a.id === payload.old.announcement_id
+                  ? { ...a, is_pinned: false }
+                  : a
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.email]);
 
   const handleCreateAnnouncement = () => {
     if (
@@ -193,21 +311,20 @@ export default function Announcements() {
       });
 
       // 🔥 RE-FETCH announcements
-      return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    //   return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   });
+    // })
+    // .then(res => res.json())
+    // .then(data => {
+    //   if (Array.isArray(data)) {
+    //     setAnnouncements(data);
+    //   } else {
+    //     setAnnouncements([]);
+    //   }
     })
-    .then(res => res.json())
-    .then(data => {
-      if (Array.isArray(data)) {
-        setAnnouncements(data);
-      } else {
-        setAnnouncements([]);
-      }
-    })
-
     .catch(err => {
       console.error(err);
       toast({
@@ -402,7 +519,7 @@ export default function Announcements() {
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-3">
-                        {announcement.isPinned && (
+                        {announcement.is_pinned && (
                           <div className="flex items-center gap-1 rounded-full bg-mint-accent/10 border border-mint-accent/30 px-3 py-1 text-xs font-medium text-mint-accent">
                             <Pin className="h-3 w-3" />
                             Pinned
