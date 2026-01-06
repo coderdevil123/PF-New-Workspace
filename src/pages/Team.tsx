@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Dialog, DialogContent } from '../components/ui/dialog';
 // import { teamMembers } from '../data/teamMembers';
 import { useAuth } from '../contexts/AuthContext';
+import { teamMembers as defaultTeam } from '../data/teamMembers';
 
 type TeamMember = {
   id: string;
@@ -27,13 +28,38 @@ export default function Team() {
   const [members, setMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(res => res.json())
-      .then(setMembers);
+    async function loadTeam() {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const dbMembers = await res.json();
+
+      // 🔥 MERGE DEFAULTS + DB BY EMAIL
+      const merged = defaultTeam.map(defaultMember => {
+        const override = dbMembers.find(
+          (m: any) => m.email === defaultMember.email
+        );
+
+        return {
+          ...defaultMember,
+          ...override, // DB overrides defaults
+          avatar_url: override?.avatar_url || defaultMember.image,
+        };
+      });
+
+      // 🔥 ADD NEW USERS (not in defaults)
+      const newUsers = dbMembers.filter(
+        (db: any) =>
+          !defaultTeam.some(def => def.email === db.email)
+      );
+
+      setMembers([...merged, ...newUsers]);
+    }
+
+    loadTeam();
   }, []);
 
   useEffect(() => {
