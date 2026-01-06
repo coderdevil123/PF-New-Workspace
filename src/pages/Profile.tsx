@@ -131,15 +131,15 @@ export default function Profile() {
   if (!user?.google_id) return;
 
   const { error } = await supabase
-    .from('profiles')
-    .update({
-      name: editData.name,
-      phone: editData.phone,
-      location: editData.location,
-      bio: editData.bio,
-      avatar_url: editData.avatar,
-    })
-    .eq('google_id', user.google_id);
+  .from('profiles')
+  .update({
+    name: editData.name,
+    phone: editData.phone,
+    bio: editData.bio,
+    avatar_url: editData.avatar,
+    location: editData.location,
+  })
+  .eq('email', user.email);
 
   if (error) {
     toast({

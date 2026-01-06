@@ -3,19 +3,45 @@ import { ArrowLeft, Users, Mail, MessageSquare, Phone, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Dialog, DialogContent } from '../components/ui/dialog';
-import { teamMembers } from '../data/teamMembers';
+// import { teamMembers } from '../data/teamMembers';
+import { useAuth } from '../contexts/AuthContext';
+
+type TeamMember = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  bio?: string;
+  phone?: string;
+  mattermost?: string;
+  image?: string;
+  avatar_url?: string;
+};
 
 export default function Team() {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedMember, setSelectedMember] = useState<typeof teamMembers[0] | null>(null);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const tiltRef = useRef<HTMLDivElement | null>(null);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then(res => res.json())
+      .then(setMembers);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     document.title = 'Our Team | Pristine Forests';
   }, []);
 
-  const handleMemberClick = (member: typeof teamMembers[0]) => {
+  const handleMemberClick = (member: TeamMember) => {
     setSelectedMember(member);
   };
 
@@ -24,9 +50,17 @@ export default function Team() {
   };
 
   // Group members by category
-  const leadership = teamMembers.filter(m => m.department === 'Leadership');
-  const heads = teamMembers.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
-  const interns = teamMembers.filter(m => m.role === 'Intern');
+  const leadership = members.filter(m => m.department === 'Leadership');
+  const heads = members.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
+  const interns = members.filter(m => m.role === 'Intern');
+
+  if (!members.length) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-muted-text">
+        Loading team...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -170,7 +204,7 @@ export default function Team() {
                     >
 
                     <img
-                      src={selectedMember.image}
+                      src={selectedMember.avatar_url || selectedMember.image}
                       alt={selectedMember.name}
                       className="h-full w-full object-cover object-top pointer-events-none"
                     />
@@ -192,6 +226,14 @@ export default function Team() {
                       <p className="font-ui text-xs sm:text-sm text-body-text dark:text-dark-muted">
                         {selectedMember.department}
                       </p>
+                      {user?.email === selectedMember.email && (
+                        <Button
+                          onClick={() => navigate('/profile')}
+                          className="w-full rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90"
+                        >
+                          Edit My Profile
+                        </Button>
+                      )}
                     </div>
 
                     <p className="font-sans text-xs sm:text-sm md:text-base leading-relaxed text-body-text dark:text-dark-text-secondary line-clamp-4 sm:line-clamp-none">
@@ -245,7 +287,7 @@ export default function Team() {
 
                     {/* Chat Button */}
                     <Button
-                      onClick={() => handleMattermostClick(selectedMember.mattermost)}
+                      onClick={() => selectedMember.mattermost && handleMattermostClick(selectedMember.mattermost)}
                       className="w-full h-9 sm:h-10 md:h-11 rounded-full bg-mint-accent text-forest-dark text-xs sm:text-sm md:text-base font-semibold hover:bg-mint-accent/90"
                     >
                       <MessageSquare className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-4.5 sm:w-4.5 md:h-5 md:w-5" />
@@ -282,7 +324,7 @@ export default function Team() {
 
 // Member Card Component
 function MemberCard({ member, index, onClick }: { 
-  member: typeof teamMembers[0]; 
+  member: TeamMember; 
   index: number;
   onClick: () => void;
 }) {
@@ -304,7 +346,7 @@ function MemberCard({ member, index, onClick }: {
         {/* Image */}
         <div className="relative h-48 sm:h-56 overflow-hidden bg-light-gray dark:bg-dark-hover">
           <img
-            src={member.image}
+            src={member.avatar_url || member.image}
             alt={member.name}
             className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
           />
@@ -315,7 +357,7 @@ function MemberCard({ member, index, onClick }: {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleMattermostClick(member.mattermost);
+                member.mattermost && handleMattermostClick(member.mattermost);
               }}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm shadow-lg transition-all hover:scale-110 hover:bg-mint-accent"
             >
