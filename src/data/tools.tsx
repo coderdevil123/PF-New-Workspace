@@ -22,7 +22,7 @@ export const toolsData = {
         id: 'mattermost',
         name: 'Mattermost',
         description: 'Team chat and internal communication platform',
-        url: 'https://mattermost.pristineforests.com',
+        url: 'https://chat.pristineforests.com',
         category: 'productivity',
         image: 'https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png',
         imageLight: 'https://mattermost.com/wp-content/uploads/2022/02/icon_WS.png',
