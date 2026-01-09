@@ -128,18 +128,18 @@ export default function Profile() {
 }
 
   const handleSave = async () => {
-  if (!user?.google_id) return;
+  if (!user?.email) return;
 
   const { error } = await supabase
-  .from('profiles')
-  .update({
-    name: editData.name,
-    phone: editData.phone,
-    bio: editData.bio,
-    avatar_url: editData.avatar,
-    location: editData.location,
-  })
-  .eq('email', user.email);
+    .from('profiles')
+    .update({
+      name: editData.name,
+      phone: editData.phone,
+      bio: editData.bio,
+      avatar_url: editData.avatar, // ✅ URL
+      location: editData.location,
+    })
+    .eq('email', user.email);
 
   if (error) {
     toast({
@@ -156,8 +156,38 @@ export default function Profile() {
 
   toast({
     title: 'Profile updated',
-    description: 'Your profile has been successfully updated.',
+    description: 'Changes saved permanently.',
   });
+};
+
+const uploadAvatar = async (file: File) => {
+  if (!user?.email) return;
+
+  const fileExt = file.name.split('.').pop();
+  const filePath = `avatars/${user.email}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    console.error(uploadError);
+    toast({
+      title: 'Avatar upload failed',
+      description: uploadError.message,
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(filePath);
+
+  setEditData((prev: any) => ({
+    ...prev,
+    avatar: data.publicUrl, // ✅ persistent URL
+  }));
 };
 
 
@@ -289,13 +319,7 @@ export default function Profile() {
                           className="hidden"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setEditData({ ...editData, avatar: reader.result as string });
-                              };
-                              reader.readAsDataURL(file);
-                            }
+                            if (file) uploadAvatar(file);
                           }}
                         />
                         <label
