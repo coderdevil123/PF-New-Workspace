@@ -56,7 +56,12 @@ export default function Team() {
           !defaultTeam.some(def => def.email === db.email)
       );
 
-      setMembers([...merged, ...newUsers]);
+      const normalized = [...merged, ...newUsers].map(m => ({
+        ...m,
+        role: m.role || 'Member',
+        department: m.department || 'General',
+      }));
+      setMembers(normalized);
     }
 
     loadTeam();
@@ -79,6 +84,12 @@ export default function Team() {
   const leadership = members.filter(m => m.department === 'Leadership');
   const heads = members.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
   const interns = members.filter(m => m.role === 'Intern');
+  const others = members.filter(
+    m =>
+      m.department !== 'Leadership' &&
+      !( ['Technology','Marketing','Design','Operations'].includes(m.department) && m.role !== 'Intern' ) &&
+      m.role !== 'Intern'
+  );
 
   if (!members.length) {
     return (
@@ -134,7 +145,7 @@ export default function Team() {
           <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
             {leadership.map((member, index) => (
               <MemberCard 
-                key={member.id} 
+                key={member.email} 
                 member={member} 
                 index={index}
                 onClick={() => handleMemberClick(member)}
@@ -153,7 +164,7 @@ export default function Team() {
           <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
             {heads.map((member, index) => (
               <MemberCard 
-                key={member.id} 
+                key={member.email} 
                 member={member} 
                 index={index}
                 onClick={() => handleMemberClick(member)}
@@ -172,7 +183,7 @@ export default function Team() {
           <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
             {interns.map((member, index) => (
               <MemberCard 
-                key={member.id} 
+                key={member.email} 
                 member={member} 
                 index={index}
                 onClick={() => handleMemberClick(member)}
@@ -181,6 +192,26 @@ export default function Team() {
           </div>
         </div>
       </section>
+
+          {others.length > 0 && (
+            <section className="px-6 py-12 lg:px-12">
+              <div className="mx-auto max-w-7xl">
+                <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal">
+                  Team Members
+                </h2>
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
+                  {others.map((member, index) => (
+                    <MemberCard
+                      key={member.email}
+                      member={member}
+                      index={index}
+                      onClick={() => handleMemberClick(member)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
 
       {/* Member Detail Modal */}
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
