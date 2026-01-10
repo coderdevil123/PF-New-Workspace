@@ -12,8 +12,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase';
 
+const mapProfile = (data: any) => ({
+  name: data.name,
+  email: data.email,
+  phone: data.phone || '',
+  location: data.location || '',
+  bio: data.bio || '',
+  avatar: data.avatar_url || '',
+  role: data.role || 'Member',
+  department: data.department || 'General',
+  joinDate: data.created_at
+    ? new Date(data.created_at).toLocaleDateString()
+    : '—',
+});
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -64,55 +77,17 @@ export default function Profile() {
   }, [hasUnsavedChanges, location.pathname]);
 
   useEffect(() => {
-  const loadProfile = async () => {
-    if (!user?.email) return;
-
-    // 1️⃣ Fetch by EMAIL (always exists)
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('email', user.email)
-      .maybeSingle(); // 👈 IMPORTANT (no crash)
-
-    if (error) {
-      console.error('Profile fetch error:', error);
-      return;
-    }
-
-    if (!data) {
-      console.warn('No profile found');
-      return;
-    }
-
-    // 2️⃣ If google_id missing, PATCH it
-    if (!data.google_id && user.google_id) {
-      await supabase
-        .from('profiles')
-        .update({ google_id: user.google_id })
-        .eq('email', user.email);
-    }
-
-    const mappedProfile = {
-  name: data.name,
-  email: data.email,
-  phone: data.phone || '',
-  location: data.location || '',
-  bio: data.bio || '',
-  avatar: data.avatar_url || '',
-  role: data.role || 'User',
-  department: data.department || 'General',
-  joinDate: data.created_at
-    ? new Date(data.created_at).toLocaleDateString()
-    : '—',
-};
-
-
-    setProfileData(mappedProfile);
-    setEditData(mappedProfile);
-  };
-
-  loadProfile();
-}, [user]);
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  })
+    .then(res => res.json())
+    .then(data => {
+      setProfileData(mapProfile(data));
+      setEditData(mapProfile(data));
+    });
+}, []);
 
   useEffect(() => {
     const isDifferent = JSON.stringify(editData) !== JSON.stringify(profileData);
@@ -128,66 +103,37 @@ export default function Profile() {
 }
 
   const handleSave = async () => {
-  if (!user?.email) return;
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({
+  await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify({
       name: editData.name,
       phone: editData.phone,
       bio: editData.bio,
-      avatar_url: editData.avatar, // ✅ URL
       location: editData.location,
-    })
-    .eq('email', user.email);
-
-  if (error) {
-    toast({
-      title: 'Update failed',
-      description: error.message,
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  setProfileData(editData);
-  setIsEditing(false);
-  setHasUnsavedChanges(false);
-
-  toast({
-    title: 'Profile updated',
-    description: 'Changes saved permanently.',
+      avatar_url: editData.avatar,
+    }),
   });
 };
 
+
 const uploadAvatar = async (file: File) => {
-  if (!user?.email) return;
+  const form = new FormData();
+  form.append('avatar', file);
 
-  const fileExt = file.name.split('.').pop();
-  const filePath = `${user.email}.${fileExt}`;
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/avatar`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: form,
+  });
 
-  const { error: uploadError } = await supabase.storage
-    .from('avatars')
-    .upload(filePath, file, { upsert: true });
-
-  if (uploadError) {
-    console.error(uploadError);
-    toast({
-      title: 'Avatar upload failed',
-      description: uploadError.message,
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  const { data } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(filePath);
-
-  setEditData((prev: any) => ({
-    ...prev,
-    avatar: data.publicUrl, // ✅ persistent URL
-  }));
+  const data = await res.json();
+  setEditData((prev: any) => ({ ...prev, avatar: data.avatar_url }));
 };
 
 
