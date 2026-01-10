@@ -15,6 +15,7 @@ type TeamMember = {
   department: string;
   bio?: string;
   phone?: string;
+  location?: string;
   mattermost?: string;
   image?: string;
   avatar_url?: string;
@@ -45,16 +46,29 @@ export default function Team() {
 
         return {
           ...defaultMember,
-          ...override, // DB overrides defaults
+
+          // ✅ only user-editable fields
+          name: override?.name ?? defaultMember.name,
+          phone: override?.phone ?? (defaultMember as any).phone,
+          bio: override?.bio ?? (defaultMember as any).bio,
+          location: override?.location ?? (defaultMember as any).location,
+
           avatar_url: override?.avatar_url || defaultMember.image,
         };
       });
 
+
       // 🔥 ADD NEW USERS (not in defaults)
-      const newUsers = dbMembers.filter(
-        (db: any) =>
-          !defaultTeam.some(def => def.email === db.email)
-      );
+      const newUsers = dbMembers
+      .filter((db: any) =>
+        !defaultTeam.some(def => def.email === db.email)
+      )
+      .map((db: any) => ({
+        ...db,
+        role: db.role || 'Member',
+        department: db.department || 'General',
+        avatar_url: db.avatar_url,
+      }));
 
       const normalized = [...merged, ...newUsers].map(m => ({
         ...m,
