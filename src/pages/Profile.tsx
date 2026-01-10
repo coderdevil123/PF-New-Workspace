@@ -103,22 +103,39 @@ export default function Profile() {
 }
 
   const handleSave = async () => {
-  await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify({
-      name: editData.name,
-      phone: editData.phone,
-      bio: editData.bio,
-      location: editData.location,
-      avatar_url: editData.avatar,
-    }),
-  });
-};
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({
+        name: editData.name,
+        phone: editData.phone,
+        bio: editData.bio,
+        location: editData.location,
+        avatar_url: editData.avatar,
+      }),
+    });
 
+    if (!res.ok) {
+      toast({
+        title: 'Update failed',
+        description: 'Could not save profile',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setProfileData(editData);
+    setIsEditing(false);
+    setHasUnsavedChanges(false);
+
+    toast({
+      title: 'Profile updated',
+      description: 'Changes saved successfully',
+    });
+  };
 
 const uploadAvatar = async (file: File) => {
   const form = new FormData();
