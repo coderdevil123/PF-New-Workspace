@@ -263,7 +263,7 @@ export default function Team() {
                     </div>
 
                     <p className="font-sans text-xs sm:text-sm md:text-base leading-relaxed text-body-text dark:text-dark-text-secondary line-clamp-4 sm:line-clamp-none">
-                      {selectedMember.bio}
+                      {selectedMember.bio || 'No bio added yet.'}
                     </p>
 
                     {/* Contact Information */}

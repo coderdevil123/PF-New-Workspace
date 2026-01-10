@@ -127,7 +127,9 @@ export default function Profile() {
       return;
     }
 
-    setProfileData(editData);
+    const updated = await res.json();
+    setProfileData(mapProfile(updated));
+    setEditData(mapProfile(updated));
     setIsEditing(false);
     setHasUnsavedChanges(false);
 
