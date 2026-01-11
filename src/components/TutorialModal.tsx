@@ -112,7 +112,7 @@ export default function TutorialModal({ open, onOpenChange, tool }: TutorialModa
             <Button
               onClick={() => onOpenChange(false)}
               variant="outline"
-              className="rounded-full border-border dark:border-dark-border h-10 sm:h-auto"
+              className="rounded-full border-border dark:border-dark-border h-10 sm:h-auto text-foreground dark:text-zinc-900 hover:bg-gray-100 dark:hover:bg-dark-hover dark:hover:text-white"
             >
               Close
             </Button>
