@@ -85,7 +85,7 @@ export const teamMembers = [
     // phone: '+1 (555) 300-0001',
     mattermost: '@maryam',
     // bio: 'Marketing intern passionate about digital marketing strategies and content creation. Eager to learn and contribute to team success.',
-    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&h=800&fit=crop&crop=faces',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Maryam.jpg',
     order: 7,
   },
   {
@@ -159,7 +159,7 @@ export const teamMembers = [
     // phone: '+1 (555) 300-0007',
     mattermost: '@aryan',
     // bio: 'Aspiring software developer intern focused on web technologies and modern frameworks. Quick learner with problem-solving mindset.',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop&crop=faces',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Aryan.jpg',
     order: 13,
   },
   {
