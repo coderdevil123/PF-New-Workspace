@@ -52,7 +52,7 @@ export default function Team() {
           phone: override?.phone ?? (defaultMember as any).phone,
           bio: override?.bio ?? (defaultMember as any).bio,
           location: override?.location ?? (defaultMember as any).location,
-
+          mattermost: override?.mattermost ?? (defaultMember as any).mattermost,
           avatar_url: override?.avatar_url || defaultMember.image,
         };
       });
@@ -402,7 +402,7 @@ function MemberCard({ member, index, onClick }: {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMattermostClick = (mattermost: string) => {
-    window.open(`https://mattermost.com/direct/${mattermost}`, '_blank');
+    window.open(`https://chat.pristineforests.com/pristine-forests/messages/${mattermost}`, '_blank');
   };
 
   return (

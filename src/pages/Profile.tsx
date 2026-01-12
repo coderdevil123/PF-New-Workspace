@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X, MessageSquare } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
@@ -20,6 +20,7 @@ const mapProfile = (data: any) => ({
   phone: data.phone || '',
   location: data.location || '',
   bio: data.bio || '',
+  mattermost: data.mattermost || '',
   avatar: data.avatar_url || '',
   role: data.role || 'Member',
   department: data.department || 'General',
@@ -114,6 +115,7 @@ export default function Profile() {
         phone: editData.phone,
         bio: editData.bio,
         location: editData.location,
+        mattermost: editData.mattermost,
         avatar_url: editData.avatar,
       }),
     });
@@ -386,6 +388,31 @@ const uploadAvatar = async (file: File) => {
                       <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
                         <Phone className="h-5 w-5 text-muted-text" />
                         <span className="text-heading-dark">{profileData.phone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mattermost */}
+                  <div>
+                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+                      Mattermost ID
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editData.mattermost}
+                        onChange={(e) =>
+                          setEditData({ ...editData, mattermost: e.target.value })
+                        }
+                        placeholder="@username"
+                        className="w-full rounded-lg border border-border bg-light-gray px-4 py-3 text-heading-dark transition-all focus:border-mint-accent focus:bg-white focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                      />
+                    ) : (
+                      <div className="flex items-center gap-3 rounded-lg border border-border bg-light-gray px-4 py-3">
+                        <MessageSquare className="h-5 w-5 text-muted-text" />
+                        <span className="text-heading-dark">
+                          {profileData.mattermost || '—'}
+                        </span>
                       </div>
                     )}
                   </div>
