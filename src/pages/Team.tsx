@@ -300,7 +300,7 @@ export default function Team() {
                       {user?.email === selectedMember.email && (
                         <Button
                           onClick={() => navigate('/profile')}
-                          className="w-full rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90"
+                          className="w-full rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90 mt-3"
                         >
                           Edit My Profile
                         </Button>
@@ -350,7 +350,7 @@ export default function Team() {
                         <div className="min-w-0 flex-1">
                           <p className="font-ui text-[10px] sm:text-xs text-muted-text dark:text-dark-muted">Mattermost</p>
                           <p className="font-sans text-xs sm:text-sm text-heading-dark dark:text-dark-text">
-                            {selectedMember.mattermost}
+                            {selectedMember.mattermost || '—'}
                           </p>
                         </div>
                       </div>
