@@ -91,7 +91,7 @@ export default function Team() {
   };
 
   const handleMattermostClick = (mattermost: string) => {
-    window.open(`https://mattermost.com/direct/${mattermost}`, '_blank');
+    window.open(`https://chat.pristineforests.com/pristine-forests/messages/${mattermost}`, '_blank');
   };
 
   // Group members by category
