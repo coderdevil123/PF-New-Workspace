@@ -108,7 +108,7 @@ export default function CategoryDetail() {
     const data = await res.json();
     setTools(data);
   }
-
+  
   useEffect(() => {
     loadTools();
   }, []);
@@ -393,6 +393,7 @@ export default function CategoryDetail() {
       />
       <AddToolModal
         open={addToolOpen}
+        category={categoryId}
         onClose={() => setAddToolOpen(false)}
         onSuccess={loadTools}
       />

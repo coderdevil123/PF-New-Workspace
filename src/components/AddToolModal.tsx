@@ -27,31 +27,46 @@ export default function AddToolModal({
   const [youtubeUrl, setYoutubeUrl] = useState('');
 
   async function handleAddTool() {
-    if (!name || !toolUrl) return;
+  if (!name || !toolUrl || !category) return;
 
-    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tools`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({
-        name,
-        url: toolUrl,
-        category,
-        tutorial_video: extractYoutubeId(youtubeUrl),
-        image: '',
-        image_light: '',
-        image_dark: '',
-      }),
-    });
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tools`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify({
+      name,
+      url: toolUrl,
+      category,
+      tutorial_video: extractYoutubeId(youtubeUrl),
+      image: '',
+      image_light: '',
+      image_dark: '',
+    }),
+  });
 
-    onSuccess();   // reload tools from DB
-    onClose();     // close modal
+  if (!res.ok) {
+    console.error('Failed to add tool');
+    return;
   }
 
+  resetForm();   // ✅ clear inputs
+  onSuccess();   // reload tools
+  onClose();     // close modal
+}
+
+function resetForm() {
+  setName('');
+  setToolUrl('');
+  setYoutubeUrl('');
+}
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(v) => {
+          if (!v) resetForm();   //reset on close
+          onClose();
+        }}>
       <DialogContent className="space-y-4">
         <h2 className="text-xl font-semibold">Add Tool</h2>
 
