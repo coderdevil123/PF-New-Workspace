@@ -8,6 +8,7 @@ import ContactHelpModal from '../components/ContactHelpModal';
 import ThemeAwareImage from '../components/ThemeAwareImage';
 import { toolsData } from '../data/tools';
 import { useTheme } from '../contexts/ThemeContext';
+import AddToolModal from '../components/AddToolModal';
 
 const categoryData: Record<string, any> = {
   productivity: {
@@ -77,8 +78,40 @@ export default function CategoryDetail() {
   const [reportIssueOpen, setReportIssueOpen] = useState(false);
   const [contactHelpOpen, setContactHelpOpen] = useState(false);
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
+  const [addToolOpen, setAddToolOpen] = useState(false);
 
-  const category = categoryId ? categoryData[categoryId] : null;
+  const [tools, setTools] = useState<any[]>([]);
+
+  const groupedTools = tools.reduce((acc: any, tool: any) => {
+    if (!acc[tool.category]) acc[tool.category] = [];
+    acc[tool.category].push(tool);
+    return acc;
+  }, {});
+
+  const category = categoryId
+  ? {
+      ...categoryData[categoryId], // keeps title, gradient, stats
+      tools: groupedTools[categoryId] || [],
+    }
+  : null;
+
+  async function loadTools() {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/tools`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    setTools(data);
+  }
+
+  useEffect(() => {
+    loadTools();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -145,7 +178,13 @@ export default function CategoryDetail() {
             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
             Back to Dashboard
           </Button>
-          
+          <Button
+              className="mt-4"
+              onClick={() => setAddToolOpen(true)}
+            >
+              + Add Tool
+            </Button>
+
           <div>
             <h1 className="font-display mb-4 text-5xl font-normal text-white animate-slide-up">
               {category.title}
@@ -352,6 +391,12 @@ export default function CategoryDetail() {
         onOpenChange={setContactHelpOpen}
         tool={selectedTool}
       />
+      <AddToolModal
+        open={addToolOpen}
+        onClose={() => setAddToolOpen(false)}
+        onSuccess={loadTools}
+      />
+
     </div>
   );
 }
