@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent } from './ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 
 interface Props {
@@ -10,9 +10,7 @@ interface Props {
 }
 
 function extractYoutubeId(url: string) {
-  const match = url.match(
-    /(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/,
-  );
+  const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/);
   return match ? match[1] : '';
 }
 
@@ -25,50 +23,69 @@ export default function AddToolModal({
   const [name, setName] = useState('');
   const [toolUrl, setToolUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  async function handleAddTool() {
-  if (!name || !toolUrl || !category) return;
-
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tools`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify({
-      name,
-      url: toolUrl,
-      category,
-      tutorial_video: extractYoutubeId(youtubeUrl),
-      image: '',
-      image_light: '',
-      image_dark: '',
-    }),
-  });
-
-  if (!res.ok) {
-    console.error('Failed to add tool');
-    return;
+  function resetForm() {
+    setName('');
+    setToolUrl('');
+    setYoutubeUrl('');
   }
 
-  resetForm();   // ✅ clear inputs
-  onSuccess();   // reload tools
-  onClose();     // close modal
-}
+  async function handleAddTool() {
+    if (!name || !toolUrl || !category) return;
 
-function resetForm() {
-  setName('');
-  setToolUrl('');
-  setYoutubeUrl('');
-}
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/tools`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            name,
+            url: toolUrl,
+            category,
+            tutorial_video: extractYoutubeId(youtubeUrl),
+            image: '',
+            image_light: '',
+            image_dark: '',
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error('Failed to add tool:', err);
+        return;
+      }
+
+      resetForm();
+      onSuccess();
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => {
-          if (!v) resetForm();   //reset on close
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          resetForm();
           onClose();
-        }}>
+        }
+      }}
+    >
       <DialogContent className="space-y-4">
-        <h2 className="text-xl font-semibold">Add Tool</h2>
+        {/* ✅ Accessibility fix */}
+        <DialogTitle className="text-xl font-semibold">
+          Add Tool
+        </DialogTitle>
 
         <input
           placeholder="Tool Name"
@@ -91,8 +108,8 @@ function resetForm() {
           className="input"
         />
 
-        <Button onClick={handleAddTool}>
-          Add Tool
+        <Button onClick={handleAddTool} disabled={loading}>
+          {loading ? 'Adding...' : 'Add Tool'}
         </Button>
       </DialogContent>
     </Dialog>
