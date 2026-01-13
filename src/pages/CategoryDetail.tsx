@@ -222,7 +222,7 @@ export default function CategoryDetail() {
         <div className="mx-auto max-w-7xl">
           {filteredTools.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="text-lg text-body-text dark:text-dark-muted">No tools found matching your search.</p>
+              <p className="text-lg text-body-text dark:text-dark-muted">Loading the Tools... Please Wait...</p>
             </div>
           ) : (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
