@@ -48,25 +48,25 @@ const categoryData: Record<string, any> = {
   },
 };
 
-const oldCategoryData: Record<string, any> = {
-  productivity_old: {
-    title: 'Productivity',
-    description: 'Task management and collaboration tools to streamline your workflow',
-    gradient: 'from-blue-500 to-cyan-500',
-    stats: { tools: 12, users: 450, avgRating: 4.8 },
-    tools_old: [
-    ],
-    allTools: toolsData.marketing.tools.map(t => t.name),
-    image: toolsData.marketing.image,
-  },
-  operations_old: {
-    title: 'Operations',
-    description: 'Business operations and analytics tools for data-driven decisions',
-    gradient: 'from-indigo-500 to-blue-500',
-    stats: { tools: 11, users: 260, avgRating: 4.7 },
-    tools_old: [],
-  },
-};
+// const oldCategoryData: Record<string, any> = {
+//   productivity_old: {
+//     title: 'Productivity',
+//     description: 'Task management and collaboration tools to streamline your workflow',
+//     gradient: 'from-blue-500 to-cyan-500',
+//     stats: { tools: 12, users: 450, avgRating: 4.8 },
+//     tools_old: [
+//     ],
+//     allTools: toolsData.marketing.tools.map(t => t.name),
+//     image: toolsData.marketing.image,
+//   },
+//   operations_old: {
+//     title: 'Operations',
+//     description: 'Business operations and analytics tools for data-driven decisions',
+//     gradient: 'from-indigo-500 to-blue-500',
+//     stats: { tools: 11, users: 260, avgRating: 4.7 },
+//     tools_old: [],
+//   },
+// };
 
 export default function CategoryDetail() {
   const { categoryId } = useParams<{ categoryId: string }>();
