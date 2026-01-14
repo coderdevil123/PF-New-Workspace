@@ -295,6 +295,31 @@ export default function CategoryDetail() {
                       </div>
                     </div>
 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-400 hover:text-red-500"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+
+                        if (!confirm(`Delete ${tool.name}?`)) return;
+
+                        await fetch(
+                          `${import.meta.env.VITE_BACKEND_URL}/api/tools/${tool.id}`,
+                          {
+                            method: 'DELETE',
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem('token')}`,
+                            },
+                          }
+                        );
+
+                        loadTools();
+                      }}
+                    >
+                      Delete
+                    </Button>
+
                     {/* Actions */}
                     <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
                       <Button
