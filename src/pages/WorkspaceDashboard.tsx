@@ -6,95 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeAwareImage from '../components/ThemeAwareImage';
 import LogoLoop from '../components/LogoLoop';
-import { toolsData } from '../data/tools';
-
-const categories = [
-  {
-    id: 'productivity',
-    title: 'Productivity',
-    description: 'Team collaboration, knowledge management, and task tracking',
-    icon: Zap,
-    color: 'from-blue-500 to-cyan-500',
-    tools: [
-      ...toolsData.productivity.tools.slice(0, 4).map(tool => ({
-        name: tool.name,
-        url: tool.url,
-        image: tool.image,
-        description: tool.description,
-      }))
-    ],
-    allTools: toolsData.productivity.tools.map(t => t.name),
-    image: toolsData.productivity.image,
-  },
-  {
-    id: 'content',
-    title: 'Content Creation',
-    description: 'Create, edit, analyze, and improve content',
-    icon: Sparkles,
-    color: 'from-purple-500 to-pink-500',
-    tools: [
-      ...toolsData.content.tools.map(tool => ({
-        name: tool.name,
-        url: tool.url,
-        image: tool.image,
-        description: tool.description,
-      }))
-    ],
-    allTools: toolsData.content.tools.map(t => t.name),
-    image: toolsData.content.image,
-  },
-  {
-    id: 'design',
-    title: 'Design',
-    description: 'UI/UX design, prototyping, and creative work',
-    icon: Palette,
-    color: 'from-orange-500 to-red-500',
-    tools: [
-      ...toolsData.design.tools.slice(0, 4).map(tool => ({
-        name: tool.name,
-        url: tool.url,
-        image: tool.image,
-        description: tool.description,
-      }))
-    ],
-    allTools: toolsData.design.tools.map(t => t.name),
-    image: toolsData.design.image,
-  },
-  {
-    id: 'marketing',
-    title: 'Marketing',
-    description: 'Customer engagement, CRM, and analytics',
-    icon: Megaphone,
-    color: 'from-green-500 to-emerald-500',
-    tools: [
-      ...toolsData.marketing.tools.map(tool => ({
-        name: tool.name,
-        url: tool.url,
-        image: tool.image,
-        description: tool.description,
-      }))
-    ],
-    allTools: toolsData.marketing.tools.map(t => t.name),
-    image: toolsData.marketing.image,
-  },
-  {
-    id: 'operations',
-    title: 'Operations',
-    description: 'Infrastructure, automation, and backend systems',
-    icon: Settings,
-    color: 'from-indigo-500 to-blue-500',
-    tools: [
-      ...toolsData.operations.tools.slice(0, 4).map(tool => ({
-        name: tool.name,
-        url: tool.url,
-        image: tool.image,
-        description: tool.description,
-      }))
-    ],
-    allTools: toolsData.operations.tools.map(t => t.name),
-    image: toolsData.operations.image,
-  },
-];
+// import { toolsData } from '../data/tools';
 
 const features = [
   {
@@ -126,6 +38,94 @@ export default function WorkspaceDashboard() {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
   const [isPreviewHovered, setIsPreviewHovered] = useState(false);
+  const [tools, setTools] = useState<Tool[]>([]);
+  type Tool = {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  category: string;
+  image?: string;
+};
+
+  /* ---------------- FETCH TOOLS ---------------- */
+  useEffect(() => {
+    async function loadTools() {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/tools`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      const data = await res.json();
+      setTools(data);
+    }
+
+    loadTools();
+  }, []);
+
+  /* ---------------- GROUP BY CATEGORY ---------------- */
+  const groupedTools = tools.reduce<Record<string, Tool[]>>((acc, tool) => {
+    if (!acc[tool.category]) acc[tool.category] = [];
+    acc[tool.category].push(tool);
+    return acc;
+  }, {});
+
+  /* ---------------- BUILD CATEGORIES ---------------- */
+  const categories = [
+    {
+      id: 'productivity',
+      title: 'Productivity',
+      description: 'Team collaboration, knowledge management, and task tracking',
+      icon: Zap,
+      color: 'from-blue-500 to-cyan-500',
+      tools: (groupedTools.productivity || []).slice(0, 4),
+      allTools: (groupedTools.productivity || []).map((t: Tool) => t.name),
+      image: groupedTools.productivity?.[0]?.image || '/images/productivity.jpg',
+    },
+    {
+      id: 'content',
+      title: 'Content Creation',
+      description: 'Create, edit, analyze, and improve content',
+      icon: Sparkles,
+      color: 'from-purple-500 to-pink-500',
+      tools: (groupedTools.content || []).slice(0, 4),
+      allTools: (groupedTools.content || []).map((t: Tool) => t.name),
+      image: groupedTools.content?.[0]?.image || '/images/content.jpg',
+    },
+    {
+      id: 'design',
+      title: 'Design',
+      description: 'UI/UX design, prototyping, and creative work',
+      icon: Palette,
+      color: 'from-orange-500 to-red-500',
+      tools: (groupedTools.design || []).slice(0, 4),
+      allTools: (groupedTools.design || []).map((t: Tool) => t.name),
+      image: groupedTools.design?.[0]?.image || '/images/design.jpg',
+    },
+    {
+      id: 'marketing',
+      title: 'Marketing',
+      description: 'Customer engagement, CRM, and analytics',
+      icon: Megaphone,
+      color: 'from-green-500 to-emerald-500',
+      tools: (groupedTools.marketing || []).slice(0, 4),
+      allTools: (groupedTools.marketing || []).map((t: Tool) => t.name),
+      image: groupedTools.marketing?.[0]?.image || '/images/marketing.jpg',
+    },
+    {
+      id: 'operations',
+      title: 'Operations',
+      description: 'Infrastructure, automation, and backend systems',
+      icon: Settings,
+      color: 'from-indigo-500 to-blue-500',
+      tools: (groupedTools.operations || []).slice(0, 4),
+      allTools: (groupedTools.operations || []).map((t: Tool) => t.name),
+      image: groupedTools.operations?.[0]?.image || '/images/operations.jpg',
+    },
+  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -347,8 +347,8 @@ export default function WorkspaceDashboard() {
                           {category.description}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {category.allTools.map((toolName, idx) => {
-                            const tool = [...toolsData.productivity.tools, ...toolsData.content.tools, ...toolsData.design.tools, ...toolsData.marketing.tools, ...toolsData.operations.tools].find(t => t.name === toolName);
+                          {category.allTools.map((toolName: string, idx: number) => {
+                            const tool = tools.find(t => t.name === toolName);
                             return (
                               <span
                                 key={idx}
@@ -421,7 +421,7 @@ export default function WorkspaceDashboard() {
                                 Available Tools
                               </h4>
                               <div className="grid grid-cols-2 gap-3">
-                                {category.tools.map((tool, idx) => (
+                                {category.tools.map((tool: Tool, idx: number) => (
                                   <div
                                     key={idx}
                                     className="group/tool relative cursor-pointer overflow-hidden rounded-xl border border-border bg-white dark:bg-dark-card transition-all duration-300 hover:border-mint-accent/50 hover:shadow-md"
@@ -435,8 +435,8 @@ export default function WorkspaceDashboard() {
                                     {/* Tool Image */}
                                     <div className="relative h-24 overflow-hidden bg-white dark:bg-dark-hover">
                                       <ThemeAwareImage
-                                        lightSrc={tool.image}
-                                        darkSrc={tool.image}
+                                        lightSrc={tool.image || '/images/tool-placeholder.png'}
+                                        darkSrc={tool.image || '/images/tool-placeholder.png'}
                                         alt={tool.name}
                                         className="h-full w-full"
                                       />
