@@ -14,48 +14,29 @@ interface TutorialModalProps {
   tool: any;
 }
 
-// Tutorial video IDs from actual tool tutorials
-const getTutorialVideo = (toolId: string): string => {
-  const videos: Record<string, string> = {
-    // Productivity
-    nextcloud: 'Ro4V4cvIi4M',
-    mattermost: 'FuDvrkrqRzg',
-    focalboard: 'v6hG91_WvhY',
-    docmost: 'm8xizxoluCs',
-    karakeep: 'CVHpcJVwpcY',
-    vaultwarden: 'KLwmCfGN7e0',
-    librechat: 'pNIOs1ovsXw',
-    // Content
-    opencut: '9CYK2fuTuFM',
-    languagetool: 'thZQPrn2wZ8',
-    pulse: '',
-    opensign: 'GY_OP697EiU',
-    // Design
-    penpot: 'To9lZhP7084',
-    'adobe-creative': 'f2K1jmjj5pM',
-    'canva-pro': 'ivFqEuo2-eE',
-    freepik: 'Mhd_UqZAAFk',
-    flaticon: '16CdIEfItwM',
-    affinity: 'lTeperbIZBc',
-    // Marketing
-    twentycrm: 'vPm8glMIkI8',
-    'odoo-marketing': '_sI-HH1C8XQ',
-    superset: '4G5xqGMCpgg',
-    // Operations
-    ollama: 'UtSSMs6ObqY',
-    supabase: 'dU7GwCOgvNY',
-    nifi: 'fblkgr1PJ0o',
-    airbyte: 'Rcpt5SVsMpk',
-    n8n: 'RpjQTGKm-ok',
-    'odoo-erp': 'pSZaXjFrgBE',
-  };
-  return videos[toolId] || 'dQw4w9WgXcQ';
-};
-
 export default function TutorialModal({ open, onOpenChange, tool }: TutorialModalProps) {
   if (!tool) return null;
 
-  const videoId = getTutorialVideo(tool.id);
+  const videoId = tool.tutorialVideo || tool.tutorial_video;
+
+  if (!tool.tutorialVideo && !tool.tutorial_video) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{tool.name} Tutorials</DialogTitle>
+            <DialogDescription>
+              No tutorial video available for this tool yet.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-end">
+            <Button onClick={() => onOpenChange(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

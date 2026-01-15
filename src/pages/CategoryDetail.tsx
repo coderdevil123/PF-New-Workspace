@@ -106,7 +106,12 @@ export default function CategoryDetail() {
     );
 
     const data = await res.json();
-    setTools(data);
+    const normalized = data.map((tool: any) => ({
+      ...tool,
+      tutorialVideo: tool.tutorial_video, // ✅ normalize
+    }));
+
+    setTools(normalized);
   }
   
   useEffect(() => {
