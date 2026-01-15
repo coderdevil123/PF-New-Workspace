@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
+import { useEffect } from 'react';
 // import { supabase } from '../lib/supabase';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   category?: string;
+  tool?: any;
 }
 
 function extractYoutubeId(url: string) {
@@ -39,6 +41,7 @@ export default function AddToolModal({
   onClose,
   onSuccess,
   category,
+  tool,
 }: Props) {
   const [name, setName] = useState('');
   const [toolUrl, setToolUrl] = useState('');
@@ -47,41 +50,56 @@ export default function AddToolModal({
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (tool) {
+      setName(tool.name);
+      setToolUrl(tool.url);
+      setYoutubeUrl(tool.tutorial_video || '');
+      setDescription(tool.description || '');
+    }
+  }, [tool]);
+  
   function resetForm() {
-  setName('');
-  setToolUrl('');
-  setYoutubeUrl('');
-  setDescription('');
-  setImageFile(null);
-}
-
-  async function handleAddTool() {
+    setName('');
+    setToolUrl('');
+    setYoutubeUrl('');
+    setDescription('');
+    setImageFile(null);
+  }
+  
+  async function handleSubmit() {
   if (!name || !toolUrl || !category) return;
 
-  const formData = new FormData();
-  formData.append('name', name);
-  formData.append('description', description);
-  formData.append('url', toolUrl);
-  formData.append('category', category);
-  formData.append('tutorial_video', extractYoutubeId(youtubeUrl));
+  setLoading(true);
 
-  if (imageFile) {
-    formData.append('image', imageFile);
-  }
+  const payload = {
+    name,
+    description,
+    url: toolUrl,
+    category,
+    tutorial_video: extractYoutubeId(youtubeUrl),
+    // image will be added later (optional)
+  };
 
-  const res = await fetch(
-    `${import.meta.env.VITE_BACKEND_URL}/api/tools`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: formData,
-    }
-  );
+  const endpoint = tool
+    ? `${import.meta.env.VITE_BACKEND_URL}/api/tools/${tool.id}`
+    : `${import.meta.env.VITE_BACKEND_URL}/api/tools`;
+
+  const method = tool ? 'PUT' : 'POST';
+
+  const res = await fetch(endpoint, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  setLoading(false);
 
   if (!res.ok) {
-    console.error('Add tool failed');
+    console.error('Tool save failed');
     return;
   }
 
@@ -90,23 +108,25 @@ export default function AddToolModal({
   onClose();
 }
 
-
+  
+  
+  
   // async function uploadImage(file: File) {
-  //   const fileName = `${Date.now()}-${file.name}`;
-
-  //   const { data, error } = await supabase.storage
-  //     .from('tool-images')
-  //     .upload(fileName, file, { upsert: true });
-
-  //   if (error) throw error;
-
-  //   return supabase.storage
-  //     .from('tool-images')
-  //     .getPublicUrl(fileName).data.publicUrl;
-  // }
-
-  return (
-    <Dialog
+    //   const fileName = `${Date.now()}-${file.name}`;
+    
+    //   const { data, error } = await supabase.storage
+    //     .from('tool-images')
+    //     .upload(fileName, file, { upsert: true });
+    
+    //   if (error) throw error;
+    
+    //   return supabase.storage
+    //     .from('tool-images')
+    //     .getPublicUrl(fileName).data.publicUrl;
+    // }
+    
+    return (
+      <Dialog
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
@@ -118,7 +138,7 @@ export default function AddToolModal({
       <DialogContent className="space-y-4">
         {/* ✅ Accessibility fix */}
         <DialogTitle className="text-xl font-semibold">
-          Add Tool
+          {tool ? 'Edit Tool' : 'Add Tool'}
         </DialogTitle>
 
         <input
@@ -156,8 +176,10 @@ export default function AddToolModal({
           className="input"
         />
 
-        <Button onClick={handleAddTool} disabled={loading}>
-          {loading ? 'Adding...' : 'Add Tool'}
+        <Button onClick={handleSubmit} disabled={loading}>
+          {loading
+            ? tool ? 'Saving...' : 'Adding...'
+            : tool ? 'Save Changes' : 'Add Tool'}
         </Button>
       </DialogContent>
     </Dialog>
