@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase';
 
 interface Props {
   open: boolean;
@@ -56,64 +56,54 @@ export default function AddToolModal({
 }
 
   async function handleAddTool() {
-    if (!name || !toolUrl || !category) return;
+  if (!name || !toolUrl || !category) return;
 
-    try {
-      setLoading(true);
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('description', description);
+  formData.append('url', toolUrl);
+  formData.append('category', category);
+  formData.append('tutorial_video', extractYoutubeId(youtubeUrl));
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
 
-      let imageUrl = '';
-      if (imageFile) {
-        imageUrl = await uploadImage(imageFile);
-      }
-
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tools`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          url: toolUrl,
-          category,
-          tutorial_video: extractYoutubeId(youtubeUrl),
-          image: imageUrl,
-          image_light: imageUrl,
-          image_dark: imageUrl,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        console.error('Add tool failed:', err);
-        return;
-      }
-
-      resetForm();
-      onSuccess();
-      onClose();
-    } finally {
-      setLoading(false);
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/api/tools`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: formData,
     }
+  );
+
+  if (!res.ok) {
+    console.error('Add tool failed');
+    return;
   }
 
-  async function uploadImage(file: File) {
-    const fileName = `${Date.now()}-${file.name}`;
+  resetForm();
+  onSuccess();
+  onClose();
+}
 
-    const { data, error } = await supabase.storage
-      .from('tool-images')
-      .upload(fileName, file, { upsert: true });
 
-    if (error) throw error;
+  // async function uploadImage(file: File) {
+  //   const fileName = `${Date.now()}-${file.name}`;
 
-    return supabase.storage
-      .from('tool-images')
-      .getPublicUrl(fileName).data.publicUrl;
-  }
+  //   const { data, error } = await supabase.storage
+  //     .from('tool-images')
+  //     .upload(fileName, file, { upsert: true });
+
+  //   if (error) throw error;
+
+  //   return supabase.storage
+  //     .from('tool-images')
+  //     .getPublicUrl(fileName).data.publicUrl;
+  // }
 
   return (
     <Dialog
