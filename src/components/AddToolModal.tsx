@@ -134,50 +134,52 @@ export default function AddToolModal({
         <DialogTitle className="font-display text-2xl font-normal text-heading-dark dark:text-white">
           {tool ? 'Edit Tool' : 'Add Tool'}
         </DialogTitle>
-        <label className="
-          flex cursor-pointer items-center justify-center gap-2
-          rounded-lg border border-dashed border-border
-          bg-light-gray px-4 py-3 text-sm
-          text-muted-text
-          hover:border-mint-accent hover:text-mint-accent
-          dark:bg-dark-hover dark:border-dark-border dark:text-dark-muted
-        ">
 
         <input
           placeholder="Tool Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="input"
+          className={inputClass}
         />
-        </label>
 
         <input
           placeholder="Tool URL"
           value={toolUrl}
           onChange={(e) => setToolUrl(e.target.value)}
-          className="input"
+          className={inputClass}
         />
 
         <input
           placeholder="YouTube Tutorial URL (optional)"
           value={youtubeUrl}
           onChange={(e) => setYoutubeUrl(e.target.value)}
-          className="input"
+          className={inputClass}
         />
 
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="input min-h-[80px]"
+          className={`${inputClass} min-h-[80px]`}
         />
 
+        <label className="block">
+        <span className="mb-2 block text-sm font-medium text-heading-dark dark:text-dark-text">
+          Tool Image
+        </span>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-          className="input"
-        />
+          className="
+            w-full cursor-pointer rounded-xl border border-dashed border-border
+            bg-light-gray dark:bg-dark-hover
+            px-4 py-6 text-sm text-muted-text
+            hover:border-mint-accent/50
+          "
+          />
+        </label>
+
         {imageFile && (
           <p className="text-xs text-muted-text dark:text-dark-muted">
             Selected: {imageFile.name}
@@ -185,30 +187,30 @@ export default function AddToolModal({
         )}
 
         <div className="flex justify-end gap-3 pt-4">
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="
-            rounded-full border-border
-            text-heading-dark
-            hover:bg-light-gray
-            dark:border-dark-border dark:text-white dark:hover:bg-dark-hover
-          "
-        >
-          Cancel
-        </Button>
-
-        <Button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="
-            rounded-full bg-mint-accent
-            text-forest-dark font-semibold
-            hover:bg-mint-accent/90
-            disabled:opacity-50
-          "
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="
+              rounded-full
+              border-border
+              text-heading-dark dark:text-dark-text
+              hover:bg-gray-100 dark:hover:bg-dark-hover
+            "
           >
-            {loading ? 'Saving...' : tool ? 'Update Tool' : 'Add Tool'}
+            Cancel
+          </Button>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="
+              rounded-full
+              bg-mint-accent text-forest-dark
+              hover:bg-mint-accent/90
+              shadow-lg shadow-mint
+            "
+            >
+              {loading ? 'Saving...' : tool ? 'Update Tool' : 'Add Tool'}
           </Button>
         </div>
 
