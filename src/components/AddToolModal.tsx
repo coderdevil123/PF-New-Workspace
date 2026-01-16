@@ -108,22 +108,11 @@ export default function AddToolModal({
   onClose();
 }
 
-  
-  
-  
-  // async function uploadImage(file: File) {
-    //   const fileName = `${Date.now()}-${file.name}`;
-    
-    //   const { data, error } = await supabase.storage
-    //     .from('tool-images')
-    //     .upload(fileName, file, { upsert: true });
-    
-    //   if (error) throw error;
-    
-    //   return supabase.storage
-    //     .from('tool-images')
-    //     .getPublicUrl(fileName).data.publicUrl;
-    // }
+  const inputClass =
+  "w-full rounded-lg border border-border bg-light-gray px-4 py-2 text-sm " +
+  "text-heading-dark placeholder:text-muted-text " +
+  "focus:outline-none focus:ring-2 focus:ring-mint-accent/30 " +
+  "dark:bg-dark-hover dark:border-dark-border dark:text-white dark:placeholder:text-dark-muted";
     
     return (
       <Dialog
@@ -135,11 +124,24 @@ export default function AddToolModal({
         }
       }}
     >
-      <DialogContent className="space-y-4">
+      <DialogContent className="w-full max-w-lg rounded-2xl
+        bg-white text-heading-dark
+        dark:bg-dark-card dark:text-white
+        border border-border dark:border-dark-border
+        shadow-xl
+        space-y-5">
         {/* ✅ Accessibility fix */}
-        <DialogTitle className="text-xl font-semibold">
+        <DialogTitle className="font-display text-2xl font-normal text-heading-dark dark:text-white">
           {tool ? 'Edit Tool' : 'Add Tool'}
         </DialogTitle>
+        <label className="
+          flex cursor-pointer items-center justify-center gap-2
+          rounded-lg border border-dashed border-border
+          bg-light-gray px-4 py-3 text-sm
+          text-muted-text
+          hover:border-mint-accent hover:text-mint-accent
+          dark:bg-dark-hover dark:border-dark-border dark:text-dark-muted
+        ">
 
         <input
           placeholder="Tool Name"
@@ -147,6 +149,7 @@ export default function AddToolModal({
           onChange={(e) => setName(e.target.value)}
           className="input"
         />
+        </label>
 
         <input
           placeholder="Tool URL"
@@ -175,12 +178,40 @@ export default function AddToolModal({
           onChange={(e) => setImageFile(e.target.files?.[0] || null)}
           className="input"
         />
+        {imageFile && (
+          <p className="text-xs text-muted-text dark:text-dark-muted">
+            Selected: {imageFile.name}
+          </p>
+        )}
 
-        <Button onClick={handleSubmit} disabled={loading}>
-          {loading
-            ? tool ? 'Saving...' : 'Adding...'
-            : tool ? 'Save Changes' : 'Add Tool'}
+        <div className="flex justify-end gap-3 pt-4">
+        <Button
+          variant="outline"
+          onClick={onClose}
+          className="
+            rounded-full border-border
+            text-heading-dark
+            hover:bg-light-gray
+            dark:border-dark-border dark:text-white dark:hover:bg-dark-hover
+          "
+        >
+          Cancel
         </Button>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="
+            rounded-full bg-mint-accent
+            text-forest-dark font-semibold
+            hover:bg-mint-accent/90
+            disabled:opacity-50
+          "
+          >
+            {loading ? 'Saving...' : tool ? 'Update Tool' : 'Add Tool'}
+          </Button>
+        </div>
+
       </DialogContent>
     </Dialog>
   );

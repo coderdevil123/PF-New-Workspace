@@ -300,12 +300,12 @@ export default function CategoryDetail() {
                         <span>Active</span>
                       </div>
                     </div>
-                    
+                    <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       className="
-                        h-8 w-8 rounded-full flex items-center justify-center
+                        h-8 w-12 rounded-[99px] rounded-full flex items-center justify-center
                         bg-white/90 text-red-600
                         dark:bg-dark-card dark:text-red-400
                         hover:bg-red-500 hover:text-white
@@ -341,7 +341,7 @@ export default function CategoryDetail() {
                         setAddToolOpen(true);
                       }}
                       className="
-                      h-8 w-8 rounded-full flex items-center justify-center
+                      h-8 w-12 rounded-[99px] rounded-full flex items-center justify-center
                       bg-white/90 text-gray-700
                       dark:bg-dark-card dark:text-gray-200
                       hover:bg-mint-accent hover:text-white
@@ -350,6 +350,7 @@ export default function CategoryDetail() {
                     >
                       Edit
                     </Button>
+                    </div>
 
                     {/* Actions */}
                     <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
