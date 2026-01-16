@@ -304,7 +304,14 @@ export default function CategoryDetail() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-red-400 hover:text-red-500"
+                      className="
+                        h-8 w-8 rounded-full flex items-center justify-center
+                        bg-white/90 text-red-600
+                        dark:bg-dark-card dark:text-red-400
+                        hover:bg-red-500 hover:text-white
+                        shadow-md transition-all
+                      "
+                      title="Delete Tool"
                       onClick={async (e) => {
                         e.stopPropagation();
 
@@ -333,6 +340,13 @@ export default function CategoryDetail() {
                         setSelectedTool(tool);
                         setAddToolOpen(true);
                       }}
+                      className="
+                      h-8 w-8 rounded-full flex items-center justify-center
+                      bg-white/90 text-gray-700
+                      dark:bg-dark-card dark:text-gray-200
+                      hover:bg-mint-accent hover:text-white
+                      shadow-md transition-all"
+                      title="Edit Tool"
                     >
                       Edit
                     </Button>
