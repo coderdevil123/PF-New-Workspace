@@ -300,7 +300,7 @@ export default function CategoryDetail() {
                         <span>Active</span>
                       </div>
                     </div>
-
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -350,6 +350,7 @@ export default function CategoryDetail() {
                     >
                       Edit
                     </Button>
+                    </div>
 
                     {/* Actions */}
                     <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
