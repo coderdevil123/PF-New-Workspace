@@ -69,6 +69,7 @@ const categoryData: Record<string, any> = {
 // };
 
 export default function CategoryDetail() {
+  const [editTool, setEditTool] = useState<any | null>(null);
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
   const { effectiveTheme } = useTheme();
@@ -325,6 +326,17 @@ export default function CategoryDetail() {
                       Delete
                     </Button>
 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedTool(tool);
+                        setAddToolOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+
                     {/* Actions */}
                     <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
                       <Button
@@ -423,9 +435,13 @@ export default function CategoryDetail() {
       />
       <AddToolModal
         open={addToolOpen}
-        category={categoryId}
-        onClose={() => setAddToolOpen(false)}
+        onClose={() => {
+          setSelectedTool(null);
+          setAddToolOpen(false);
+        }}
         onSuccess={loadTools}
+        category={categoryId}
+        tool={selectedTool}
       />
 
     </div>
