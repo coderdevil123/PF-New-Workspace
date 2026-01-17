@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { useTheme, type Theme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: (value: boolean) => void }) => (
   <button
@@ -26,7 +27,8 @@ export default function Settings() {
   const { theme, setTheme } = useTheme();
   
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('appSettings');
+    const userKey = `appSettings:${localStorage.getItem('user_email')}`;
+    const saved = localStorage.getItem(userKey);
     const defaultSettings = {
       notifications: {
         email: true,
@@ -62,6 +64,26 @@ export default function Settings() {
     }
     return defaultSettings;
   });
+  const { setLanguage } = useLanguage();
+
+  const handleLanguageChange = (lang: string) => {
+    handleSettingChange('appearance', 'language', lang);
+    setLanguage(lang as any);
+  };
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    root.classList.remove('text-sm', 'text-base', 'text-lg');
+
+    if (settings.accessibility.fontSize === 'small') {
+      root.classList.add('text-sm');
+    } else if (settings.accessibility.fontSize === 'large') {
+      root.classList.add('text-lg');
+    } else {
+      root.classList.add('text-base');
+    }
+  }, [settings.accessibility.fontSize]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -69,7 +91,8 @@ export default function Settings() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('appSettings', JSON.stringify(settings));
+    const userKey = `appSettings:${localStorage.getItem('user_email')}`;
+    localStorage.setItem(userKey, JSON.stringify(settings));
   }, [settings]);
 
   const handleSettingChange = (category: string, setting: string, value: any) => {
@@ -261,8 +284,8 @@ export default function Settings() {
                   </div>
                   <select
                     value={settings.appearance.language}
-                    onChange={(e) => handleSettingChange('appearance', 'language', e.target.value)}
-                    className="w-full rounded-lg border border-border bg-white dark:bg-dark-card px-3 py-2 text-heading-dark dark:text-dark-text focus:border-mint-accent focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
+                    onChange={(e) => handleLanguageChange(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-white dark:bg-dark-card px-3 py-2"
                   >
                     <option value="en" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">English</option>
                     <option value="es" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">Español</option>

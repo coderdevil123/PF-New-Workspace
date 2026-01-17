@@ -12,10 +12,12 @@ import Team from './pages/Team';
 import Login from './pages/Login';
 // import Signup from './pages/Signup';
 import OAuthSuccess from './pages/OAuthSuccess';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
     <ThemeProvider>
+      <LanguageProvider>
       <AuthProvider>
         <Router>
           <AppLayout>
@@ -34,6 +36,7 @@ function App() {
           <Toaster />
         </Router>
       </AuthProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
