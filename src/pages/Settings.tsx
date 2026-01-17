@@ -285,7 +285,7 @@ export default function Settings() {
                   <select
                     value={settings.appearance.language}
                     onChange={(e) => handleLanguageChange(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-white dark:bg-dark-card px-3 py-2"
+                    className="w-full rounded-lg border border-border bg-white dark:bg-dark-card px-3 py-2 text-heading-dark dark:text-dark-text focus:border-mint-accent focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
                   >
                     <option value="en" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">English</option>
                     <option value="es" className="bg-white dark:bg-dark-card text-heading-dark dark:text-dark-text">Español</option>
