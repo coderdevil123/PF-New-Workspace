@@ -131,7 +131,7 @@ export default function Settings() {
         <div className="mx-auto max-w-4xl space-y-8">
           
           {/* Notifications */}
-          <div className="rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up">
+          {/* <div className="rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-500/20">
                 <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -161,10 +161,10 @@ export default function Settings() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Privacy & Security */}
-          <div className="rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          {/* <div className="rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-500/20">
                 <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -208,7 +208,7 @@ export default function Settings() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Appearance */}
           <div className="rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.2s' }}>
@@ -306,7 +306,7 @@ export default function Settings() {
             </div>
 
             <div className="space-y-4">
-              {[
+              {/* {[
                 { key: 'reducedMotion', label: 'Reduced Motion', description: 'Minimize animations and transitions' },
                 { key: 'highContrast', label: 'High Contrast', description: 'Increase color contrast for better visibility' },
               ].map((item) => (
@@ -320,7 +320,7 @@ export default function Settings() {
                     onChange={(value) => handleSettingChange('accessibility', item.key, value)}
                   />
                 </div>
-              ))}
+              ))} */}
 
               <div className="rounded-lg border border-border bg-light-gray dark:bg-dark-hover p-4">
                 <div className="mb-3">
