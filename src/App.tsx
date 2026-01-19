@@ -13,12 +13,14 @@ import Login from './pages/Login';
 // import Signup from './pages/Signup';
 import OAuthSuccess from './pages/OAuthSuccess';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
 
 function App() {
   return (
     <ThemeProvider>
-      <LanguageProvider>
+      {/* <LanguageProvider> */}
       <AuthProvider>
+        {/* <AnnouncementsProvider> */}
         <Router>
           <AppLayout>
           <Routes>
@@ -35,8 +37,9 @@ function App() {
           </AppLayout>
           <Toaster />
         </Router>
+        {/* </AnnouncementsProvider> */}
       </AuthProvider>
-      </LanguageProvider>
+      {/* </LanguageProvider> */}
     </ThemeProvider>
   );
 }

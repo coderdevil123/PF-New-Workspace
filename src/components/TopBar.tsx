@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import { useToast } from '../hooks/use-toast';
+// import { useAnnouncements } from '../contexts/AnnouncementsContext';
 
 interface TopBarProps {
   onMenuClick: () => void;

@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 import { supabase } from '../lib/supabaseClient';
+// import { useAnnouncements } from '../contexts/AnnouncementsContext';
 
 export default function Announcements() {
   const getCategoryColor = (category: string) => {
