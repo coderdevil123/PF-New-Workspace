@@ -1,0 +1,23 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Personnalisez votre espace de travail",
+    "appearance": "Apparence",
+    "language": "Langue",
+    "timezone": "Fuseau horaire",
+    "fontSize": "Taille du texte",
+    "small": "Petit",
+    "medium": "Moyen",
+    "large": "Grand",
+    "theme": "Thème"
+  },
+  "dashboard": {
+    "explore": "Explorer par catégorie",
+    "availableTools": "Outils disponibles"
+  }
+}

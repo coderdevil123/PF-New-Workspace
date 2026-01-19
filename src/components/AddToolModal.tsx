@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { useEffect } from 'react';
-// import { supabase } from '../lib/supabase';
 
 interface Props {
   open: boolean;
@@ -20,12 +19,10 @@ function extractYoutubeId(url: string) {
       return u.pathname.slice(1);
     }
 
-    // youtube.com/watch?v=VIDEO_ID
     if (u.searchParams.get('v')) {
       return u.searchParams.get('v')!;
     }
 
-    // youtube.com/embed/VIDEO_ID
     if (u.pathname.includes('/embed/')) {
       return u.pathname.split('/embed/')[1];
     }
@@ -78,7 +75,6 @@ export default function AddToolModal({
     url: toolUrl,
     category,
     tutorial_video: extractYoutubeId(youtubeUrl),
-    // image will be added later (optional)
   };
 
   const endpoint = tool

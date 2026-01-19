@@ -1,29 +1,55 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Language = 'en' | 'es' | 'fr' | 'de';
+import en from '../i18n/en.json';
+import fr from '../i18n/fr.json';
 
-const LanguageContext = createContext<{
+type Language = 'en' | 'fr';
+
+const dictionaries: Record<Language, any> = {
+  en,
+  fr,
+};
+
+interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-}>({
-  language: 'en',
-  setLanguage: () => {},
-});
+  t: (key: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const userKey = `language:${localStorage.getItem('user_email')}`;
+
   const [language, setLanguage] = useState<Language>(() => {
-    return (localStorage.getItem('language') as Language) || 'en';
+    return (localStorage.getItem(userKey) as Language) || 'en';
   });
 
   useEffect(() => {
-    localStorage.setItem('language', language);
+    localStorage.setItem(userKey, language);
   }, [language]);
 
+  const t = (key: string) => {
+    const keys = key.split('.');
+    let value = dictionaries[language];
+
+    for (const k of keys) {
+      value = value?.[k];
+      if (!value) return key; // fallback
+    }
+
+    return value;
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 }
 
-export const useLanguage = () => useContext(LanguageContext);
+export function useLanguage() {
+  const ctx = useContext(LanguageContext);
+  if (!ctx) throw new Error('useLanguage must be used inside LanguageProvider');
+  return ctx;
+}

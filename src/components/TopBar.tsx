@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,6 +25,23 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const { toast } = useToast();
   const { user, logout } = useAuth();
   const { theme, setTheme, effectiveTheme } = useTheme();
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+
+  useEffect(() => {
+  if (!user) {
+    setAnnouncements([]);
+    return;
+  }
+
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  })
+    .then(res => res.json())
+    .then(data => setAnnouncements(Array.isArray(data) ? data : []))
+    .catch(() => setAnnouncements([]));
+}, [user]);
 
   const handleLogout = () => {
     logout();
@@ -44,23 +61,25 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   };
 
   // Get unread announcements from localStorage
-  const getUnreadCount = () => {
-    const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
-    const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
-    return announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
-  };
+  // const getUnreadCount = () => {
+  //   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+  //   const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
+  //   return announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
+  // };
 
-  const getLatestAnnouncements = () => {
-    const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
-    const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
-    return announcements
-      .filter((a: any) => !readAnnouncements.includes(a.id))
-      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 3);
-  };
+  // const getLatestAnnouncements = () => {
+  //   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+  //   const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
+  //   return announcements
+  //     .filter((a: any) => !readAnnouncements.includes(a.id))
+  //     .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  //     .slice(0, 3);
+  // };
 
-  const unreadCount = getUnreadCount();
-  const latestAnnouncements = getLatestAnnouncements();
+  const unreadCount = announcements.filter(a => !a.is_read).length;
+  const latestAnnouncements = announcements
+  .filter(a => !a.is_read)
+  .slice(0, 3);
 
   const themeIcons = {
     light: Sun,
@@ -152,6 +171,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         </Button>
 
         {/* Notifications with Preview */}
+        {user && (
         <DropdownMenu open={notificationOpen} onOpenChange={setNotificationOpen}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -231,7 +251,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             )}
           </DropdownMenuContent>
         </DropdownMenu>
-
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

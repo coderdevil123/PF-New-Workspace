@@ -1,0 +1,23 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your workspace experience and preferences",
+    "appearance": "Appearance",
+    "language": "Language",
+    "timezone": "Timezone",
+    "fontSize": "Font Size",
+    "small": "Small",
+    "medium": "Medium",
+    "large": "Large",
+    "theme": "Theme"
+  },
+  "dashboard": {
+    "explore": "Explore by Category",
+    "availableTools": "Available Tools"
+  }
+}

@@ -51,6 +51,13 @@ export default function Announcements() {
   });
 
   useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     document.title = 'Announcements | Pristine Forests';
   }, []);
