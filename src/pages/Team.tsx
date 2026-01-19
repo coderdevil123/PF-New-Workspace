@@ -113,6 +113,8 @@ export default function Team() {
     );
   }
 
+  if (!user) return;
+
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
       {/* Header */}
