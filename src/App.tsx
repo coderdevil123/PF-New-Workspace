@@ -18,9 +18,9 @@ import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
 function App() {
   return (
     <ThemeProvider>
-      {/* <LanguageProvider> */}
+      <LanguageProvider>
       <AuthProvider>
-        {/* <AnnouncementsProvider> */}
+        <AnnouncementsProvider>
         <Router>
           <AppLayout>
           <Routes>
@@ -37,9 +37,9 @@ function App() {
           </AppLayout>
           <Toaster />
         </Router>
-        {/* </AnnouncementsProvider> */}
+        </AnnouncementsProvider>
       </AuthProvider>
-      {/* </LanguageProvider> */}
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

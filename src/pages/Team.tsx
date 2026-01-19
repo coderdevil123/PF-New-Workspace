@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { teamMembers as defaultTeam } from '../data/teamMembers';
 
 type TeamMember = {
-  id: string;
+  id: string | number;
   name: string;
   email: string;
   role: string;
@@ -30,53 +30,60 @@ export default function Team() {
 
   useEffect(() => {
     async function loadTeam() {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+  if (!localStorage.getItem('token')) {
+    setMembers(defaultTeam); // fallback
+    return;
+  }
 
-      const dbMembers = await res.json();
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
 
-      // 🔥 MERGE DEFAULTS + DB BY EMAIL
-      const merged = defaultTeam.map(defaultMember => {
-        const override = dbMembers.find(
-          (m: any) => m.email === defaultMember.email
-        );
+  if (!res.ok) {
+    setMembers(defaultTeam);
+    return;
+  }
 
-        return {
-          ...defaultMember,
+  const dbMembers = await res.json();
 
-          // ✅ only user-editable fields
-          name: override?.name ?? defaultMember.name,
-          phone: override?.phone ?? (defaultMember as any).phone,
-          bio: override?.bio ?? (defaultMember as any).bio,
-          location: override?.location ?? (defaultMember as any).location,
-          mattermost: override?.mattermost ?? (defaultMember as any).mattermost,
-          avatar_url: override?.avatar_url || defaultMember.image,
-        };
-      });
+  if (!Array.isArray(dbMembers)) {
+    setMembers(defaultTeam);
+    return;
+  }
 
+  // 🔥 SAFE MERGE
+  const merged = defaultTeam.map(defaultMember => {
+    const override = dbMembers.find(
+      (m: any) => m.email === defaultMember.email
+    );
 
-      // 🔥 ADD NEW USERS (not in defaults)
-      const newUsers = dbMembers
-      .filter((db: any) =>
-        !defaultTeam.some(def => def.email === db.email)
-      )
-      .map((db: any) => ({
-        ...db,
-        role: db.role || 'Member',
-        department: db.department || 'General',
-        avatar_url: db.avatar_url,
-      }));
+    return {
+      ...defaultMember,
+      name: override?.name ?? defaultMember.name,
+      phone: override?.phone ?? (defaultMember as any).phone,
+      bio: override?.bio ?? (defaultMember as any).bio,
+      location: override?.location ?? (defaultMember as any).location,
+      mattermost: override?.mattermost ?? defaultMember.mattermost,
+      avatar_url: override?.avatar_url || defaultMember.image,
+    };
+  });
 
-      const normalized = [...merged, ...newUsers].map(m => ({
-        ...m,
-        role: m.role || 'Member',
-        department: m.department || 'General',
-      }));
-      setMembers(normalized);
-    }
+  const newUsers = dbMembers
+    .filter((db: any) =>
+      !defaultTeam.some(def => def.email === db.email)
+    )
+    .map((db: any) => ({
+      ...db,
+      role: db.role || 'Member',
+      department: db.department || 'General',
+      avatar_url: db.avatar_url,
+    }));
+
+  setMembers([...merged, ...newUsers]);
+}
+
 
     loadTeam();
   }, []);
@@ -113,7 +120,7 @@ export default function Team() {
     );
   }
 
-  if (!user) return;
+  if (!user) return null;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
