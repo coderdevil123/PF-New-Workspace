@@ -120,7 +120,7 @@ export default function Team() {
     );
   }
 
-  if (!user) return null;
+  // if (!user) return null;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
