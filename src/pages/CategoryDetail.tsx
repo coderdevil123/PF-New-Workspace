@@ -83,11 +83,16 @@ export default function CategoryDetail() {
 
   const [tools, setTools] = useState<any[]>([]);
 
-  const groupedTools = tools.reduce((acc: any, tool: any) => {
+  const safeTools = Array.isArray(tools) ? tools : [];
+  const groupedTools = safeTools.reduce((acc: any, tool: any) => {
+    if (!tool?.category) return acc;
+
     if (!acc[tool.category]) acc[tool.category] = [];
     acc[tool.category].push(tool);
+
     return acc;
-  }, {});
+  }, {} as Record<string, any[]>);
+
 
   const category = categoryId
   ? {
@@ -139,6 +144,14 @@ export default function CategoryDetail() {
             Back to Dashboard
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  if (!Array.isArray(tools)) {
+    return (
+      <div className="text-center text-muted-text mt-20">
+        Loading tools…
       </div>
     );
   }

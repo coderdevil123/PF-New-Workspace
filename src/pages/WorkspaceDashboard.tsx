@@ -67,11 +67,17 @@ export default function WorkspaceDashboard() {
   }, []);
 
   /* ---------------- GROUP BY CATEGORY ---------------- */
-  const groupedTools = tools.reduce<Record<string, Tool[]>>((acc, tool) => {
+  const safeTools = Array.isArray(tools) ? tools : [];
+
+  const groupedTools = safeTools.reduce((acc: any, tool: any) => {
+    if (!tool?.category) return acc;
+
     if (!acc[tool.category]) acc[tool.category] = [];
     acc[tool.category].push(tool);
+
     return acc;
-  }, {});
+  }, {} as Record<string, any[]>);
+
 
   /* ---------------- BUILD CATEGORIES ---------------- */
   const categories = [
@@ -143,6 +149,14 @@ export default function WorkspaceDashboard() {
     }
     window.open(url, '_blank');
   };
+
+  if (!Array.isArray(tools)) {
+    return (
+      <div className="text-center text-muted-text mt-20">
+        Loading tools…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
