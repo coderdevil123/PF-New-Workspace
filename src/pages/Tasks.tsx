@@ -12,14 +12,15 @@ export default function Tasks() {
   const { toast } = useToast();
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate('/login');
+  //   }
+  // }, [user, navigate]);
 
   const [tasks, setTasks] = useState<any[]>([]);
 
+  
   const DUMMY_TASKS = [
   {
     id: '1',
