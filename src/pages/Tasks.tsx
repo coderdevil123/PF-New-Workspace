@@ -1,75 +1,70 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckSquare, Calendar } from 'lucide-react';
+import { ArrowLeft, CheckSquare, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '../hooks/use-toast';
 
-export default function Tasks() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const token = localStorage.getItem('token');
+type Task = {
+  id: string;
+  title: string;
+  description?: string;
+  is_completed: boolean;
+};
 
-  const [tasks, setTasks] = useState<any[]>([]);
-
-  const DUMMY_TASKS = [
+const DUMMY_TASKS: Task[] = [
   {
     id: '1',
     title: 'Prepare weekly security report',
     description: 'Based on last team meeting',
-    due_date: '2026-01-25',
     is_completed: false,
   },
   {
     id: '2',
     title: 'Review Pristine Forests workspace RBAC',
     description: 'Check intern vs admin permissions',
-    due_date: '2026-01-27',
     is_completed: true,
   },
   {
     id: '3',
     title: 'Sync Mattermost meeting notes',
     description: 'Extract tasks from meeting summary',
-    due_date: null,
     is_completed: false,
-  },]
+  },
+];
 
+export default function Tasks() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // 🔐 Auth guard (SAFE – no hook violation)
   useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // 🧪 Dummy task loader
+  useEffect(() => {
+    if (!user) return;
+
     document.title = 'Tasks | Pristine Forests';
-
     setTasks(DUMMY_TASKS);
+  }, [user]);
 
-    // fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
-    //   headers: { Authorization: `Bearer ${token}` },
-    // })
-    //   .then(res => res.json())
-    //   .then(setTasks)
-    //   .catch(() => {
-    //     toast({
-    //       title: 'Error',
-    //       description: 'Failed to load tasks',
-    //       variant: 'destructive',
-    //     });
-    //   });
-  }, []);
-
-  const toggleTask = async (id: string) => {
-    await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/tasks/${id}/toggle`,
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
+  // ✅ LOCAL toggle ONLY (no backend in dummy mode)
+  const toggleTask = (id: string) => {
     setTasks(prev =>
-      prev.map(t =>
-        t.id === id ? { ...t, is_completed: !t.is_completed } : t
+      prev.map(task =>
+        task.id === id
+          ? { ...task, is_completed: !task.is_completed }
+          : task
       )
     );
   };
+
+  // Prevent render until auth resolved
+  if (!user) return null;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -106,35 +101,40 @@ export default function Tasks() {
           {tasks.map(task => (
             <div
               key={task.id}
-              className="flex items-start gap-4 rounded-xl border bg-white dark:bg-dark-card p-6 shadow-card hover:shadow-card-hover transition"
+              onClick={() => toggleTask(task.id)}
+              className="flex cursor-pointer items-start gap-4 rounded-xl border
+                         bg-white/5 dark:bg-dark-card p-6
+                         shadow-card hover:shadow-card-hover
+                         transition-all"
             >
-              <input
-                type="checkbox"
-                checked={task.is_completed}
-                onChange={() => toggleTask(task.id)}
-                className="mt-1 h-5 w-5 accent-mint-accent"
-              />
+              <div
+                className={`mt-1 flex h-5 w-5 items-center justify-center rounded border
+                  ${
+                    task.is_completed
+                      ? 'bg-mint-accent border-mint-accent'
+                      : 'border-muted-foreground'
+                  }`}
+              >
+                {task.is_completed && (
+                  <Check className="h-4 w-4 text-white" />
+                )}
+              </div>
 
               <div className="flex-1">
-                <h3 className={`text-lg font-medium ${
-                  task.is_completed
-                    ? 'line-through text-muted-foreground'
-                    : 'text-heading-dark dark:text-dark-text'
-                }`}>
+                <h3
+                  className={`text-lg font-medium ${
+                    task.is_completed
+                      ? 'line-through text-muted-foreground'
+                      : 'text-heading-dark dark:text-dark-text'
+                  }`}
+                >
                   {task.title}
                 </h3>
 
                 {task.description && (
-                  <p className="text-sm text-muted-text mt-1">
+                  <p className="mt-1 text-sm text-muted-text">
                     {task.description}
                   </p>
-                )}
-
-                {task.due_date && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-text">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(task.due_date).toDateString()}
-                  </div>
                 )}
               </div>
             </div>
