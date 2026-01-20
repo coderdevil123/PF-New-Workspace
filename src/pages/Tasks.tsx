@@ -13,21 +13,46 @@ export default function Tasks() {
 
   const [tasks, setTasks] = useState<any[]>([]);
 
+  const DUMMY_TASKS = [
+  {
+    id: '1',
+    title: 'Prepare weekly security report',
+    description: 'Based on last team meeting',
+    due_date: '2026-01-25',
+    is_completed: false,
+  },
+  {
+    id: '2',
+    title: 'Review Pristine Forests workspace RBAC',
+    description: 'Check intern vs admin permissions',
+    due_date: '2026-01-27',
+    is_completed: true,
+  },
+  {
+    id: '3',
+    title: 'Sync Mattermost meeting notes',
+    description: 'Extract tasks from meeting summary',
+    due_date: null,
+    is_completed: false,
+  },]
+
   useEffect(() => {
     document.title = 'Tasks | Pristine Forests';
 
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(setTasks)
-      .catch(() => {
-        toast({
-          title: 'Error',
-          description: 'Failed to load tasks',
-          variant: 'destructive',
-        });
-      });
+    setTasks(DUMMY_TASKS);
+
+    // fetch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks`, {
+    //   headers: { Authorization: `Bearer ${token}` },
+    // })
+    //   .then(res => res.json())
+    //   .then(setTasks)
+    //   .catch(() => {
+    //     toast({
+    //       title: 'Error',
+    //       description: 'Failed to load tasks',
+    //       variant: 'destructive',
+    //     });
+    //   });
   }, []);
 
   const toggleTask = async (id: string) => {

@@ -128,6 +128,14 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
         {/* Theme Toggle Dropdown */}
         <DropdownMenu>
+          <Button
+              onClick={() => navigate('/tasks')}
+              variant="ghost"
+              size="sm"
+              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+            >
+              <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
+            </Button>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
@@ -140,15 +148,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <DropdownMenuContent align="end" className="w-40 bg-popover text-popover-foreground">
             <DropdownMenuLabel className="text-popover-foreground">Theme</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            
-            <Button
-              onClick={() => navigate('/tasks')}
-              variant="ghost"
-              size="sm"
-              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-            >
-              <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
-            </Button>
 
             <DropdownMenuItem 
               onClick={() => handleThemeChange('light')}
