@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import OAuthSuccess from './pages/OAuthSuccess';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
+import Tasks from './pages/Tasks';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/announcements" element={<Announcements />} />
+            <Route path="/tasks" element={<Tasks />} />
             <Route path="/team" element={<Team />} />
             <Route path="/login" element={<Login />} />
             <Route path="/oauth/success" element={<OAuthSuccess />} />

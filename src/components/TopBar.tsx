@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import { useToast } from '../hooks/use-toast';
+import { CheckSquare } from 'lucide-react';
+
 // import { useAnnouncements } from '../contexts/AnnouncementsContext';
 
 interface TopBarProps {
@@ -138,6 +140,16 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <DropdownMenuContent align="end" className="w-40 bg-popover text-popover-foreground">
             <DropdownMenuLabel className="text-popover-foreground">Theme</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            
+            <Button
+              onClick={() => navigate('/tasks')}
+              variant="ghost"
+              size="sm"
+              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+            >
+              <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
+            </Button>
+
             <DropdownMenuItem 
               onClick={() => handleThemeChange('light')}
               className={`cursor-pointer ${theme === 'light' ? 'bg-accent' : ''}`}
