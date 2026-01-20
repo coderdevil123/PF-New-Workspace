@@ -9,26 +9,43 @@ type Task = {
   title: string;
   description?: string;
   is_completed: boolean;
+  created_at?: string;
 };
 
-const DUMMY_TASKS: Task[] = [
+const formatTaskDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  return date.toLocaleString('en-US', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const DUMMY_TASKS = [
   {
     id: '1',
     title: 'Prepare weekly security report',
     description: 'Based on last team meeting',
-    is_completed: false,
+    is_completed: true,
+    created_at: '2026-01-29T10:45:00Z',
   },
   {
     id: '2',
     title: 'Review Pristine Forests workspace RBAC',
     description: 'Check intern vs admin permissions',
-    is_completed: true,
+    is_completed: false,
+    created_at: '2026-01-29T11:10:00Z',
   },
   {
     id: '3',
     title: 'Sync Mattermost meeting notes',
     description: 'Extract tasks from meeting summary',
     is_completed: false,
+    created_at: '2026-01-29T12:30:00Z',
   },
 ];
 
@@ -135,6 +152,12 @@ export default function Tasks() {
                   <p className="mt-1 text-sm text-muted-text">
                     {task.description}
                   </p>
+                )}
+
+                {task.created_at && (
+                  <div className="mt-3 text-xs text-muted-text dark:text-dark-muted">
+                    {formatTaskDate(task.created_at)}
+                  </div>
                 )}
               </div>
             </div>

@@ -83,8 +83,6 @@ export default function Team() {
 
   setMembers([...merged, ...newUsers]);
 }
-
-
     loadTeam();
   }, []);
 
