@@ -29,12 +29,19 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const { user, logout } = useAuth();
   const { theme, setTheme, effectiveTheme } = useTheme();
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
   if (!user) {
     setAnnouncements([]);
     return;
   }
+
+  useEffect(() => {
+    if (!user) return;
+    // currently it is being hard coded for tesitng purpose
+    setTaskCount(2); // example of pending tasks
+  }, [user]);
 
   fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
     headers: {
@@ -128,6 +135,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
         {/* Theme Toggle Dropdown */}
         <DropdownMenu>
+          {user && (
           <Button
               onClick={() => navigate('/tasks')}
               variant="ghost"
@@ -136,6 +144,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             >
               <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
             </Button>
+          )}
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"

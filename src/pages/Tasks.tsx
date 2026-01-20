@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckSquare, Calendar } from 'lucide-react';
+import { ArrowLeft, CheckSquare, Calendar, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
+
 
 export default function Tasks() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user]);
 
   const [tasks, setTasks] = useState<any[]>([]);
 
@@ -105,39 +112,45 @@ export default function Tasks() {
         <div className="mx-auto max-w-5xl space-y-4">
           {tasks.map(task => (
             <div
-              key={task.id}
-              className="flex items-start gap-4 rounded-xl border bg-white dark:bg-dark-card p-6 shadow-card hover:shadow-card-hover transition"
+            key={task.id}
+            onClick={() => toggleTask(task.id)}
+            className="flex cursor-pointer items-start gap-4 rounded-xl border 
+                      bg-white/5 dark:bg-dark-card p-6 
+                      shadow-card hover:shadow-card-hover 
+                      transition-all"
+          >
+            <div
+              className={`mt-1 flex h-5 w-5 items-center justify-center rounded 
+                border ${
+                  task.is_completed
+                    ? 'bg-mint-accent border-mint-accent'
+                    : 'border-muted-foreground'
+                }`}
             >
-              <input
-                type="checkbox"
-                checked={task.is_completed}
-                onChange={() => toggleTask(task.id)}
-                className="mt-1 h-5 w-5 accent-mint-accent"
-              />
+              {task.is_completed && (
+                <Check className="h-4 w-4 text-white" />
+              )}
+            </div>
 
-              <div className="flex-1">
-                <h3 className={`text-lg font-medium ${
+            <div className="flex-1">
+              <h3
+                className={`text-lg font-medium ${
                   task.is_completed
                     ? 'line-through text-muted-foreground'
                     : 'text-heading-dark dark:text-dark-text'
-                }`}>
-                  {task.title}
-                </h3>
+                }`}
+              >
+                {task.title}
+              </h3>
 
-                {task.description && (
-                  <p className="text-sm text-muted-text mt-1">
-                    {task.description}
-                  </p>
-                )}
-
-                {task.due_date && (
-                  <div className="mt-2 flex items-center gap-2 text-xs text-muted-text">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(task.due_date).toDateString()}
-                  </div>
-                )}
-              </div>
+              {task.description && (
+                <p className="mt-1 text-sm text-muted-text">
+                  {task.description}
+                </p>
+              )}
             </div>
+          </div>
+
           ))}
         </div>
       </section>
