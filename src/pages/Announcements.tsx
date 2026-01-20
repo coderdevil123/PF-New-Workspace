@@ -317,21 +317,6 @@ export default function Announcements() {
         recipients: 'all',
         taggedUsers: [],
       });
-
-      // 🔥 RE-FETCH announcements
-    //   return fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   });
-    // })
-    // .then(res => res.json())
-    // .then(data => {
-    //   if (Array.isArray(data)) {
-    //     setAnnouncements(data);
-    //   } else {
-    //     setAnnouncements([]);
-    //   }
     })
     .catch(err => {
       console.error(err);

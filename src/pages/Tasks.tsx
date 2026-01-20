@@ -86,29 +86,41 @@ export default function Tasks() {
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
       {/* Header */}
-      <section className="bg-forest-gradient px-6 py-8 lg:px-12">
-        <div className="mx-auto max-w-5xl flex items-center gap-4">
-          <Button
-            onClick={() => navigate('/workspace')}
-            variant="ghost"
-            className="text-white/90 hover:bg-white/10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+      <section className="relative overflow-hidden bg-forest-gradient px-6 py-8 lg:px-12">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px',
+          }} />
+        </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg">
-              <CheckSquare className="h-7 w-7 text-white" />
+        <div className="relative mx-auto max-w-5xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                onClick={() => navigate('/workspace')}
+                variant="ghost"
+                className="group -ml-3 rounded-lg text-white/90 transition-all hover:bg-white/10 hover:text-white animate-slide-down"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+              
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
+                  <CheckSquare className="h-7 w-7 text-white" />
+                </div>
+                <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                  <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
+                    My Tasks
+                  </h1>
+                  <p className="font-sans text-sm sm:text-lg text-white/80">
+                    Tasks assigned to you from meetings
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-display text-white">
-                My Tasks
-              </h1>
-              <p className="text-white/80">
-                Tasks assigned to you from meetings
-              </p>
             </div>
-          </div>
         </div>
       </section>
 
