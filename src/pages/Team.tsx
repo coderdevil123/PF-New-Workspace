@@ -29,31 +29,65 @@ export default function Team() {
   const [members, setMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
-  async function loadTeam() {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/team/public`
-      );
+    async function loadTeam() {
+  // if (!localStorage.getItem('token')) {
+  //   setMembers(defaultTeam); // fallback
+  //   return;
+  // }
 
-      if (!res.ok) {
-        throw new Error('Team fetch failed');
-      }
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
 
-      const data = await res.json();
-
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid team data');
-      }
-
-      setMembers(data);
-    } catch (err) {
-      console.error('Team load error:', err);
-      setMembers([]); // 🔒 no fake data
-    }
+  if (!res.ok) {
+    setMembers(defaultTeam);
+    return;
   }
 
-  loadTeam();
-}, []);
+  const dbMembers = await res.json();
+
+  if (!Array.isArray(dbMembers)) {
+    setMembers(defaultTeam);
+    return;
+  }
+
+  // 🔥 SAFE MERGE
+  const merged = defaultTeam.map(defaultMember => {
+    const override = dbMembers.find(
+      (m: any) => m.email === defaultMember.email
+    );
+
+    return {
+      ...defaultMember,
+      name: override?.name ?? defaultMember.name,
+      phone: override?.phone ?? (defaultMember as any).phone,
+      bio: override?.bio ?? (defaultMember as any).bio,
+      location: override?.location ?? (defaultMember as any).location,
+      mattermost: override?.mattermost ?? defaultMember.mattermost,
+      avatar_url: override?.avatar_url || defaultMember.image,
+    };
+  });
+
+  const newUsers = dbMembers
+    .filter((db: any) =>
+      !defaultTeam.some(def => def.email === db.email)
+    )
+    .map((db: any) => ({
+      ...db,
+      role: db.role || 'Member',
+      department: db.department || 'General',
+      avatar_url: db.avatar_url,
+    }));
+
+  setMembers([...merged, ...newUsers]);
+}
+
+
+    loadTeam();
+  }, []);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
