@@ -13,7 +13,7 @@ import Login from './pages/Login';
 // import Signup from './pages/Signup';
 import OAuthSuccess from './pages/OAuthSuccess';
 import { LanguageProvider } from './contexts/LanguageContext';
-// import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
+import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
 import Tasks from './pages/Tasks';
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
     <ThemeProvider>
       <LanguageProvider>
       <AuthProvider>
-        {/* <AnnouncementsProvider> */}
+        <AnnouncementsProvider>
         <Router>
           <AppLayout>
           <Routes>
@@ -39,7 +39,7 @@ function App() {
           </AppLayout>
           <Toaster />
         </Router>
-        {/* </AnnouncementsProvider> */}
+        </AnnouncementsProvider>
       </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>

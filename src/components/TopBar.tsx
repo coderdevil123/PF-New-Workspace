@@ -36,13 +36,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     setAnnouncements([]);
     return;
   }
-
-  useEffect(() => {
-    if (!user) return;
-    // currently it is being hard coded for tesitng purpose
-    setTaskCount(2); // example of pending tasks
-  }, [user]);
-
   fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -52,6 +45,12 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     .then(data => setAnnouncements(Array.isArray(data) ? data : []))
     .catch(() => setAnnouncements([]));
 }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    // currently it is being hard coded for tesitng purpose
+    setTaskCount(2); // example of pending tasks
+  }, [user]);
 
   const handleLogout = () => {
     logout();
