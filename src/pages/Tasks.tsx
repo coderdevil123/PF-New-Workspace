@@ -65,6 +65,10 @@ export default function Tasks() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+
 
   // 🔐 Auth guard (SAFE – no hook violation)
   useEffect(() => {
@@ -93,7 +97,20 @@ export default function Tasks() {
   // };
 
   const openEditModal = (task: Task) => {
-    alert(`Edit task: ${task.title}`);
+    setEditingTask(task);
+    setEditTitle(task.title);
+    setEditDescription(task.description || '');
+  };
+
+  const saveEditedTask = () => {
+    if (!editingTask) return;
+
+    updateTask(editingTask.id, {
+      title: editTitle,
+      description: editDescription,
+    });
+
+    setEditingTask(null);
   };
 
   const updateTask = (id: string, updates: Partial<any>) => {
@@ -180,44 +197,42 @@ export default function Tasks() {
               {/* RIGHT: Task Status Panel */}
               <div className="flex items-center gap-6">
                 {/* In Progress */}
-                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                <label className="flex flex-col items-center gap-1 text-sm cursor-pointer">
                   <input
                     type="checkbox"
                     checked={task.in_progress}
-                    onChange={() => updateTask(task.id, { in_progress: !task.in_progress, completed: false, })}
-                    className="h-4 w-4 accent-mint-accent"
+                    onChange={() =>
+                      updateTask(task.id, { in_progress: !task.in_progress })
+                    }
+                    className="text-xs font-medium text-gray-700 dark:text-gray-200"
                   />
                   In-Progress
                 </label>
 
                 {/* Completed (MAIN ACTION) */}
-                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                <label className="flex flex-col items-center gap-1 text-sm cursor-pointer">
                   <input
                     type="checkbox"
                     checked={task.completed}
                     onChange={() =>
-                      updateTask(task.id, {
-                        completed: !task.completed,
-                        in_progress: false,
-                      })
+                      updateTask(task.id, { completed: !task.completed })
                     }
-                    className="h-4 w-4 accent-green-500"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-200"
                   />
                   Completed
                 </label>
 
                 {/* Correct or Not (Feedback) */}
-                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                <label className="flex flex-col items-center gap-1 text-sm cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={task.in_progress}
-                    disabled={task.completed}
+                    checked={task.is_correct === true}
                     onChange={() =>
                       updateTask(task.id, {
                         is_correct: task.is_correct === true ? null : true,
                       })
                     }
-                    className="h-4 w-4 accent-blue-500"
+                    className="text-xs font-medium text-gray-700 dark:text-gray-200"
                   />
                   Correct
                 </label>
@@ -229,6 +244,49 @@ export default function Tasks() {
                 >
                   Edit
                 </button>
+                {editingTask && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="w-full max-w-md rounded-xl bg-white dark:bg-dark-card p-6 shadow-xl">
+                      <h3 className="mb-4 text-lg font-semibold text-heading-dark dark:text-dark-text">
+                        Edit Task
+                      </h3>
+
+                      <input
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        className="mb-3 w-full rounded-lg border px-3 py-2
+                                  bg-white dark:bg-dark-bg
+                                  text-heading-dark dark:text-dark-text"
+                        placeholder="Task title"
+                      />
+
+                      <textarea
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                        className="mb-4 w-full rounded-lg border px-3 py-2
+                                  bg-white dark:bg-dark-bg
+                                  text-heading-dark dark:text-dark-text"
+                        rows={3}
+                        placeholder="Task description"
+                      />
+
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => setEditingTask(null)}
+                          className="text-sm text-muted-text hover:underline"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={saveEditedTask}
+                          className="rounded-lg bg-mint-accent px-4 py-2 text-sm font-medium text-white"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
