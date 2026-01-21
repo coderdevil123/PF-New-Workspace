@@ -8,8 +8,11 @@ type Task = {
   id: string;
   title: string;
   description?: string;
-  is_completed: boolean;
+  // is_completed: boolean;
   created_at?: string;
+  in_progress: boolean;
+  completed: boolean;
+  is_correct: boolean | null;
 };
 
 const formatTaskDate = (dateString: string) => {
@@ -30,22 +33,31 @@ const DUMMY_TASKS = [
     id: '1',
     title: 'Prepare weekly security report',
     description: 'Based on last team meeting',
-    is_completed: true,
+    // is_completed: true,
     created_at: '2026-01-29T10:45:00Z',
+    in_progress: false,
+    completed: false,
+    is_correct: true,
   },
   {
     id: '2',
     title: 'Review Pristine Forests workspace RBAC',
     description: 'Check intern vs admin permissions',
-    is_completed: false,
+    // is_completed: false,
     created_at: '2026-01-29T11:10:00Z',
+    in_progress: true,
+    completed: false,
+    is_correct: null,
   },
   {
     id: '3',
     title: 'Sync Mattermost meeting notes',
     description: 'Extract tasks from meeting summary',
-    is_completed: false,
+    // is_completed: false,
     created_at: '2026-01-29T12:30:00Z',
+    in_progress: false,
+    completed: false,
+    is_correct: true,
   },
 ];
 
@@ -70,12 +82,24 @@ export default function Tasks() {
   }, [user]);
 
   // ✅ LOCAL toggle ONLY (no backend in dummy mode)
-  const toggleTask = (id: string) => {
+  // const toggleTask = (id: string) => {
+  //   setTasks(prev =>
+  //     prev.map(task =>
+  //       task.id === id
+  //         ? { ...task, completed: !task.completed }
+  //         : task
+  //     )
+  //   );
+  // };
+
+  const openEditModal = (task: Task) => {
+    alert(`Edit task: ${task.title}`);
+  };
+
+  const updateTask = (id: string, updates: Partial<any>) => {
     setTasks(prev =>
       prev.map(task =>
-        task.id === id
-          ? { ...task, is_completed: !task.is_completed }
-          : task
+        task.id === id ? { ...task, ...updates } : task
       )
     );
   };
@@ -130,33 +154,13 @@ export default function Tasks() {
           {tasks.map(task => (
             <div
               key={task.id}
-              onClick={() => toggleTask(task.id)}
-              className="flex cursor-pointer items-start gap-4 rounded-xl border
-                         bg-white/5 dark:bg-dark-card p-6
-                         shadow-card hover:shadow-card-hover
-                         transition-all"
+              className="flex justify-between gap-6 rounded-xl border
+                        bg-white/5 dark:bg-dark-card p-6
+                        shadow-card hover:shadow-card-hover transition-all"
             >
-              <div
-                className={`mt-1 flex h-5 w-5 items-center justify-center rounded border
-                  ${
-                    task.is_completed
-                      ? 'bg-mint-accent border-mint-accent'
-                      : 'border-muted-foreground'
-                  }`}
-              >
-                {task.is_completed && (
-                  <Check className="h-4 w-4 text-white" />
-                )}
-              </div>
-
+              {/* LEFT: Task Content */}
               <div className="flex-1">
-                <h3
-                  className={`text-lg font-medium ${
-                    task.is_completed
-                      ? 'line-through text-muted-foreground'
-                      : 'text-heading-dark dark:text-dark-text'
-                  }`}
-                >
+                <h3 className="text-lg font-medium text-heading-dark dark:text-dark-text">
                   {task.title}
                 </h3>
 
@@ -167,10 +171,64 @@ export default function Tasks() {
                 )}
 
                 {task.created_at && (
-                  <div className="mt-3 text-xs text-muted-text dark:text-dark-muted">
+                  <div className="mt-3 text-xs text-muted-text">
                     {formatTaskDate(task.created_at)}
                   </div>
                 )}
+              </div>
+
+              {/* RIGHT: Task Status Panel */}
+              <div className="flex items-center gap-6">
+                {/* In Progress */}
+                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={task.in_progress}
+                    onChange={() => updateTask(task.id, { in_progress: !task.in_progress, completed: false, })}
+                    className="h-4 w-4 accent-mint-accent"
+                  />
+                  In-Progress
+                </label>
+
+                {/* Completed (MAIN ACTION) */}
+                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() =>
+                      updateTask(task.id, {
+                        completed: !task.completed,
+                        in_progress: false,
+                      })
+                    }
+                    className="h-4 w-4 accent-green-500"
+                  />
+                  Completed
+                </label>
+
+                {/* Correct or Not (Feedback) */}
+                <label className="flex flex-col items-center gap-1 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={task.in_progress}
+                    disabled={task.completed}
+                    onChange={() =>
+                      updateTask(task.id, {
+                        is_correct: task.is_correct === true ? null : true,
+                      })
+                    }
+                    className="h-4 w-4 accent-blue-500"
+                  />
+                  Correct
+                </label>
+
+                {/* Edit Button */}
+                <button
+                  onClick={() => openEditModal(task)}
+                  className="text-xs text-mint-accent hover:underline"
+                >
+                  Edit
+                </button>
               </div>
             </div>
           ))}
