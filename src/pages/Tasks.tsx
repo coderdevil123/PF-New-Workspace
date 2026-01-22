@@ -68,6 +68,7 @@ export default function Tasks() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [openDropdownTaskId, setOpenDropdownTaskId] = useState<string | null>(null);
 
 
   // 🔐 Auth guard (SAFE – no hook violation)
@@ -199,66 +200,130 @@ export default function Tasks() {
                 )}
               </div>
 
-              {/* RIGHT: Task Status Panel */}
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-6 rounded-xl
-                bg-black/5 dark:bg-white/5
-                px-4 py-3">
-                {/* In Progress */}
-                <label className="flex flex-col items-center gap-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={task.in_progress}
-                    onChange={() =>
-                      updateTask(task.id, { in_progress: !task.in_progress })
-                    }
-                    className="h-4 w-4 accent-mint-accent"
-                  />
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    In-Progress
-                  </span>
-                </label>
-
-                {/* Completed (MAIN ACTION) */}
-                <label className="flex flex-col items-center gap-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() =>
-                      updateTask(task.id, { completed: !task.completed })
-                    }
-                    className="h-4 w-4 accent-green-500"
-                  />
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    Completed
-                  </span>
-                </label>
-
-                {/* Correct or Not (Feedback) */}
-                <label className="flex flex-col items-center gap-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={task.is_correct === true}
-                    onChange={() =>
-                      updateTask(task.id, {
-                        is_correct: task.is_correct === true ? null : true,
-                      })
-                    }
-                    className="h-4 w-4 accent-blue-500"
-                  />
-                  <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                    Correct?
-                  </span>
-                </label>
-
-                {/* Edit Button */}
+              {/* RIGHT: Status Dropdown */}
+              <div className="relative">
                 <button
-                  onClick={() => openEditModal(task)}
-                  className="text-xs text-mint-accent hover:underline"
+                  onClick={() =>
+                    setOpenDropdownTaskId(
+                      openDropdownTaskId === task.id ? null : task.id
+                    )
+                  }
+                  className="rounded-lg border px-4 py-2 text-sm
+                            bg-white dark:bg-dark-bg
+                            text-gray-800 dark:text-gray-200
+                            hover:bg-gray-100 dark:hover:bg-dark-hover
+                            transition"
                 >
-                  Edit
+                  Task Status ▾
                 </button>
-                </div>
+
+                {openDropdownTaskId === task.id && (
+                  <div
+                    className="absolute right-0 z-30 mt-2 w-64 rounded-xl border
+                              bg-white dark:bg-dark-card
+                              shadow-xl p-3 space-y-3"
+                  >
+                    {/* In Progress */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        Task In-Progress
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => updateTask(task.id, { in_progress: true })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            task.in_progress
+                              ? 'bg-mint-accent text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => updateTask(task.id, { in_progress: false })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            !task.in_progress
+                              ? 'bg-mint-accent text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Completed */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        Task Completed
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => updateTask(task.id, { completed: true })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            task.completed
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => updateTask(task.id, { completed: false })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            !task.completed
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Correct */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700 dark:text-gray-200">
+                        Task Correct?
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => updateTask(task.id, { is_correct: true })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            task.is_correct === true
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => updateTask(task.id, { is_correct: false })}
+                          className={`px-2 py-1 rounded text-xs ${
+                            task.is_correct === false
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+
+                    <hr className="border-gray-200 dark:border-dark-border" />
+
+                    {/* Edit */}
+                    <button
+                      onClick={() => {
+                        openEditModal(task);
+                        setOpenDropdownTaskId(null);
+                      }}
+                      className="w-full text-left text-sm text-mint-accent hover:underline"
+                    >
+                      Edit Task
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
