@@ -10,8 +10,8 @@ type Task = {
   description?: string;
   // is_completed: boolean;
   created_at?: string;
-  in_progress: boolean;
-  completed: boolean;
+  in_progress: boolean | null;
+  completed: boolean | null;
   is_correct: boolean | null;
 };
 
@@ -35,9 +35,9 @@ const DUMMY_TASKS = [
     description: 'Based on last team meeting',
     // is_completed: true,
     created_at: '2026-01-29T10:45:00Z',
-    in_progress: false,
-    completed: false,
-    is_correct: true,
+    in_progress: null,
+    completed: null,
+    is_correct: null,
   },
   {
     id: '2',
@@ -45,8 +45,8 @@ const DUMMY_TASKS = [
     description: 'Check intern vs admin permissions',
     // is_completed: false,
     created_at: '2026-01-29T11:10:00Z',
-    in_progress: true,
-    completed: false,
+    in_progress: null,
+    completed: null,
     is_correct: null,
   },
   {
@@ -55,9 +55,9 @@ const DUMMY_TASKS = [
     description: 'Extract tasks from meeting summary',
     // is_completed: false,
     created_at: '2026-01-29T12:30:00Z',
-    in_progress: false,
-    completed: false,
-    is_correct: true,
+    in_progress: null,
+    completed: null,
+    is_correct: null,
   },
 ];
 
@@ -230,19 +230,30 @@ export default function Tasks() {
                       </span>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => updateTask(task.id, { in_progress: true })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              in_progress:
+                                task.in_progress === true ? null : true,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
-                            task.in_progress
+                            task.in_progress === true
                               ? 'bg-mint-accent text-white'
                               : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
                           }`}
                         >
                           Yes
                         </button>
+
                         <button
-                          onClick={() => updateTask(task.id, { in_progress: false })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              in_progress:
+                                task.in_progress === false ? null : false,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
-                            !task.in_progress
+                            task.in_progress === false
                               ? 'bg-mint-accent text-white'
                               : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
                           }`}
@@ -259,19 +270,30 @@ export default function Tasks() {
                       </span>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => updateTask(task.id, { completed: true })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              completed:
+                                task.completed === true ? null : true,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
-                            task.completed
+                            task.completed === true
                               ? 'bg-green-500 text-white'
                               : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
                           }`}
                         >
                           Yes
                         </button>
+
                         <button
-                          onClick={() => updateTask(task.id, { completed: false })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              completed:
+                                task.completed === false ? null : false,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
-                            !task.completed
+                            task.completed === false
                               ? 'bg-green-500 text-white'
                               : 'bg-gray-200 dark:bg-dark-hover text-gray-800 dark:text-gray-200'
                           }`}
@@ -288,7 +310,12 @@ export default function Tasks() {
                       </span>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => updateTask(task.id, { is_correct: true })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              is_correct:
+                                task.is_correct === true ? null : true,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
                             task.is_correct === true
                               ? 'bg-blue-500 text-white'
@@ -297,8 +324,14 @@ export default function Tasks() {
                         >
                           Yes
                         </button>
+
                         <button
-                          onClick={() => updateTask(task.id, { is_correct: false })}
+                          onClick={() =>
+                            updateTask(task.id, {
+                              is_correct:
+                                task.is_correct === false ? null : false,
+                            })
+                          }
                           className={`px-2 py-1 rounded text-xs ${
                             task.is_correct === false
                               ? 'bg-blue-500 text-white'
