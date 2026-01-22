@@ -70,7 +70,7 @@ export default function Tasks() {
   const [openDropdownTaskId, setOpenDropdownTaskId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'wrong'>('all');
   const [dateFilter, setDateFilter] = useState<string>('');
-
+  const [searchQuery, setSearchQuery] = useState('');
 
 
   // 🔐 Auth guard (SAFE – no hook violation)
@@ -174,6 +174,51 @@ export default function Tasks() {
             </div>
         </div>
       </section>
+
+      {/* Search & Filters */}
+        <section className="px-6 pt-6 lg:px-12">
+          <div className="mx-auto max-w-5xl flex flex-wrap gap-4 items-center">
+            
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search tasks..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-64 rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
+            />
+
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value as any)}
+              className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="wrong">Wrong</option>
+            </select>
+
+            {/* Date Filter */}
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={e => setDateFilter(e.target.value)}
+              className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
+            />
+
+          </div>
+        </section>
 
       {/* Task List */}
     <div className="mx-auto max-w-5xl space-y-4 max-h-[70vh] overflow-y-auto pr-2">
