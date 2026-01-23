@@ -15,14 +15,11 @@ import {
 import { useToast } from '../hooks/use-toast';
 import { CheckSquare } from 'lucide-react';
 
-// import { useAnnouncements } from '../contexts/AnnouncementsContext';
-
 interface TopBarProps {
   onMenuClick: () => void;
 }
 
 export default function TopBar({ onMenuClick }: TopBarProps) {
-  // const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -69,22 +66,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
     });
   };
 
-  // Get unread announcements from localStorage
-  // const getUnreadCount = () => {
-  //   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
-  //   const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
-  //   return announcements.filter((a: any) => !readAnnouncements.includes(a.id)).length;
-  // };
-
-  // const getLatestAnnouncements = () => {
-  //   const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
-  //   const readAnnouncements = JSON.parse(localStorage.getItem('readAnnouncements') || '[]');
-  //   return announcements
-  //     .filter((a: any) => !readAnnouncements.includes(a.id))
-  //     .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  //     .slice(0, 3);
-  // };
-
   const unreadCount = announcements.filter(a => !a.is_read).length;
   const latestAnnouncements = announcements
   .filter(a => !a.is_read)
@@ -110,30 +91,17 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         >
           <Menu className="h-5 w-5" strokeWidth={1.5} />
         </Button>
-        
-        {/* <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-text transition-colors" strokeWidth={1.5} />
-          <input
-            type="text"
-            placeholder="Search tools..."
-            className="h-10 w-64 rounded-full border border-border bg-light-gray dark:bg-dark-card pl-10 pr-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted transition-all focus:border-mint-accent focus:bg-white dark:focus:bg-dark-hover focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-          />
-        </div> */}
       </div>
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
-        {/* <Button
-          onClick={() => setSearchOpen(!searchOpen)}
-          variant="ghost"
-          size="sm"
-          className="text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent md:hidden"
-        >
-          <Search className="h-5 w-5" strokeWidth={1.5} />
-        </Button> */}
-
         {/* Theme Toggle Dropdown */}
         <DropdownMenu>
+          {/* {user?.role === 'admin' && (
+            <Button onClick={() => navigate('/manager/tasks')} variant="ghost">
+              Manager
+            </Button>
+          )} */}
           {user && (
           <Button
               onClick={() => navigate('/tasks')}
@@ -325,18 +293,6 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       </div>
 
       {/* Mobile Search */}
-      {/* {searchOpen && (
-        <div className="absolute left-0 right-0 top-16 border-b border-border bg-white dark:bg-dark-bg p-4 shadow-lg animate-slide-down md:hidden">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-text dark:text-dark-muted" strokeWidth={1.5} />
-            <input
-              type="text"
-              placeholder="Search tools..."
-              className="h-10 w-full rounded-full border border-border bg-light-gray dark:bg-dark-card pl-10 pr-4 text-sm text-heading-dark dark:text-dark-text placeholder:text-muted-text dark:placeholder:text-dark-muted transition-all focus:border-mint-accent focus:bg-white dark:focus:bg-dark-hover focus:outline-none focus:ring-2 focus:ring-mint-accent/20"
-            />
-          </div>
-        </div>
-      )} */}
     </header>
   );
 }

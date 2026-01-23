@@ -4,13 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 
+type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'wrong' | 'blocked' | 'on-hold';
+
 type Task = {
   id: string;
   title: string;
   description?: string;
   // is_completed: boolean;
   created_at?: string;
-  status: 'pending' | 'completed' | 'wrong' | null;
+  status: TaskStatus | null;
   issue_reported?: boolean;
 };
 
@@ -27,11 +29,15 @@ const formatTaskDate = (dateString: string) => {
   });
 };
 
-const STATUS_STYLES = {
+const STATUS_STYLES: Record<TaskStatus, string> = {
   pending: 'bg-blue-100 text-blue-700',
+  'in-progress': 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
   wrong: 'bg-red-100 text-red-700',
+  blocked: 'bg-orange-100 text-orange-700',
+  'on-hold': 'bg-gray-200 text-gray-700',
 };
+
 
 const DUMMY_TASKS: Task[] = [
   {
@@ -71,16 +77,14 @@ export default function Tasks() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'wrong'>('all');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dateRange, setDateRange] = useState<'all' | 'today' | 'yesterday' | 'last7' | 'last14'>('all');
 
-
-  // 🔐 Auth guard (SAFE – no hook violation)
   useEffect(() => {
     if (!user) {
       navigate('/login');
     }
   }, [user, navigate]);
 
-  // 🧪 Dummy task loader
   useEffect(() => {
     if (!user) return;
 
@@ -105,11 +109,65 @@ export default function Tasks() {
     setEditDescription(task.description || '');
   };
 
+  const isWithinRange = (dateString: string, range: string) => {
+    const taskDate = new Date(dateString);
+    const now = new Date();
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    switch (range) {
+      case 'today':
+        return taskDate >= startOfToday;
+
+      case 'yesterday': {
+        const startOfYesterday = new Date(startOfToday);
+        startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+        return taskDate >= startOfYesterday && taskDate < startOfToday;
+      }
+
+      case 'last7': {
+        const last7 = new Date();
+        last7.setDate(last7.getDate() - 7);
+        return taskDate >= last7;
+      }
+
+      case 'last14': {
+        const last14 = new Date();
+        last14.setDate(last14.getDate() - 14);
+        return taskDate >= last14;
+      }
+
+      default:
+        return true;
+    }
+  };
+
   const filteredTasks = tasks.filter(task => {
-      if (statusFilter !== 'all' && task.status !== statusFilter) return false;
-      if (dateFilter && !task.created_at?.startsWith(dateFilter)) return false;
-      return true;
-    });
+  if (
+    searchQuery &&
+    !task.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    !task.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) {
+    return false;
+  }
+  if (statusFilter !== 'all' && task.status !== statusFilter) {
+    return false;
+  }
+  if (dateFilter && !task.created_at?.startsWith(dateFilter)) {
+    return false;
+  }
+  if (
+    dateRange !== 'all' &&
+    task.created_at &&
+    !isWithinRange(task.created_at, dateRange)
+  ) {
+    return false;
+  }
+  return true;
+});
+
 
 
   const saveEditedTask = () => {
@@ -206,6 +264,21 @@ export default function Tasks() {
               <option value="wrong">Wrong</option>
             </select>
 
+            <select
+              value={dateRange}
+              onChange={e => setDateRange(e.target.value as any)}
+              className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
+            >
+              <option value="all">All Days</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="last7">Last 7 Days</option>
+              <option value="last14">Last 14 Days</option>
+            </select>
+
             {/* Date Filter */}
             <input
               type="date"
@@ -280,7 +353,7 @@ export default function Tasks() {
                 {openDropdownTaskId === task.id && (
                   <div className="absolute right-0 z-30 mt-2 w-56 rounded-xl border
                                   bg-white dark:bg-dark-card shadow-xl p-2">
-                    {['pending', 'completed', 'wrong'].map(option => (
+                    {['pending', 'in-progress', 'completed', 'wrong', 'blocked', 'on-hold'].map(option => (
                       <button
                         key={option}
                         onClick={() => {
@@ -303,9 +376,9 @@ export default function Tasks() {
                         openEditModal(task);
                         setOpenDropdownTaskId(null);
                       }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-mint-accent hover:underline"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-mint-accent"
                     >
-                      ✏️ Edit Task
+                      <Pencil className="h-4 w-4" />
                     </button>
                   </div>
                 )}
