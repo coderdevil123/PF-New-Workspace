@@ -74,7 +74,7 @@ export default function Tasks() {
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [openDropdownTaskId, setOpenDropdownTaskId] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed' | 'wrong'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
   const [dateFilter, setDateFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'yesterday' | 'last7' | 'last14'>('all');
