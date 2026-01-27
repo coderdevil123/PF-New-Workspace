@@ -38,34 +38,6 @@ const STATUS_STYLES: Record<TaskStatus, string> = {
   'on-hold': 'bg-gray-200 text-gray-700',
 };
 
-
-const DUMMY_TASKS: Task[] = [
-  {
-    id: '1',
-    title: 'Prepare weekly security report',
-    description: 'Based on last team meeting',
-    created_at: '2026-01-29T10:45:00Z',
-    status: 'pending',
-    issue_reported: false,
-  },
-  {
-    id: '2',
-    title: 'Review Pristine Forests workspace RBAC',
-    description: 'Check intern vs admin permissions',
-    created_at: '2026-01-29T11:10:00Z',
-    status: 'completed',
-    issue_reported: false,
-  },
-  {
-    id: '3',
-    title: 'Sync Mattermost meeting notes',
-    description: 'Extract tasks from meeting summary',
-    created_at: '2026-01-29T12:30:00Z',
-    status: 'wrong',
-    issue_reported: true,
-  },
-];
-
 export default function Tasks() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -79,6 +51,25 @@ export default function Tasks() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'yesterday' | 'last7' | 'last14'>('all');
 
+  const fetchTasks = async () => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/tasks`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+      setTasks(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to fetch tasks', err);
+    }
+  };
+
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -89,19 +80,10 @@ export default function Tasks() {
     if (!user) return;
 
     document.title = 'Tasks | Pristine Forests';
-    setTasks(DUMMY_TASKS);
+    fetchTasks();
   }, [user]);
 
-  // ✅ LOCAL toggle ONLY (no backend in dummy mode)
-  // const toggleTask = (id: string) => {
-  //   setTasks(prev =>
-  //     prev.map(task =>
-  //       task.id === id
-  //         ? { ...task, completed: !task.completed }
-  //         : task
-  //     )
-  //   );
-  // };
+
 
   const openEditModal = (task: Task) => {
     setEditingTask(task);
@@ -181,13 +163,30 @@ export default function Tasks() {
     setEditingTask(null);
   };
 
-  const updateTask = (id: string, updates: Partial<any>) => {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, ...updates } : task
-      )
+  const updateTask = async (id: string, updates: Partial<Task>) => {
+  setTasks(prev =>
+    prev.map(task =>
+      task.id === id ? { ...task, ...updates } : task
+    )
+  );
+
+  try {
+    await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/tasks/${id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ status: updates.status }),
+      }
     );
-  };
+  } catch (err) {
+    console.error('Failed to update task', err);
+  }
+};
+
 
   // Prevent render until auth resolved
   if (!user) return null;
