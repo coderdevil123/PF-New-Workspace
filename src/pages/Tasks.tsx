@@ -262,6 +262,9 @@ export default function Tasks() {
               <option value="pending">Pending</option>
               <option value="completed">Completed</option>
               <option value="wrong">Wrong</option>
+              <option value="blocked">Blocked</option>
+              <option value="on-hold">On Hold</option>
+              <option value="in-progress">In Progress</option>
             </select>
 
             <select
