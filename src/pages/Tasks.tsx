@@ -3,6 +3,12 @@ import { ArrowLeft, CheckSquare, Check, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 
 type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'wrong' | 'blocked' | 'on-hold';
 
@@ -50,6 +56,9 @@ export default function Tasks() {
   const [dateFilter, setDateFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<'all' | 'today' | 'yesterday' | 'last7' | 'last14'>('all');
+  const [wrongReasonTask, setWrongReasonTask] = useState<Task | null>(null);
+  const [reassignModalTask, setReassignModalTask] = useState<Task | null>(null);
+  const [teamMembers, setTeamMembers] = useState<{ name: string; email: string }[]>([]);
 
   const fetchTasks = async () => {
   try {
@@ -83,7 +92,16 @@ export default function Tasks() {
     fetchTasks();
   }, [user]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(setTeamMembers);
+  }, []);
 
   const openEditModal = (task: Task) => {
     setEditingTask(task);
@@ -149,8 +167,6 @@ export default function Tasks() {
   }
   return true;
 });
-
-
 
   const saveEditedTask = () => {
     if (!editingTask) return;
@@ -359,6 +375,11 @@ export default function Tasks() {
                       <button
                         key={option}
                         onClick={() => {
+                          if (option === 'wrong') {
+                            setWrongReasonTask(task);
+                            setOpenDropdownTaskId(null);
+                            return;
+                          }
                           updateTask(task.id, { status: option as Task['status'] });
                           setOpenDropdownTaskId(null);
                         }}
@@ -434,6 +455,68 @@ export default function Tasks() {
                 </div>
               </div>
             )}
+            {/* ✅ WRONG REASON DIALOG */}
+          {wrongReasonTask && (
+            <Dialog open onOpenChange={() => setWrongReasonTask(null)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Why is this task wrong?</DialogTitle>
+                </DialogHeader>
+
+                <Button
+                  onClick={() => {
+                    setReassignModalTask(wrongReasonTask);
+                    setWrongReasonTask(null);
+                  }}
+                >
+                  Task is correct but assigned to wrong member
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    openEditModal(wrongReasonTask);
+                    setWrongReasonTask(null);
+                  }}
+                >
+                  Task assigned correctly but details are wrong
+                </Button>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {/* ✅ REASSIGN MODAL */}
+          {reassignModalTask && (
+            <Dialog open onOpenChange={() => setReassignModalTask(null)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Reassign Task</DialogTitle>
+                </DialogHeader>
+
+                {teamMembers.map(member => (
+                  <Button
+                    key={member.email}
+                    onClick={async () => {
+                      await fetch(
+                        `${import.meta.env.VITE_BACKEND_URL}/api/tasks/${reassignModalTask.id}/reassign`,
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                          },
+                          body: JSON.stringify({ toEmail: member.email }),
+                        }
+                      );
+                      setReassignModalTask(null);
+                    }}
+                  >
+                    {member.name}
+                  </Button>
+                ))}
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
         </section>
       </div>
