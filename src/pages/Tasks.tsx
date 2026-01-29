@@ -361,10 +361,10 @@ export default function Tasks() {
         </section>
 
       {/* Task List */}
-    <div className="mx-auto max-w-5xl space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+    <div className="mx-auto max-w-6xl space-y-4 max-h-[70vh] overflow-y-visible px-2">
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-5xl space-y-4">
-          {filteredTasks.map(task => (
+          {activeTab === 'tasks' && filteredTasks.map(task => (
             <div
               key={task.id}
               className="flex justify-between gap-6 rounded-xl border
@@ -418,7 +418,7 @@ export default function Tasks() {
                 </button>
 
                 {openDropdownTaskId === task.id && (
-                  <div className="absolute right-0 z-30 mt-2 w-56 rounded-xl border
+                  <div className="absolute left-0 z-30 mt-2 w-56 rounded-xl border
                                   bg-white dark:bg-dark-card shadow-xl p-2">
                     {['pending', 'in-progress', 'completed', 'blocked', 'on-hold'].map(option => (
                       <button
@@ -445,17 +445,17 @@ export default function Tasks() {
                           )
                         }
                         className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm
-                          text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover
+                          dark:hover:bg-red-900/20"
                       >
                         Wrong
                         <span className="text-xs">▸</span>
                       </button>
 
                       {openWrongSubmenuTaskId === task.id && (
-                        <div
-                          className="absolute left-full top-0 z-40 ml-1 w-64 rounded-xl border
-                            bg-white dark:bg-dark-card shadow-xl p-2"
-                        >
+                        <div className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border
+                          bg-white dark:bg-dark-card shadow-xl p-2">
+
                           <button
                             onClick={() => {
                               setReassignModalTask(task);
