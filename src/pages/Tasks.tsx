@@ -61,6 +61,7 @@ export default function Tasks() {
   const [teamMembers, setTeamMembers] = useState<{ name: string; email: string }[]>([]);
   const [activeTab, setActiveTab] = useState<'tasks' | 'reassign'>('tasks');
   const [reassignRequests, setReassignRequests] = useState<any[]>([]);
+  const [openWrongSubmenuTaskId, setOpenWrongSubmenuTaskId] = useState<string | null>(null);
 
   const fetchTasks = async () => {
   try {
@@ -260,26 +261,30 @@ export default function Tasks() {
                 <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
                     <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => setActiveTab('tasks')}
-                        className={`text-lg font-medium ${
-                          activeTab === 'tasks' ? 'text-white' : 'text-white/60'
-                        }`}
-                      >
+                      <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
                         My Tasks
-                      </button>
+                      </h1>
 
-                      <button
-                        onClick={() => setActiveTab('reassign')}
-                        className="relative text-lg font-medium text-white/80"
+                      <p className="font-sans text-sm sm:text-lg text-white/80">
+                        Tasks assigned to you from meetings
+                      </p>
+
+                      <Button
+                        onClick={() =>
+                          setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')
+                        }
+                        className="relative rounded-full bg-white/10 px-6 py-2
+                                  text-white backdrop-blur-md
+                                  hover:bg-white/20 transition"
                       >
                         Reassignment Inbox
                         {reassignRequests.length > 0 && (
-                          <span className="absolute -top-2 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                          <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
+                                          justify-center rounded-full bg-red-500 text-xs">
                             {reassignRequests.length}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     </div>
                   </h1>
                   <p className="font-sans text-sm sm:text-lg text-white/80">
@@ -415,16 +420,11 @@ export default function Tasks() {
                 {openDropdownTaskId === task.id && (
                   <div className="absolute right-0 z-30 mt-2 w-56 rounded-xl border
                                   bg-white dark:bg-dark-card shadow-xl p-2">
-                    {['pending', 'in-progress', 'completed', 'wrong', 'blocked', 'on-hold'].map(option => (
+                    {['pending', 'in-progress', 'completed', 'blocked', 'on-hold'].map(option => (
                       <button
                         key={option}
                         onClick={() => {
-                          if (option === 'wrong') {
-                            setWrongReasonTask(task);
-                            setOpenDropdownTaskId(null);
-                            return;
-                          }
-                          updateTask(task.id, { status: option as Task['status'] });
+                          updateTask(task.id, { status: option as TaskStatus });
                           setOpenDropdownTaskId(null);
                         }}
                         className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm
@@ -435,6 +435,53 @@ export default function Tasks() {
                         {task.status === option && <Check className="h-4 w-4" />}
                       </button>
                     ))}
+
+                    {/* WRONG with secondary dropdown */}
+                    <div className="relative">
+                      <button
+                        onClick={() =>
+                          setOpenWrongSubmenuTaskId(
+                            openWrongSubmenuTaskId === task.id ? null : task.id
+                          )
+                        }
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm
+                          text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        Wrong
+                        <span className="text-xs">▸</span>
+                      </button>
+
+                      {openWrongSubmenuTaskId === task.id && (
+                        <div
+                          className="absolute left-full top-0 z-40 ml-1 w-64 rounded-xl border
+                            bg-white dark:bg-dark-card shadow-xl p-2"
+                        >
+                          <button
+                            onClick={() => {
+                              setReassignModalTask(task);
+                              setOpenWrongSubmenuTaskId(null);
+                              setOpenDropdownTaskId(null);
+                            }}
+                            className="w-full rounded-lg px-3 py-2 text-left text-sm
+                              hover:bg-soft-mint dark:hover:bg-mint-accent/20"
+                          >
+                            Task is correct but assigned to wrong member
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              openEditModal(task);
+                              setOpenWrongSubmenuTaskId(null);
+                              setOpenDropdownTaskId(null);
+                            }}
+                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm
+                              hover:bg-gray-100 dark:hover:bg-dark-hover"
+                          >
+                            Task assigned correctly but details are wrong
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
                     <hr className="my-2 border-gray-200 dark:border-dark-border" />
 
@@ -566,7 +613,7 @@ export default function Tasks() {
               </section>
             )}
 
-            {/* ✅ WRONG REASON DIALOG */}
+            {/* ✅ WRONG REASON DIALOG
           {wrongReasonTask && (
             <Dialog open onOpenChange={() => setWrongReasonTask(null)}>
               <DialogContent>
@@ -594,37 +641,45 @@ export default function Tasks() {
                 </Button>
               </DialogContent>
             </Dialog>
-          )}
+          )} */}
 
           {/* ✅ REASSIGN MODAL */}
           {reassignModalTask && (
             <Dialog open onOpenChange={() => setReassignModalTask(null)}>
-              <DialogContent>
+              <DialogContent className="rounded-2xl bg-white dark:bg-dark-card shadow-2xl">
                 <DialogHeader>
-                  <DialogTitle>Reassign Task</DialogTitle>
+                  <DialogTitle className="text-xl font-semibold text-forest-dark dark:text-white">
+                    Reassign Task
+                  </DialogTitle>
                 </DialogHeader>
 
-                {teamMembers.map(member => (
-                  <Button
-                    key={member.email}
-                    onClick={async () => {
-                      await fetch(
-                        `${import.meta.env.VITE_BACKEND_URL}/api/tasks/${reassignModalTask.id}/reassign`,
-                        {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${localStorage.getItem('token')}`,
-                          },
-                          body: JSON.stringify({ toEmail: member.email }),
-                        }
-                      );
-                      setReassignModalTask(null);
-                    }}
-                  >
-                    {member.name}
-                  </Button>
-                ))}
+                <div className="mt-4 grid grid-cols-1 gap-2">
+                  {teamMembers.map(member => (
+                    <button
+                      key={member.email}
+                      onClick={async () => {
+                        await fetch(
+                          `${import.meta.env.VITE_BACKEND_URL}/api/tasks/${reassignModalTask.id}/reassign`,
+                          {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: `Bearer ${localStorage.getItem('token')}`,
+                            },
+                            body: JSON.stringify({ toEmail: member.email }),
+                          }
+                        );
+                        setReassignModalTask(null);
+                      }}
+                      className="rounded-xl border px-4 py-3 text-left
+                        hover:bg-soft-mint dark:hover:bg-mint-accent/20
+                        transition"
+                    >
+                      <div className="font-medium">{member.name}</div>
+                      <div className="text-xs text-muted-text">{member.email}</div>
+                    </button>
+                  ))}
+                </div>
               </DialogContent>
             </Dialog>
           )}
