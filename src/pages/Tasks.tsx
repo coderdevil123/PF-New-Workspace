@@ -259,21 +259,21 @@ export default function Tasks() {
                   <CheckSquare className="h-7 w-7 text-white" />
                 </div>
                 <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
-                    <div className="flex items-center gap-4">
-                      <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
-                        My Tasks
-                      </h1>
-
-                      <p className="font-sans text-sm sm:text-lg text-white/80">
-                        Tasks assigned to you from meetings
-                      </p>
+                  <div className="flex items-center gap-4">
+                      <div>
+                        <h1 className="font-display text-2xl sm:text-4xl font-normal text-white">
+                          My Tasks
+                        </h1>
+                        <p className="font-sans text-sm sm:text-lg text-white/80">
+                          Tasks assigned to you from meetings
+                        </p>
+                      </div>
 
                       <Button
                         onClick={() =>
                           setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')
                         }
-                        className="relative rounded-full bg-white/10 px-6 py-2
+                        className="relative ml-6 rounded-full bg-white/10 px-6 py-2
                                   text-white backdrop-blur-md
                                   hover:bg-white/20 transition"
                       >
@@ -286,10 +286,9 @@ export default function Tasks() {
                         )}
                       </Button>
                     </div>
-                  </h1>
-                  <p className="font-sans text-sm sm:text-lg text-white/80">
+                  {/* <p className="font-sans text-sm sm:text-lg text-white/80">
                     Tasks assigned to you from meetings
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>
@@ -361,6 +360,7 @@ export default function Tasks() {
         </section>
 
       {/* Task List */}
+     
     <div className="mx-auto max-w-6xl space-y-4 max-h-[70vh] overflow-y-visible px-2">
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-5xl space-y-4">
