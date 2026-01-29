@@ -36,13 +36,20 @@ const formatTaskDate = (dateString: string) => {
 };
 
 const STATUS_STYLES: Record<TaskStatus, string> = {
-  pending: 'bg-blue-100 text-blue-700',
-  'in-progress': 'bg-yellow-100 text-yellow-700',
-  completed: 'bg-green-100 text-green-700',
-  wrong: 'bg-red-100 text-red-700',
-  blocked: 'bg-orange-100 text-orange-700',
-  'on-hold': 'bg-gray-200 text-gray-700',
+  pending:
+    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200',
+  'in-progress':
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200',
+  completed:
+    'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200',
+  wrong:
+    'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200',
+  blocked:
+    'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-200',
+  'on-hold':
+    'bg-gray-200 text-gray-700 dark:bg-gray-700/40 dark:text-gray-200',
 };
+
 
 export default function Tasks() {
   const navigate = useNavigate();
@@ -269,22 +276,27 @@ export default function Tasks() {
                         </p>
                       </div>
 
-                      <Button
-                        onClick={() =>
-                          setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')
-                        }
-                        className="relative ml-6 rounded-full bg-white/10 px-6 py-2
-                                  text-white backdrop-blur-md
-                                  hover:bg-white/20 transition"
-                      >
-                        Reassignment Inbox
-                        {reassignRequests.length > 0 && (
-                          <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
-                                          justify-center rounded-full bg-red-500 text-xs">
-                            {reassignRequests.length}
-                          </span>
-                        )}
-                      </Button>
+                      <div className="mt-4 sm:mt-0">
+                        <Button
+                          onClick={() => setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')}
+                          className="
+                            relative rounded-full
+                            bg-white/10 px-5 py-2
+                            text-white
+                            backdrop-blur-md
+                            hover:bg-white/20
+                            transition
+                          "
+                        >
+                          Reassignment Inbox
+                          {reassignRequests.length > 0 && (
+                            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
+                                            justify-center rounded-full bg-red-500 text-xs">
+                              {reassignRequests.length}
+                            </span>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   {/* <p className="font-sans text-sm sm:text-lg text-white/80">
                     Tasks assigned to you from meetings
@@ -366,11 +378,18 @@ export default function Tasks() {
         <div className="mx-auto max-w-5xl space-y-4">
           {activeTab === 'tasks' && filteredTasks.map(task => (
             <div
-              key={task.id}
-              className="flex justify-between gap-6 rounded-xl border
-                        bg-white/5 dark:bg-dark-card p-6
-                        shadow-card hover:shadow-card-hover transition-all"
-            >
+                key={task.id}
+                className="
+                  flex flex-col sm:flex-row
+                  sm:justify-between
+                  gap-4 sm:gap-6
+                  rounded-xl border
+                  bg-white/5 dark:bg-dark-card
+                  p-4 sm:p-6
+                  shadow-card hover:shadow-card-hover
+                  transition-all
+                "
+              >
               {/* LEFT: Task Content */}
               <div className="flex-1">
                 <h3
@@ -396,7 +415,7 @@ export default function Tasks() {
               </div>
 
               {/* RIGHT: Status Dropdown */}
-              <div className="relative">
+              <div className="relative self-start sm:self-auto">
                 <button
                   onClick={() =>
                     setOpenDropdownTaskId(
@@ -560,13 +579,13 @@ export default function Tasks() {
                       key={req.id}
                       className="rounded-xl border bg-white dark:bg-dark-card p-6 flex justify-between items-center"
                     >
-                      <div>
-                        <h3 className="font-medium text-lg">{req.tasks.title}</h3>
-                        <p className="text-sm text-muted-text">
-                          Requested by {req.from_email}
-                        </p>
-                      </div>
+                      <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100">
+                        {req.tasks.title}
+                      </h3>
 
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Requested by {req.from_email}
+                      </p>
                       <div className="flex gap-3">
                         <Button
                           onClick={async () => {
