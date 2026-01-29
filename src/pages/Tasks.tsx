@@ -428,8 +428,9 @@ export default function Tasks() {
                           setOpenDropdownTaskId(null);
                         }}
                         className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm
+                          text-gray-700 dark:text-gray-100
                           hover:bg-gray-100 dark:hover:bg-dark-hover
-                          ${task.status === option ? STATUS_STYLES[option] : 'text-gray-700 dark:text-gray-200'}`}
+                          ${task.status === option ? STATUS_STYLES[option] : ''}`}
                       >
                         {option.charAt(0).toUpperCase() + option.slice(1)}
                         {task.status === option && <Check className="h-4 w-4" />}
@@ -445,8 +446,8 @@ export default function Tasks() {
                           )
                         }
                         className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm
-                          text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover
-                          dark:hover:bg-red-900/20"
+                          text-gray-700 dark:text-gray-100
+                          hover:bg-gray-100 dark:hover:bg-dark-hover"
                       >
                         Wrong
                         <span className="text-xs">▸</span>
@@ -454,8 +455,7 @@ export default function Tasks() {
 
                       {openWrongSubmenuTaskId === task.id && (
                         <div className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border
-                          bg-white dark:bg-dark-card shadow-xl p-2">
-
+                          bg-white dark:bg-dark-card text-gray-800 dark:text-gray-100 shadow-xl p-2">
                           <button
                             onClick={() => {
                               setReassignModalTask(task);
@@ -463,6 +463,7 @@ export default function Tasks() {
                               setOpenDropdownTaskId(null);
                             }}
                             className="w-full rounded-lg px-3 py-2 text-left text-sm
+                              text-gray-800 dark:text-gray-100
                               hover:bg-soft-mint dark:hover:bg-mint-accent/20"
                           >
                             Task is correct but assigned to wrong member
@@ -646,7 +647,7 @@ export default function Tasks() {
           {/* ✅ REASSIGN MODAL */}
           {reassignModalTask && (
             <Dialog open onOpenChange={() => setReassignModalTask(null)}>
-              <DialogContent className="rounded-2xl bg-white dark:bg-dark-card shadow-2xl">
+              <DialogContent className="rounded-2xl bg-white dark:bg-dark-card text-gray-900 dark:text-gray-100 shadow-2xl">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-semibold text-forest-dark dark:text-white">
                     Reassign Task
