@@ -361,7 +361,7 @@ export default function Tasks() {
 
       {/* Task List */}
      
-    <div className="mx-auto max-w-6xl space-y-4 max-h-[70vh] overflow-y-visible px-2">
+    <div className="mx-auto max-w-6xl space-y-4 max-h-[70vh] overflow-y-auto px-2">
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-5xl space-y-4">
           {activeTab === 'tasks' && filteredTasks.map(task => (
