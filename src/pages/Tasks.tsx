@@ -59,6 +59,8 @@ export default function Tasks() {
   const [wrongReasonTask, setWrongReasonTask] = useState<Task | null>(null);
   const [reassignModalTask, setReassignModalTask] = useState<Task | null>(null);
   const [teamMembers, setTeamMembers] = useState<{ name: string; email: string }[]>([]);
+  const [activeTab, setActiveTab] = useState<'tasks' | 'reassign'>('tasks');
+  const [reassignRequests, setReassignRequests] = useState<any[]>([]);
 
   const fetchTasks = async () => {
   try {
@@ -77,6 +79,27 @@ export default function Tasks() {
       console.error('Failed to fetch tasks', err);
     }
   };
+
+  const fetchReassignRequests = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/tasks/reassign/inbox`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const data = await res.json();
+    setReassignRequests(Array.isArray(data) ? data : []);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchTasks();
+    fetchReassignRequests();
+  }, [user]);
 
 
   useEffect(() => {
@@ -236,7 +259,28 @@ export default function Tasks() {
                 </div>
                 <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <h1 className="font-display mb-1 text-2xl sm:text-4xl font-normal text-white">
-                    My Tasks
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => setActiveTab('tasks')}
+                        className={`text-lg font-medium ${
+                          activeTab === 'tasks' ? 'text-white' : 'text-white/60'
+                        }`}
+                      >
+                        My Tasks
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTab('reassign')}
+                        className="relative text-lg font-medium text-white/80"
+                      >
+                        Reassignment Inbox
+                        {reassignRequests.length > 0 && (
+                          <span className="absolute -top-2 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                            {reassignRequests.length}
+                          </span>
+                        )}
+                      </button>
+                    </div>
                   </h1>
                   <p className="font-sans text-sm sm:text-lg text-white/80">
                     Tasks assigned to you from meetings
@@ -455,6 +499,73 @@ export default function Tasks() {
                 </div>
               </div>
             )}
+
+            {activeTab === 'reassign' && (
+              <section className="px-6 py-10 lg:px-12">
+                <div className="mx-auto max-w-5xl space-y-4">
+                  {reassignRequests.length === 0 && (
+                    <p className="text-muted-text">No reassignment requests 🎉</p>
+                  )}
+
+                  {reassignRequests.map(req => (
+                    <div
+                      key={req.id}
+                      className="rounded-xl border bg-white dark:bg-dark-card p-6 flex justify-between items-center"
+                    >
+                      <div>
+                        <h3 className="font-medium text-lg">{req.tasks.title}</h3>
+                        <p className="text-sm text-muted-text">
+                          Requested by {req.from_email}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Button
+                          onClick={async () => {
+                            await fetch(
+                              `${import.meta.env.VITE_BACKEND_URL}/api/tasks/reassign/${req.id}`,
+                              {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                                body: JSON.stringify({ action: 'accepted' }),
+                              }
+                            );
+                            fetchReassignRequests();
+                            fetchTasks();
+                          }}
+                        >
+                          Accept
+                        </Button>
+
+                        <Button
+                          variant="outline"
+                          onClick={async () => {
+                            await fetch(
+                              `${import.meta.env.VITE_BACKEND_URL}/api/tasks/reassign/${req.id}`,
+                              {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  Authorization: `Bearer ${localStorage.getItem('token')}`,
+                                },
+                                body: JSON.stringify({ action: 'rejected' }),
+                              }
+                            );
+                            fetchReassignRequests();
+                          }}
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* ✅ WRONG REASON DIALOG */}
           {wrongReasonTask && (
             <Dialog open onOpenChange={() => setWrongReasonTask(null)}>
