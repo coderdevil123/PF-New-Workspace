@@ -151,7 +151,7 @@ export default function Login() {
               variant="outline"
               onClick={() => handleSocialLogin('Google')}
               className="
-                h-12 w-12
+                h-12 w-30
                 rounded-full
                 border-2
                 flex items-center justify-center
