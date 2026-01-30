@@ -153,7 +153,7 @@ export default function Login() {
             >
               <Chrome className="h-5 w-5" />
             </Button>
-            <Button
+            {/* <Button
               type="button"
               variant="outline"
               onClick={() => handleSocialLogin('Facebook')}
@@ -168,7 +168,7 @@ export default function Login() {
               className="h-12 border-2 hover:border-primary hover:bg-primary/5"
             >
               <Github className="h-5 w-5" />
-            </Button>
+            </Button> */}
           </div>
 
         </div>
