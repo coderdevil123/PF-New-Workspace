@@ -214,9 +214,9 @@ const uploadAvatar = async (file: File) => {
             Back to Dashboard
           </Button>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="font-display mb-2 text-4xl font-normal text-white animate-slide-up">
+              <h1 className="font-display mb-2 text-4xl sm:text-4xl font-normal text-white animate-slide-up">
                 My Profile
               </h1>
               <p className="font-sans text-lg text-white/80 animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -259,13 +259,13 @@ const uploadAvatar = async (file: File) => {
       {/* Profile Content */}
       <section className="px-6 py-12 lg:px-12">
         <div className="mx-auto max-w-4xl">
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
             {/* Profile Card */}
             <div className="lg:col-span-1">
-              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up">
+              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-5 sm:p-8 shadow-card animate-slide-up">
                 <div className="text-center">
                   {/* Avatar */}
-                  <div className="relative mx-auto mb-6 h-32 w-32">
+                  <div className="relative mx-auto mb-6 h-24 w-24 sm:h-32 sm:w-32">
                     {profileData.avatar ? (
                       <img
                         src={profileData.avatar}
@@ -326,7 +326,7 @@ const uploadAvatar = async (file: File) => {
 
             {/* Profile Details */}
             <div className="lg:col-span-2">
-              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="mint-corner-accent rounded-2xl border border-border bg-white dark:bg-dark-card p-5 sm:p-8 shadow-card animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 <h3 className="font-display mb-6 text-xl font-normal text-heading-dark dark:text-dark-text">
                   Profile Information
                 </h3>
