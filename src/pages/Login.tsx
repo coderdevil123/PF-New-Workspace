@@ -152,7 +152,7 @@ export default function Login() {
               onClick={() => handleSocialLogin('Google')}
               className="
                 h-12 w-30
-                rounded-full
+                rounded-xl
                 border-2
                 flex items-center justify-center
                 hover:border-primary
