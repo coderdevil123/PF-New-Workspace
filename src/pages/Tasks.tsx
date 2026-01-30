@@ -250,102 +250,60 @@ export default function Tasks() {
         </div>
 
         <div className="relative mx-auto max-w-5xl">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {/* LEFT SIDE */}
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg">
-                <CheckSquare className="h-7 w-7 text-white" />
-              </div>
+          {/* LEFT ZONE: Back + Title */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          {/* Back button (original position) */}
+          <Button
+            onClick={() => navigate('/workspace')}
+            variant="ghost"
+            className="group -ml-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
 
-              <div>
-                <h1 className="font-display text-2xl sm:text-4xl font-normal text-white">
-                  My Tasks
-                </h1>
-                <p className="font-sans text-sm sm:text-lg text-white/80">
-                  Tasks assigned to you from meetings
-                </p>
-              </div>
+          {/* Title block */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg">
+              <CheckSquare className="h-7 w-7 text-white" />
             </div>
 
-            {/* RIGHT SIDE */}
-            <div className="flex justify-start sm:justify-end">
-              <Button
-                onClick={() =>
-                  setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')
-                }
-                className="
-                  relative rounded-full
-                  bg-white/10 px-5 py-2
-                  text-white backdrop-blur-md
-                  hover:bg-white/20
-                  transition
-                "
-              >
-                Reassignment Inbox
-                {reassignRequests.length > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
-                                  justify-center rounded-full bg-red-500 text-xs">
-                    {reassignRequests.length}
-                  </span>
-                )}
-              </Button>
+            <div>
+              <h1 className="font-display text-2xl sm:text-4xl font-normal text-white">
+                My Tasks
+              </h1>
+              <p className="font-sans text-sm sm:text-lg text-white/80">
+                Tasks assigned to you from meetings
+              </p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Button
-                onClick={() => navigate('/workspace')}
-                variant="ghost"
-                className="group -ml-3 rounded-lg text-white/90 transition-all hover:bg-white/10 hover:text-white animate-slide-down"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back</span>
-              </Button>
-              
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
-                  <CheckSquare className="h-7 w-7 text-white" />
-                </div>
-                <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  {/* <div className="flex items-center gap-4">
-                      <div>
-                        <h1 className="font-display text-2xl sm:text-4xl font-normal text-white">
-                          My Tasks
-                        </h1>
-                        <p className="font-sans text-sm sm:text-lg text-white/80">
-                          Tasks assigned to you from meetings
-                        </p>
-                      </div>
-
-                      <div className="mt-4 sm:mt-0">
-                        <Button
-                          onClick={() => setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')}
-                          className="
-                            relative rounded-full
-                            bg-white/10 px-5 py-2
-                            text-white
-                            backdrop-blur-md
-                            hover:bg-white/20
-                            transition
-                          "
-                        >
-                          Reassignment Inbox
-                          {reassignRequests.length > 0 && (
-                            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
-                                            justify-center rounded-full bg-red-500 text-xs">
-                              {reassignRequests.length}
-                            </span>
-                          )}
-                        </Button>
-                      </div>
-                    </div> */}
-                  {/* <p className="font-sans text-sm sm:text-lg text-white/80">
-                    Tasks assigned to you from meetings
-                  </p> */}
-                </div>
-              </div>
-            </div>
-            </div>
+          </div>
         </div>
-      </section>
+
+        {/* RIGHT ZONE: Reassignment Inbox */}
+        <div className="flex justify-start sm:justify-end">
+          <Button
+            onClick={() =>
+              setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')
+            }
+            className="
+              relative rounded-full
+              bg-white/10 px-5 py-2
+              text-white backdrop-blur-md
+              hover:bg-white/20
+              transition
+            "
+          >
+            Reassignment Inbox
+            {reassignRequests.length > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center
+                              justify-center rounded-full bg-red-500 text-xs">
+                {reassignRequests.length}
+              </span>
+            )}
+          </Button>
+        </div>
+      </div>
+     </section>
 
       {/* Search & Filters */}
         <section className="px-6 pt-6 lg:px-12">
