@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  pf-workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pf-workspace
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - pf-network
+
+networks:
+  pf-network:
+    driver: bridge
