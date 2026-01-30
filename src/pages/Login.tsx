@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { useToast } from '../hooks/use-toast';
 import { Mail, Lock, Github, Chrome, Facebook, ArrowRight } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -144,31 +145,25 @@ export default function Login() {
           </div>
 
           {/* Social Login */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex justify-center">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleSocialLogin('Google')}
-              className="h-12 border-2 hover:border-primary hover:bg-primary/5"
+              className="
+                h-12 w-12
+                rounded-full
+                border-2
+                flex items-center justify-center
+                hover:border-primary
+                hover:bg-primary/5
+                transition-all
+              "
             >
-              <Chrome className="h-5 w-5" />
+              <span className="flex items-center justify-center">
+                {FcGoogle({ className: "h-6 w-6" })}
+              </span>
             </Button>
-            {/* <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleSocialLogin('Facebook')}
-              className="h-12 border-2 hover:border-primary hover:bg-primary/5"
-            >
-              <Facebook className="h-5 w-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleSocialLogin('Github')}
-              className="h-12 border-2 hover:border-primary hover:bg-primary/5"
-            >
-              <Github className="h-5 w-5" />
-            </Button> */}
           </div>
 
         </div>
