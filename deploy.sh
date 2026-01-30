@@ -13,20 +13,20 @@ git pull origin main || echo "⚠️  Not pulling from git (working on local cha
 
 # Stop and remove existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose down
+docker compose down
 
 # Build and start new containers
 echo "🔨 Building Docker image..."
-docker-compose build --no-cache
+docker compose build --no-cache
 
 echo "▶️  Starting containers..."
-docker-compose up -d
+docker compose up -d
 
 # Show container status
 echo "✅ Deployment complete!"
 echo ""
 echo "Container status:"
-docker-compose ps
+docker compose ps
 
 echo ""
 echo "🌐 Your application is now running!"
