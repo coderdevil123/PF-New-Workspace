@@ -46,12 +46,14 @@ export default function AddToolModal({
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [existingVideoId, setExistingVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     if (tool) {
       setName(tool.name);
       setToolUrl(tool.url);
-      setYoutubeUrl(tool.tutorial_video || '');
+      setYoutubeUrl('');
+      setExistingVideoId(tool.tutorial_video || null);
       setDescription(tool.description || '');
     }
   }, [tool]);
@@ -69,12 +71,14 @@ export default function AddToolModal({
 
   setLoading(true);
 
+  const newVideoId = extractYoutubeId(youtubeUrl);
+
   const payload = {
     name,
     description,
     url: toolUrl,
     category,
-    tutorial_video: extractYoutubeId(youtubeUrl),
+    tutorial_video: newVideoId || existingVideoId,
   };
 
   const endpoint = tool
