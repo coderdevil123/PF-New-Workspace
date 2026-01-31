@@ -1,16 +1,18 @@
-version: '3.8'
-
 services:
   pf-workspace:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     container_name: pf-workspace
     ports:
       - "8090:80"
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
+    env_file:
+      - .env.production
     networks:
       - pf-network
 
