@@ -36,9 +36,10 @@ export default function Login() {
 
   const handleSocialLogin = (provider: string) => {
     if (provider === 'Google') {
+      const origin = window.location.origin;
     // Redirect to YOUR BACKEND, not Google
     window.location.href =
-      'https://backend-for-testing-9h8v.onrender.com/auth/google';
+      `https://backend-for-testing-9h8v.onrender.com/auth/google?origin=${encodeURIComponent(origin)}`;
     return;
     }
 
