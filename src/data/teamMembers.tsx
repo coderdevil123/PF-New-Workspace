@@ -43,7 +43,7 @@ export const teamMembers = [
     name: 'Yogita',
     role: 'Content & Social Head',
     department: 'Marketing',
-    email: 'Yogita.Nagpal@pristineforests.com',
+    email: 'yogita.nagpal@pristineforests.com',
     // phone: '+1 (555) 200-0002',
     mattermost: '@yogita',
     // bio: 'Strategic marketing leader specializing in content creation and social media engagement. Driving brand awareness and customer engagement initiatives.',
