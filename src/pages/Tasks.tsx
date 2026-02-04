@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckSquare, Check, Pencil } from 'lucide-react';
+import { ArrowLeft, CheckSquare, Check, Pencil, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -117,7 +117,12 @@ export default function Tasks() {
   };
 
   useEffect(() => {
-    const closeOnOutsideClick = () => setOpenSummaryTaskId(null);
+    const closeOnOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-summary-bubble]')) {
+        setOpenSummaryTaskId(null);
+      }
+    };
     window.addEventListener('click', closeOnOutsideClick);
     return () => window.removeEventListener('click', closeOnOutsideClick);
   }, []);
@@ -432,7 +437,7 @@ export default function Tasks() {
               </div>
 
               {/* RIGHT: Status Dropdown */}
-              <div className="relative self-start sm:self-auto">
+              <div className="flex flex-col items-end gap-2 relative">
                 <button
                   onClick={() =>
                     setOpenDropdownTaskId(
@@ -555,20 +560,33 @@ export default function Tasks() {
                         openSummaryTaskId === task.id ? null : task.id
                       );
                     }}
-                    className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-hover"
+                    className="
+                      flex items-center gap-1.5
+                      rounded-md px-2 py-1
+                      text-xs font-medium
+                      text-gray-600 dark:text-gray-300
+                      hover:bg-gray-100 dark:hover:bg-dark-hover
+                      transition
+                    "
                   >
-                    ℹ️
+                    <Info className="h-3.5 w-3.5" />
+                    Summary
                   </button>
-                {openSummaryTaskId && summaryPosition && (
+                {openSummaryTaskId === task.id && summaryPosition && (
                   <div
+                    data-summary-bubble
                     onClick={(e) => e.stopPropagation()}
                     className="
                       fixed z-[9999]
                       w-72 max-h-48 overflow-y-auto
-                      rounded-2xl border shadow-2xl
+                      rounded-xl
+                      border border-black/5 dark:border-white/10
                       bg-white dark:bg-dark-card
                       text-sm text-gray-800 dark:text-gray-100
                       p-4
+
+                      shadow-[0_6px_16px_rgba(0,0,0,0.15)]
+                      dark:shadow-[0_6px_16px_rgba(0,0,0,0.6)]
                     "
                     style={{
                       top: summaryPosition.top,
