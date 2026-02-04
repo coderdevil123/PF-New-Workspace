@@ -14,6 +14,7 @@ import {
 } from '../components/ui/dropdown-menu';
 import { useToast } from '../hooks/use-toast';
 import { CheckSquare } from 'lucide-react';
+import { Tooltip } from '../components/ui/Tooltip';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -103,24 +104,28 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             </Button>
           )} */}
           {user && (
-          <Button
-              onClick={() => navigate('/tasks')}
-              variant="ghost"
-              size="sm"
-              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-            >
-              <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
-            </Button>
+            <Tooltip label="Tasks">
+              <Button
+                  onClick={() => navigate('/tasks')}
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+                >
+                  <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
+              </Button>
+            </Tooltip>
           )}
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-            >
-              <ThemeIcon className="h-5 w-5" strokeWidth={1.5} />
-            </Button>
-          </DropdownMenuTrigger>
+          <Tooltip label="Theme">
+            <DropdownMenuTrigger asChild>
+              <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+                >
+                  <ThemeIcon className="h-5 w-5" strokeWidth={1.5} />
+              </Button>
+            </DropdownMenuTrigger>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-40 bg-popover text-popover-foreground">
             <DropdownMenuLabel className="text-popover-foreground">Theme</DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -148,33 +153,35 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <Button
-          onClick={() => navigate('/team')}
-          variant="ghost"
-          size="sm"
-          className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-        >
-          <Users className="h-5 w-5" strokeWidth={1.5} />
-        </Button>
-
+          <Tooltip label="Team">
+            <Button
+                onClick={() => navigate('/team')}
+                variant="ghost"
+                size="sm"
+                className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+              >
+                <Users className="h-5 w-5" strokeWidth={1.5} />
+            </Button>
+          </Tooltip>
         {/* Notifications with Preview */}
         {user && (
         <DropdownMenu open={notificationOpen} onOpenChange={setNotificationOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
-            >
-              <Bell className="h-5 w-5" strokeWidth={1.5} />
-              {unreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-mint-accent text-xs font-bold text-white shadow-lg">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
+          <Tooltip label="Notifications">
+            <DropdownMenuTrigger asChild>
+              <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105"
+                >
+                  <Bell className="h-5 w-5" strokeWidth={1.5} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-mint-accent text-xs font-bold text-white shadow-lg">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+              </Button>
+            </DropdownMenuTrigger>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-80 bg-popover text-popover-foreground">
             <DropdownMenuLabel className="flex items-center justify-between text-popover-foreground">
               <span>Notifications</span>
@@ -241,17 +248,19 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         </DropdownMenu>
         )}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:scale-105"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent shadow-md">
-                <User className="h-4 w-4 text-white" strokeWidth={1.5} />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
+          <Tooltip label="Account">
+            <DropdownMenuTrigger asChild>
+              <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:scale-105"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent shadow-md">
+                    <User className="h-4 w-4 text-white" strokeWidth={1.5} />
+                  </div>
+              </Button>
+            </DropdownMenuTrigger>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-56 bg-popover text-popover-foreground">
             <DropdownMenuLabel className="text-popover-foreground">
               <div className="flex flex-col space-y-1">
