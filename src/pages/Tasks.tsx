@@ -77,6 +77,11 @@ export default function Tasks() {
   const [reassignRequests, setReassignRequests] = useState<any[]>([]);
   const [openWrongSubmenuTaskId, setOpenWrongSubmenuTaskId] = useState<string | null>(null);
   const [openSummaryTaskId, setOpenSummaryTaskId] = useState<string | null>(null);
+  const [summaryPosition, setSummaryPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
 
   const fetchTasks = async () => {
   try {
@@ -536,39 +541,49 @@ export default function Tasks() {
               </div>
               <div className="relative mt-2 flex justify-end">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenSummaryTaskId(
-                      openSummaryTaskId === task.id ? null : task.id
-                    );
-                  }}
-                  className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-hover"
-                >
-                  ℹ️
-                </button>
-                {openSummaryTaskId === task.id && (
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+
+                      setSummaryPosition({
+                        top: rect.bottom + 8,
+                        left: Math.min(rect.left, window.innerWidth - 320),
+                      });
+
+                      setOpenSummaryTaskId(
+                        openSummaryTaskId === task.id ? null : task.id
+                      );
+                    }}
+                    className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-hover"
+                  >
+                    ℹ️
+                  </button>
+                {openSummaryTaskId && summaryPosition && (
                   <div
+                    onClick={(e) => e.stopPropagation()}
                     className="
-                      absolute z-50
+                      fixed z-[9999]
                       w-72 max-h-48 overflow-y-auto
-                      rounded-2xl border shadow-xl
+                      rounded-2xl border shadow-2xl
                       bg-white dark:bg-dark-card
                       text-sm text-gray-800 dark:text-gray-100
                       p-4
-
-                      /* Desktop */
-                      sm:right-0 sm:top-full sm:mt-2
-
-                      /* Mobile */
-                      left-0 top-full mt-2
                     "
+                    style={{
+                      top: summaryPosition.top,
+                      left: summaryPosition.left,
+                    }}
                   >
-                    <div className="font-medium mb-2 text-mint-accent">
+                    <div className="mb-2 font-medium text-mint-accent">
                       Meeting Summary
                     </div>
 
-                    <p className="text-sm leading-relaxed">
-                      {task.meeting_summary || 'No summary available for this meeting.'}
+                    <p className="leading-relaxed">
+                      {
+                        tasks.find(t => t.id === openSummaryTaskId)
+                          ?.meeting_summary || 'No summary available for this meeting.'
+                      }
                     </p>
                   </div>
                 )}
