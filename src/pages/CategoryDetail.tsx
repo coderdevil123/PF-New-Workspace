@@ -284,11 +284,11 @@ export default function CategoryDetail() {
                       </Button>
                     </div>
 
-                    {/* Rating Badge */}
+                    {/* Rating Badge
                     <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-mint-accent px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
                       <Sparkles className="h-3 w-3" />
                       {tool.rating}
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Content */}
@@ -303,7 +303,7 @@ export default function CategoryDetail() {
                     </div>
 
                     {/* Stats */}
-                    <div className="font-ui mb-4 flex items-center gap-4 text-xs text-muted-text dark:text-dark-muted">
+                    {/* <div className="font-ui mb-4 flex items-center gap-4 text-xs text-muted-text dark:text-dark-muted">
                       <div className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
                         <span>{tool.users} users</span>
@@ -312,7 +312,7 @@ export default function CategoryDetail() {
                         <Clock className="h-3 w-3" />
                         <span>Active</span>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
