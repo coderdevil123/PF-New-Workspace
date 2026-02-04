@@ -11,10 +11,12 @@ import {
 } from '../components/ui/dialog';
 
 type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'wrong' | 'blocked' | 'on-hold';
-
+type TaskPriority = 'high' | 'medium' | 'low';
 type Task = {
   id: string;
   title: string;
+  priority?: TaskPriority;
+  meeting_summary?: string;
   description?: string;
   // is_completed: boolean;
   created_at?: string;
@@ -50,6 +52,11 @@ const STATUS_STYLES: Record<TaskStatus, string> = {
     'bg-gray-200 text-gray-700 dark:bg-gray-700/40 dark:text-gray-200',
 };
 
+const PRIORITY_STYLES: Record<TaskPriority, string> = {
+  high: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200',
+  medium: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200',
+  low: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200',
+};
 
 export default function Tasks() {
   const navigate = useNavigate();
@@ -69,6 +76,7 @@ export default function Tasks() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'reassign'>('tasks');
   const [reassignRequests, setReassignRequests] = useState<any[]>([]);
   const [openWrongSubmenuTaskId, setOpenWrongSubmenuTaskId] = useState<string | null>(null);
+  const [openSummaryTaskId, setOpenSummaryTaskId] = useState<string | null>(null);
 
   const fetchTasks = async () => {
   try {
@@ -102,6 +110,12 @@ export default function Tasks() {
     const data = await res.json();
     setReassignRequests(Array.isArray(data) ? data : []);
   };
+
+  useEffect(() => {
+    const closeOnOutsideClick = () => setOpenSummaryTaskId(null);
+    window.addEventListener('click', closeOnOutsideClick);
+    return () => window.removeEventListener('click', closeOnOutsideClick);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -395,12 +409,16 @@ export default function Tasks() {
                 >
                   {task.title}
                 </h3>
-                {task.description && (
-                  <p className="mt-1 text-sm text-muted-text">
-                    {task.description}
-                  </p>
+                {task.priority && (
+                  <div className="mt-2">
+                    <span
+                      className={`inline-block rounded-full px-3 py-1 text-xs font-medium
+                        ${PRIORITY_STYLES[task.priority]}`}
+                    >
+                      Priority: {task.priority.toUpperCase()}
+                    </span>
+                  </div>
                 )}
-
                 {task.created_at && (
                   <div className="mt-3 text-xs text-muted-text">
                     {formatTaskDate(task.created_at)}
@@ -513,6 +531,45 @@ export default function Tasks() {
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
+                  </div>
+                )}
+              </div>
+              <div className="relative mt-2 flex justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenSummaryTaskId(
+                      openSummaryTaskId === task.id ? null : task.id
+                    );
+                  }}
+                  className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-dark-hover"
+                >
+                  ℹ️
+                </button>
+                {openSummaryTaskId === task.id && (
+                  <div
+                    className="
+                      absolute z-50
+                      w-72 max-h-48 overflow-y-auto
+                      rounded-2xl border shadow-xl
+                      bg-white dark:bg-dark-card
+                      text-sm text-gray-800 dark:text-gray-100
+                      p-4
+
+                      /* Desktop */
+                      sm:right-0 sm:top-full sm:mt-2
+
+                      /* Mobile */
+                      left-0 top-full mt-2
+                    "
+                  >
+                    <div className="font-medium mb-2 text-mint-accent">
+                      Meeting Summary
+                    </div>
+
+                    <p className="text-sm leading-relaxed">
+                      {task.meeting_summary || 'No summary available for this meeting.'}
+                    </p>
                   </div>
                 )}
               </div>
