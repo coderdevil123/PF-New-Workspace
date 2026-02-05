@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { ChevronRight, ArrowUpRight } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { useAuth } from "../contexts/AuthContext";
+import AuthRequiredModal from "../components/AuthRequiredModal";
 
 interface Category {
   id: string;
@@ -23,10 +25,18 @@ export default function CategoryTile({ category, index }: CategoryTileProps) {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   const Icon = category.icon;
+  const { isAuthenticated } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleClick = () => {
+    if (!isAuthenticated) {
+      setAuthModalOpen(true);
+      return;
+    }
+
     navigate(`/workspace/${category.id}`);
   };
+
 
   return (
     <Card
@@ -110,6 +120,10 @@ export default function CategoryTile({ category, index }: CategoryTileProps) {
           </div>
         </div>
       </div>
+      <AuthRequiredModal
+      open={authModalOpen}
+      onClose={() => setAuthModalOpen(false)}
+    />
     </Card>
   );
 }

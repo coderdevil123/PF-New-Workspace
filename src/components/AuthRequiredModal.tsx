@@ -28,7 +28,10 @@ export default function AuthRequiredModal({ open, onClose }: Props) {
 
         <Button
           className="mt-4 w-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
-          onClick={() => navigate("/login")}
+          onClick={() => {
+            onClose();   
+            navigate("/login");
+            }}
         >
           Login
         </Button>

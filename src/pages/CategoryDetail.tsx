@@ -291,7 +291,13 @@ export default function CategoryDetail() {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(tool.url, '_blank');
+
+                          if (!isAuthenticated) {
+                            setAuthModalOpen(true);
+                            return;
+                          }
+
+                          window.open(tool.url, "_blank");
                         }}
                         size="sm"
                         className="h-10 w-10 rounded-full bg-mint-accent p-0 text-white shadow-lg shadow-mint transition-all hover:scale-110"
