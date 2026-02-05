@@ -161,7 +161,14 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                         }
                         window.location.href = `/workspace/${category.id}`;
                       }}
-                      className="cursor-pointer"
+                      className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
+                          isActive 
+                            ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
+                            : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
+                        }`}
+                        style={{ 
+                          transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
+                        }}
                     >
                     {isActive && (
                       <div className="absolute left-0 h-8 w-1 rounded-r-full bg-mint-accent transition-all duration-300" />
