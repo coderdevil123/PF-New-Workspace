@@ -81,7 +81,7 @@ export default function Tasks() {
     top: number;
     left: number;
   } | null>(null);
-
+  const [selectedTaskView, setSelectedTaskView] = useState<Task | null>(null);
 
   const fetchTasks = async () => {
   try {
@@ -397,6 +397,7 @@ export default function Tasks() {
           {activeTab === 'tasks' && filteredTasks.map(task => (
             <div
                 key={task.id}
+                onClick={() => setSelectedTaskView(task)}
                 className="
                   flex flex-col sm:flex-row
                   sm:justify-between
@@ -405,7 +406,7 @@ export default function Tasks() {
                   bg-white/5 dark:bg-dark-card
                   p-4 sm:p-6
                   shadow-card hover:shadow-card-hover
-                  transition-all relative
+                  transition-all relative cursor-pointer
                 "
               >
               {/* LEFT: Task Content */}
@@ -439,11 +440,12 @@ export default function Tasks() {
               {/* RIGHT: Status Dropdown */}
               <div className="flex flex-col items-end gap-2 relative">
                 <button
-                  onClick={() =>
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setOpenDropdownTaskId(
                       openDropdownTaskId === task.id ? null : task.id
-                    )
-                  }
+                    );
+                  }}
                   className="rounded-lg border px-4 py-2 text-sm
                             bg-white dark:bg-dark-bg
                             text-gray-800 dark:text-gray-200
@@ -609,6 +611,79 @@ export default function Tasks() {
             </div>
           ))}
           
+          {selectedTaskView && (
+              <Dialog open onOpenChange={() => setSelectedTaskView(null)}>
+                <DialogContent className="max-w-lg rounded-2xl bg-white dark:bg-dark-card">
+
+                  {/* HEADER */}
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-semibold">
+                      {selectedTaskView.title}
+                    </DialogTitle>
+                  </DialogHeader>
+
+                  {/* PRIORITY */}
+                  {selectedTaskView.priority && (
+                    <div className="mt-2">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium
+                          ${PRIORITY_STYLES[selectedTaskView.priority]}`}
+                      >
+                        Priority: {selectedTaskView.priority.toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* STATUS */}
+                  {selectedTaskView.status && (
+                    <div className="mt-4">
+                      <div className="text-xs text-muted-text mb-1">
+                        Current Status
+                      </div>
+
+                      <span
+                        className={`rounded-full px-3 py-1 text-sm font-medium
+                          ${STATUS_STYLES[selectedTaskView.status]}`}
+                      >
+                        {selectedTaskView.status.toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* MEETING SUMMARY */}
+                  <div className="mt-6">
+                    <div className="text-sm font-semibold text-mint-accent mb-2">
+                      Meeting Summary
+                    </div>
+
+                    <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                      {selectedTaskView.meeting_summary ||
+                        'No summary available for this meeting.'}
+                    </p>
+                  </div>
+
+                  {/* JELLYFIN LINK */}
+                  {selectedTaskView.description && (
+                    <div className="mt-6">
+                      <div className="text-sm font-semibold text-mint-accent mb-2">
+                        Jellyfin Recording
+                      </div>
+
+                      <a
+                        href={selectedTaskView.description}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-500 underline hover:text-blue-400"
+                      >
+                        Open Recording
+                      </a>
+                    </div>
+                  )}
+
+                </DialogContent>
+              </Dialog>
+            )}
+
           {/* EDIT MODAL */}
           {editingTask && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
