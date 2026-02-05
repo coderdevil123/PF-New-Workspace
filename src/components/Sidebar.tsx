@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Zap, Palette, Megaphone, Settings, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { useAuth } from "../contexts/AuthContext";
+import AuthRequiredModal from "../components/AuthRequiredModal";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,6 +24,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isHoveringDesktop, setIsHoveringDesktop] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -134,20 +138,31 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 const isActive = location.pathname === `/workspace/${category.id}`;
                 
                 return (
-                  <Link
-                    key={category.id}
-                    to={`/workspace/${category.id}`}
-                    className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
-                        : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
-                    }`}
-                    style={{ 
-                      transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
-                    }}
-                    onMouseEnter={() => setHoveredItem(category.id)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  >
+                  // <Link
+                  //   key={category.id}
+                  //   to={`/workspace/${category.id}`}
+                  //   className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
+                  //     isActive 
+                  //       ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
+                  //       : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
+                  //   }`}
+                  //   style={{ 
+                  //     transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
+                  //   }}
+                  //   onMouseEnter={() => setHoveredItem(category.id)}
+                  //   onMouseLeave={() => setHoveredItem(null)}
+                  // >
+                  <div
+                      key={category.id}
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          setAuthModalOpen(true);
+                          return;
+                        }
+                        window.location.href = `/workspace/${category.id}`;
+                      }}
+                      className="cursor-pointer"
+                    >
                     {isActive && (
                       <div className="absolute left-0 h-8 w-1 rounded-r-full bg-mint-accent transition-all duration-300" />
                     )}
@@ -167,7 +182,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                         {category.label}
                       </div>
                     )}
-                  </Link>
+                  {/* </Link> */}
+                  </div>
                 );
               })}
             </nav>
@@ -195,6 +211,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
         </div>
       </aside>
+      <AuthRequiredModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </>
   );
 }

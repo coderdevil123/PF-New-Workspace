@@ -9,6 +9,8 @@ import ThemeAwareImage from '../components/ThemeAwareImage';
 import { toolsData } from '../data/tools';
 import { useTheme } from '../contexts/ThemeContext';
 import AddToolModal from '../components/AddToolModal';
+import { useAuth } from "../contexts/AuthContext";
+import AuthRequiredModal from "../components/AuthRequiredModal";
 
 const categoryData: Record<string, any> = {
   productivity: {
@@ -80,6 +82,8 @@ export default function CategoryDetail() {
   const [contactHelpOpen, setContactHelpOpen] = useState(false);
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
   const [addToolOpen, setAddToolOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const [tools, setTools] = useState<any[]>([]);
 
@@ -119,7 +123,13 @@ export default function CategoryDetail() {
 
     setTools(normalized);
   }
-  
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setAuthModalOpen(true);
+    }
+  }, [isAuthenticated]);
+
   useEffect(() => {
     loadTools();
   }, []);
@@ -256,7 +266,13 @@ export default function CategoryDetail() {
                   {/* Tool Image */}
                   <div 
                     className="relative h-48 cursor-pointer overflow-hidden bg-white dark:bg-dark-hover"
-                    onClick={() => window.open(tool.url, '_blank')}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        setAuthModalOpen(true);
+                        return;
+                      }
+                      window.open(tool.url, "_blank");
+                    }}
                   >
                     <ThemeAwareImage
                       lightSrc={tool.imageLight || tool.image}
@@ -470,6 +486,10 @@ export default function CategoryDetail() {
         onSuccess={loadTools}
         category={categoryId}
         tool={selectedTool}
+      />
+      <AuthRequiredModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
       />
 
     </div>

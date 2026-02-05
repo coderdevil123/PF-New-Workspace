@@ -7,6 +7,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import ThemeAwareImage from '../components/ThemeAwareImage';
 import LogoLoop from '../components/LogoLoop';
 // import { toolsData } from '../data/tools';
+import AuthRequiredModal from "../components/AuthRequiredModal";
 
 const features = [
   {
@@ -39,6 +40,7 @@ export default function WorkspaceDashboard() {
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
   const [isPreviewHovered, setIsPreviewHovered] = useState(false);
   const [tools, setTools] = useState<Tool[]>([]);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   type Tool = {
   id: string;
   name: string;
@@ -144,11 +146,16 @@ export default function WorkspaceDashboard() {
   };
 
   const handleToolClick = (url: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation();
-    }
-    window.open(url, '_blank');
-  };
+  if (e) e.stopPropagation();
+
+  if (!isAuthenticated) {
+    setAuthModalOpen(true);
+    return;
+  }
+
+  window.open(url, "_blank");
+};
+
 
   if (!Array.isArray(tools)) {
     return (
@@ -346,7 +353,13 @@ export default function WorkspaceDashboard() {
                     className="mint-corner-accent group cursor-pointer rounded-2xl border border-border bg-white dark:bg-dark-card p-6 shadow-card transition-all duration-500 hover:shadow-card-hover hover:-translate-y-1 animate-slide-right"
                     style={{ animationDelay: `${index * 0.1}s` }}
                     onMouseEnter={() => handleCategoryHover(category.id)}
-                    onClick={() => navigate(`/workspace/${category.id}`)}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        setAuthModalOpen(true);
+                        return;
+                      }
+                      navigate(`/workspace/${category.id}`);
+                    }}
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-soft-mint dark:bg-mint-accent/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-mint-accent group-hover:shadow-md">
@@ -481,7 +494,13 @@ export default function WorkspaceDashboard() {
 
                             <Button
                               className="font-ui w-full rounded-full bg-mint-accent text-forest-dark font-medium hover:bg-mint-accent/90 hover:shadow-md transition-all"
-                              onClick={() => navigate(`/workspace/${category.id}`)}
+                              onClick={() => {
+                                if (!isAuthenticated) {
+                                  setAuthModalOpen(true);
+                                  return;
+                                }
+                                navigate(`/workspace/${category.id}`);
+                              }}
                             >
                               View All {category.title} Tools
                               <ArrowRight className="ml-2 h-4 w-4" />
@@ -530,7 +549,10 @@ export default function WorkspaceDashboard() {
         </div>
       </section>
       )}
-
+      <AuthRequiredModal
+        open={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }
