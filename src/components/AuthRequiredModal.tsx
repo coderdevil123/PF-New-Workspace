@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface Props {
   open: boolean;

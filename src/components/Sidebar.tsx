@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from "../contexts/AuthContext";
 import AuthRequiredModal from "../components/AuthRequiredModal";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { isAuthenticated } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -152,14 +154,18 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   //   onMouseEnter={() => setHoveredItem(category.id)}
                   //   onMouseLeave={() => setHoveredItem(null)}
                   // >
-                  <div
+                  <button
                       key={category.id}
-                      onClick={() => {
+                      // to={`/workspace/${category.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+
                         if (!isAuthenticated) {
                           setAuthModalOpen(true);
                           return;
                         }
-                        window.location.href = `/workspace/${category.id}`;
+
+                        navigate(`/workspace/${category.id}`);
                       }}
                       className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
                           isActive 
@@ -192,7 +198,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       </div>
                     )}
                   {/* </Link> */}
-                  </div>
+                  </button>
                 );
               })}
             </nav>

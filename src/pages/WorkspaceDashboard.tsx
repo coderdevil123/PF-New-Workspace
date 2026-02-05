@@ -377,23 +377,25 @@ export default function WorkspaceDashboard() {
                           {category.allTools.map((toolName: string, idx: number) => {
                             const tool = tools.find(t => t.name === toolName);
                             return (
-                              <span
+                              <button type="button"
                                 key={idx}
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (tool) {
-                                    if (!isAuthenticated) {
-                                        setAuthModalOpen(true);
-                                        return;
-                                      }
+                                    e.preventDefault();
+                                    e.stopPropagation();
 
-                                      window.open(tool.url, "_blank");
-                                  }
-                                }}
+                                    if (!tool) return;
+
+                                    if (!isAuthenticated) {
+                                      setAuthModalOpen(true);
+                                      return;
+                                    }
+
+                                    window.open(tool.url, "_blank", "noopener,noreferrer");
+                                  }}
                                 className="font-ui cursor-pointer rounded-full border border-mint-accent/30 bg-soft-mint dark:bg-mint-accent/10 px-2.5 py-1 text-xs font-medium text-forest-green dark:text-mint-accent transition-all hover:scale-105 hover:bg-mint-accent hover:text-white hover:border-mint-accent"
                               >
                                 {toolName}
-                              </span>
+                              </button>
                             );
                           })}
                         </div>
