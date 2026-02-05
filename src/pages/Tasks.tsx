@@ -397,7 +397,7 @@ export default function Tasks() {
           {activeTab === 'tasks' && filteredTasks.map(task => (
             <div
                 key={task.id}
-                onClick={() => setSelectedTaskView(task)}
+                // onClick={() => setSelectedTaskView(task)}
                 className="
                   flex flex-col sm:flex-row
                   sm:justify-between
@@ -410,7 +410,13 @@ export default function Tasks() {
                 "
               >
               {/* LEFT: Task Content */}
-              <div className="flex-1">
+              <div
+                  className="flex-1 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedTaskView(task);
+                  }}
+                >
                 <h3
                   className={`text-lg font-medium ${
                     task.status === 'completed'
@@ -610,51 +616,74 @@ export default function Tasks() {
               </div>
             </div>
           ))}
-          
+
           {selectedTaskView && (
               <Dialog open onOpenChange={() => setSelectedTaskView(null)}>
-                <DialogContent className="max-w-lg rounded-2xl bg-white dark:bg-dark-card">
+                <DialogContent
+                  className="
+                    max-w-xl
+                    rounded-2xl
+                    border border-border
+                    bg-white dark:bg-dark-card
+                    text-gray-900 dark:text-gray-100
+                    shadow-2xl
 
+                    animate-in fade-in slide-in-from-top-10
+                    data-[state=closed]:animate-out
+                    data-[state=closed]:slide-out-to-bottom-10
+                  "
+                >
                   {/* HEADER */}
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
+                    <DialogTitle className="text-2xl font-semibold text-heading-dark dark:text-white">
                       {selectedTaskView.title}
                     </DialogTitle>
                   </DialogHeader>
 
-                  {/* PRIORITY */}
-                  {selectedTaskView.priority && (
-                    <div className="mt-2">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium
-                          ${PRIORITY_STYLES[selectedTaskView.priority]}`}
-                      >
-                        Priority: {selectedTaskView.priority.toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  {/* META ROW */}
+                  <div className="flex flex-wrap gap-3 mt-3">
 
-                  {/* STATUS */}
-                  {selectedTaskView.status && (
-                    <div className="mt-4">
-                      <div className="text-xs text-muted-text mb-1">
-                        Current Status
+                    {/* Priority */}
+                    {selectedTaskView.priority && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-medium text-muted-text">
+                          Task Priority
+                        </span>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-medium
+                            ${PRIORITY_STYLES[selectedTaskView.priority]}`}
+                        >
+                          {selectedTaskView.priority.toUpperCase()}
+                        </span>
                       </div>
+                    )}
 
-                      <span
-                        className={`rounded-full px-3 py-1 text-sm font-medium
-                          ${STATUS_STYLES[selectedTaskView.status]}`}
-                      >
-                        {selectedTaskView.status.toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                    {/* Status */}
+                    {selectedTaskView.status && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-medium text-muted-text">
+                          Current Status
+                        </span>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-sm font-medium
+                            ${STATUS_STYLES[selectedTaskView.status]}`}
+                        >
+                          {selectedTaskView.status.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* DIVIDER */}
+                  <hr className="my-5 border-border" />
 
                   {/* MEETING SUMMARY */}
-                  <div className="mt-6">
-                    <div className="text-sm font-semibold text-mint-accent mb-2">
+                  <div>
+                    <h3 className="text-sm font-semibold text-mint-accent mb-2">
                       Meeting Summary
-                    </div>
+                    </h3>
 
                     <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                       {selectedTaskView.meeting_summary ||
@@ -662,24 +691,29 @@ export default function Tasks() {
                     </p>
                   </div>
 
-                  {/* JELLYFIN LINK */}
+                  {/* RECORDING */}
                   {selectedTaskView.description && (
                     <div className="mt-6">
-                      <div className="text-sm font-semibold text-mint-accent mb-2">
+                      <h3 className="text-sm font-semibold text-mint-accent mb-2">
                         Jellyfin Recording
-                      </div>
+                      </h3>
 
                       <a
                         href={selectedTaskView.description}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-500 underline hover:text-blue-400"
+                        className="
+                          inline-block
+                          text-sm font-medium
+                          text-blue-600 dark:text-blue-400
+                          underline underline-offset-4
+                          hover:text-blue-500
+                        "
                       >
                         Open Recording
                       </a>
                     </div>
                   )}
-
                 </DialogContent>
               </Dialog>
             )}
