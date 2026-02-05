@@ -169,6 +169,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                         style={{ 
                           transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
                         }}
+                        onMouseEnter={() => setHoveredItem(category.id)}
+                        onMouseLeave={() => setHoveredItem(null)}
                     >
                     {isActive && (
                       <div className="absolute left-0 h-8 w-1 rounded-r-full bg-mint-accent transition-all duration-300" />
