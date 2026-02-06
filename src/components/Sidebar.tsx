@@ -4,7 +4,6 @@ import { LayoutDashboard, Zap, Palette, Megaphone, Settings, ChevronLeft, Chevro
 import { Button } from '../components/ui/button';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { useAuth } from "../contexts/AuthContext";
-import AuthRequiredModal from "../components/AuthRequiredModal";
 import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
@@ -202,10 +201,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
         </div>
       </aside>
-      <AuthRequiredModal
-        open={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
     </>
   );
 }
