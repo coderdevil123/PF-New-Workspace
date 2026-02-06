@@ -30,39 +30,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 🔥 FETCH ROLE FROM BACKEND
   useEffect(() => {
-    const enrichUserWithRole = async () => {
-      const token = localStorage.getItem('token');
-      if (!token || !user) return;
+  const enrichUserWithRole = async () => {
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
 
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/team/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    if (!token || !savedUser) return;
 
-        if (!res.ok) return;
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/team/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-        const profile = await res.json();
-
-        const updatedUser = {
-          ...user,
-          role: profile.role,
-          department: profile.department,
-        };
-
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      } catch (err) {
-        console.error('Failed to fetch user role', err);
+      if (!res.ok) {
+        console.error('Failed to fetch /me');
+        return;
       }
-    };
 
-    enrichUserWithRole();
-  }, []);
+      const profile = await res.json();
+
+      const parsedUser = JSON.parse(savedUser);
+
+      const updatedUser = {
+        ...parsedUser,
+        role: profile.role,
+        department: profile.department,
+      };
+
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      console.log('✅ User enriched with role:', updatedUser);
+    } catch (err) {
+      console.error('Role fetch failed', err);
+    }
+  };
+
+  enrichUserWithRole();
+}, []);
+
 
   const login = (userData: User) => {
     setUser(userData);
