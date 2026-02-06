@@ -69,10 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Role fetch failed', err);
     }
   };
+  if (!user) return;
 
   enrichUserWithRole();
-}, []);
-
+}, [user]);
 
   const login = (userData: User) => {
     setUser(userData);
