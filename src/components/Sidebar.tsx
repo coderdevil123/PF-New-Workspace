@@ -156,17 +156,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   // >
                   <button
                       key={category.id}
-                      // to={`/workspace/${category.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => navigate(`/workspace/${category.id}`)}
+                      // onClick={(e) => {
+                      //   e.preventDefault();
 
-                        if (!isAuthenticated) {
-                          setAuthModalOpen(true);
-                          return;
-                        }
+                      //   if (!isAuthenticated) {
+                      //     setAuthModalOpen(true);
+                      //     return;
+                      //   }
 
-                        navigate(`/workspace/${category.id}`);
-                      }}
+                      //   navigate(`/workspace/${category.id}`);
+                      // }}
                       className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
                           isActive 
                             ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
