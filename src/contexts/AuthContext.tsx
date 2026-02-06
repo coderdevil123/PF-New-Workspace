@@ -30,12 +30,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 🔥 FETCH ROLE FROM BACKEND
   useEffect(() => {
+  const token = localStorage.getItem('token');
+  const savedUser = localStorage.getItem('user');
+
+  if (!token || !savedUser) return;
+
   const enrichUserWithRole = async () => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-
-    if (!token || !savedUser) return;
-
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/api/team/me`,
@@ -46,33 +46,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       );
 
-      if (!res.ok) {
-        console.error('Failed to fetch /me');
-        return;
-      }
+      if (!res.ok) return;
 
       const profile = await res.json();
-
       const parsedUser = JSON.parse(savedUser);
 
+      // ⬇️ NORMALIZE ROLE CASE
       const updatedUser = {
         ...parsedUser,
-        role: profile.role,
+        role: profile.role, // Admin | Team Lead | Intern | User
         department: profile.department,
       };
 
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      console.log('✅ User enriched with role:', updatedUser);
     } catch (err) {
-      console.error('Role fetch failed', err);
+      console.error(err);
     }
   };
-  if (!user) return;
 
   enrichUserWithRole();
-}, [user]);
+}, []); // 👈 RUN ONLY ONCE
 
   const login = (userData: User) => {
     setUser(userData);

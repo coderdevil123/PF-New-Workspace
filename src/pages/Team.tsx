@@ -105,15 +105,23 @@ export default function Team() {
   };
 
   // Group members by category
-  const leadership = members.filter(m => m.department === 'Leadership');
-  const heads = members.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
-  const interns = members.filter(m => m.role === 'Intern');
+  const leadership = members.filter(m => m.role === 'admin');
+
+  const heads = members.filter(m => m.role === 'team_lead');
+
+  const interns = members.filter(m => m.role === 'intern');
+
   const others = members.filter(
-    m =>
-      m.department !== 'Leadership' &&
-      !( ['Technology','Marketing','Design','Operations'].includes(m.department) && m.role !== 'Intern' ) &&
-      m.role !== 'Intern'
+    m => !['admin', 'team_lead', 'intern'].includes(m.role)
   );
+  // const heads = members.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
+  // const interns = members.filter(m => m.role === 'Intern');
+  // const others = members.filter(
+  //   m =>
+  //     m.department !== 'Leadership' &&
+  //     !( ['Technology','Marketing','Design','Operations'].includes(m.department) && m.role !== 'Intern' ) &&
+  //     m.role !== 'Intern'
+  // );
 
   if (!members.length) {
     return (
@@ -415,7 +423,8 @@ export default function Team() {
       </section>
       {/* RBAC Modal – Admin Only */}
         <Dialog open={rbacOpen} onOpenChange={setRbacOpen}>
-          <DialogContent className="max-w-xl bg-white dark:bg-dark-card border-border">
+          <DialogContent className="max-w-xl bg-white dark:bg-dark-card border-border 
+            text-heading-dark dark:text-dark-text">
             <h2 className="text-xl font-semibold mb-4">
               Manage Team Roles
             </h2>
@@ -427,8 +436,8 @@ export default function Team() {
                   className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-light-gray dark:hover:bg-dark-hover"
                 >
                   <div>
-                    <p className="font-medium">{member.name}</p>
-                    <p className="text-xs text-muted-text">{member.email}</p>
+                    <p className="font-medium text-heading-dark dark:text-dark-text">{member.name}</p>
+                    <p className="text-xs text-muted-text dark:text-dark-muted">{member.email}</p>
                   </div>
 
                   <Button
@@ -447,15 +456,15 @@ export default function Team() {
         {/* Role Editor */}
         {editingMember && (
           <Dialog open onOpenChange={() => setEditingMember(null)}>
-            <DialogContent className="max-w-md bg-white dark:bg-dark-card border-border">
+            <DialogContent className="max-w-md bg-white dark:bg-dark-card border-border text-heading-dark dark:text-dark-text">
               <h3 className="text-lg font-semibold mb-4">
                 Update {editingMember.name}
               </h3>
 
               {/* Role */}
-              <label className="text-sm font-medium">Role</label>
+              <label className="text-sm font-medium text-heading-dark dark:text-dark-text">Role</label>
               <select
-                className="w-full mt-1 mb-3 rounded-lg border border-border p-2 bg-transparent"
+                className="w-full mt-1 mb-3 rounded-lg border border-border p-2 bg-transparent text-heading-dark dark:text-dark-text"
                 value={editingMember.role}
                 onChange={e =>
                   setEditingMember({
@@ -474,7 +483,7 @@ export default function Team() {
               {(editingMember.role === 'Team Lead' ||
                 editingMember.role === 'Intern') && (
                 <>
-                  <label className="text-sm font-medium">Department</label>
+                  <label className="text-sm font-medium text-heading-dark dark:text-dark-text">Department</label>
                   <select
                     className="w-full mt-1 mb-4 rounded-lg border border-border p-2 bg-transparent"
                     value={editingMember.department}
@@ -496,7 +505,7 @@ export default function Team() {
               <Button
                 className="w-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
                 onClick={async () => {
-                  await fetch(
+                  const res = await fetch(
                     `${import.meta.env.VITE_BACKEND_URL}/api/admin/update-role`,
                     {
                       method: 'PATCH',
@@ -512,9 +521,26 @@ export default function Team() {
                     }
                   );
 
+                  if (!res.ok) {
+                    alert('Failed to update role');
+                    return;
+                  }
+
+                  // ✅ Update local UI immediately
+                  setMembers(prev =>
+                    prev.map(m =>
+                      m.id === editingMember.id
+                        ? {
+                            ...m,
+                            role: editingMember.role,
+                            department: editingMember.department,
+                          }
+                        : m
+                    )
+                  );
+
                   setEditingMember(null);
                   setRbacOpen(false);
-                  window.location.reload(); // safe for now
                 }}
               >
                 Save Changes
