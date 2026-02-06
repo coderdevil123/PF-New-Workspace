@@ -124,11 +124,11 @@ export default function CategoryDetail() {
     setTools(normalized);
   }
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setAuthModalOpen(true);
-    }
-  }, [isAuthenticated]);
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     setAuthModalOpen(true);
+  //   }
+  // }, [isAuthenticated]);
 
   useEffect(() => {
     loadTools();
