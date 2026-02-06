@@ -140,44 +140,20 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 const isActive = location.pathname === `/workspace/${category.id}`;
                 
                 return (
-                  // <Link
-                  //   key={category.id}
-                  //   to={`/workspace/${category.id}`}
-                  //   className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
-                  //     isActive 
-                  //       ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
-                  //       : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
-                  //   }`}
-                  //   style={{ 
-                  //     transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
-                  //   }}
-                  //   onMouseEnter={() => setHoveredItem(category.id)}
-                  //   onMouseLeave={() => setHoveredItem(null)}
-                  // >
-                  <button
-                      key={category.id}
-                      onClick={() => navigate(`/workspace/${category.id}`)}
-                      // onClick={(e) => {
-                      //   e.preventDefault();
-
-                      //   if (!isAuthenticated) {
-                      //     setAuthModalOpen(true);
-                      //     return;
-                      //   }
-
-                      //   navigate(`/workspace/${category.id}`);
-                      // }}
-                      className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
-                          isActive 
-                            ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
-                            : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
-                        }`}
-                        style={{ 
-                          transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
-                        }}
-                        onMouseEnter={() => setHoveredItem(category.id)}
-                        onMouseLeave={() => setHoveredItem(null)}
-                    >
+                  <Link
+                    key={category.id}
+                    to={`/workspace/${category.id}`}
+                    className={`font-ui group relative flex items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-sm font-medium transition-all duration-300 ${
+                      isActive 
+                        ? 'bg-soft-mint dark:bg-mint-accent/20 text-forest-green dark:text-mint-accent' 
+                        : 'text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover'
+                    }`}
+                    style={{ 
+                      transitionDelay: shouldBeOpen ? `${index * 50}ms` : '0ms',
+                    }}
+                    onMouseEnter={() => setHoveredItem(category.id)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                  >
                     {isActive && (
                       <div className="absolute left-0 h-8 w-1 rounded-r-full bg-mint-accent transition-all duration-300" />
                     )}
@@ -197,8 +173,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                         {category.label}
                       </div>
                     )}
-                  {/* </Link> */}
-                  </button>
+                  </Link> 
+                  // </button>
                 );
               })}
             </nav>
