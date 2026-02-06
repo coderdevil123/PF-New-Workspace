@@ -27,6 +27,10 @@ export default function Team() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const tiltRef = useRef<HTMLDivElement | null>(null);
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const isAdmin = user?.role === 'admin';
+  const [rbacOpen, setRbacOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+
 
   useEffect(() => {
     async function loadTeam() {
@@ -142,18 +146,30 @@ export default function Team() {
             Back to Dashboard
           </Button>
           
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
-              <Users className="h-7 w-7 text-white" />
+          <div className="flex items-center gap-4 justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-accent shadow-lg animate-slide-up">
+                <Users className="h-7 w-7 text-white" />
+              </div>
+              <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <h1 className="font-display mb-1 text-4xl font-normal text-white">
+                  Meet Our Team
+                </h1>
+                <p className="font-sans text-lg text-white/80">
+                  The talented people behind Pristine Forests
+                </p>
+              </div>
             </div>
-            <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              <h1 className="font-display mb-1 text-4xl font-normal text-white">
-                Meet Our Team
-              </h1>
-              <p className="font-sans text-lg text-white/80">
-                The talented people behind Pristine Forests
-              </p>
-            </div>
+
+            {/* ✅ ADMIN ONLY BUTTON */}
+            {isAdmin && (
+              <Button
+                onClick={() => setRbacOpen(true)}
+                className="rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90"
+              >
+                Manage Roles
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -218,7 +234,7 @@ export default function Team() {
           {others.length > 0 && (
             <section className="px-6 py-12 lg:px-12">
               <div className="mx-auto max-w-7xl">
-                <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal">
+                <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">
                   Team Members
                 </h2>
                 <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
@@ -397,6 +413,115 @@ export default function Team() {
           </Button>
         </div>
       </section>
+      {/* RBAC Modal – Admin Only */}
+        <Dialog open={rbacOpen} onOpenChange={setRbacOpen}>
+          <DialogContent className="max-w-xl bg-white dark:bg-dark-card border-border">
+            <h2 className="text-xl font-semibold mb-4">
+              Manage Team Roles
+            </h2>
+
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+              {members.map(member => (
+                <div
+                  key={member.email}
+                  className="flex items-center justify-between rounded-lg border border-border p-3 hover:bg-light-gray dark:hover:bg-dark-hover"
+                >
+                  <div>
+                    <p className="font-medium">{member.name}</p>
+                    <p className="text-xs text-muted-text">{member.email}</p>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setEditingMember(member)}
+                  >
+                    Edit
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Role Editor */}
+        {editingMember && (
+          <Dialog open onOpenChange={() => setEditingMember(null)}>
+            <DialogContent className="max-w-md bg-white dark:bg-dark-card border-border">
+              <h3 className="text-lg font-semibold mb-4">
+                Update {editingMember.name}
+              </h3>
+
+              {/* Role */}
+              <label className="text-sm font-medium">Role</label>
+              <select
+                className="w-full mt-1 mb-3 rounded-lg border border-border p-2 bg-transparent"
+                value={editingMember.role}
+                onChange={e =>
+                  setEditingMember({
+                    ...editingMember,
+                    role: e.target.value,
+                  })
+                }
+              >
+                <option>Admin</option>
+                <option>Team Lead</option>
+                <option>Intern</option>
+                <option>User</option>
+              </select>
+
+              {/* Department */}
+              {(editingMember.role === 'Team Lead' ||
+                editingMember.role === 'Intern') && (
+                <>
+                  <label className="text-sm font-medium">Department</label>
+                  <select
+                    className="w-full mt-1 mb-4 rounded-lg border border-border p-2 bg-transparent"
+                    value={editingMember.department}
+                    onChange={e =>
+                      setEditingMember({
+                        ...editingMember,
+                        department: e.target.value,
+                      })
+                    }
+                  >
+                    <option>Technology</option>
+                    <option>Design</option>
+                    <option>Marketing</option>
+                    <option>Operations</option>
+                  </select>
+                </>
+              )}
+
+              <Button
+                className="w-full bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+                onClick={async () => {
+                  await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/admin/update-role`,
+                    {
+                      method: 'PATCH',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                      },
+                      body: JSON.stringify({
+                        userId: editingMember.id,
+                        role: editingMember.role,
+                        department: editingMember.department,
+                      }),
+                    }
+                  );
+
+                  setEditingMember(null);
+                  setRbacOpen(false);
+                  window.location.reload(); // safe for now
+                }}
+              >
+                Save Changes
+              </Button>
+            </DialogContent>
+          </Dialog>
+        )}
     </div>
   );
 }
