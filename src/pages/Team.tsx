@@ -337,10 +337,10 @@ export default function Team() {
                         {selectedMember.name}
                       </h2>
                       <p className="font-ui mb-0.5 sm:mb-1 text-sm sm:text-base md:text-lg font-medium text-mint-accent">
-                        {selectedMember.role}
+                        {formatRole(selectedMember.role)}
                       </p>
                       <p className="font-ui text-xs sm:text-sm text-body-text dark:text-dark-muted">
-                        {selectedMember.department}
+                        {formatDepartment(selectedMember.department)}
                       </p>
                       {user?.email === selectedMember.email && (
                         <Button
@@ -486,10 +486,10 @@ export default function Team() {
                   })
                 }
               >
-                <option>Admin</option>
-                <option>Team Lead</option>
-                <option>Intern</option>
-                <option>User</option>
+                <option value="admin">Admin</option>
+                <option value="team_lead">Team Lead</option>
+                <option value="intern">Intern</option>
+                <option value="member">Member</option>
               </select>
 
               {/* Department */}
@@ -507,10 +507,10 @@ export default function Team() {
                       })
                     }
                   >
-                    <option>Technology</option>
-                    <option>Design</option>
-                    <option>Marketing</option>
-                    <option>Operations</option>
+                    <option value="technology">Technology</option>
+                    <option value="design">Design</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="operations">Operations</option>
                   </select>
                 </>
               )}
