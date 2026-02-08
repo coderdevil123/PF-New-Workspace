@@ -21,6 +21,19 @@ type TeamMember = {
   avatar_url?: string;
 };
 
+const formatRole = (role: string) => {
+    if (!role) return '';
+    return role
+      .split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
+  const formatDepartment = (dept: string) => {
+    if (!dept) return '';
+    return dept.charAt(0).toUpperCase() + dept.slice(1);
+  };
+
 export default function Team() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -30,7 +43,6 @@ export default function Team() {
   const isAdmin = user?.role === 'admin';
   const [rbacOpen, setRbacOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-
 
   useEffect(() => {
     async function loadTeam() {
@@ -114,6 +126,7 @@ export default function Team() {
   const others = members.filter(
     m => !['admin', 'team_lead', 'intern'].includes(m.role)
   );
+
   // const heads = members.filter(m => ['Technology', 'Marketing', 'Design', 'Operations'].includes(m.department) && m.role !== 'Intern');
   // const interns = members.filter(m => m.role === 'Intern');
   // const others = members.filter(
@@ -602,10 +615,10 @@ function MemberCard({ member, index, onClick }: {
             {member.name}
           </h3>
           <p className="font-ui mb-1 text-xs sm:text-sm font-medium text-mint-accent">
-            {member.role}
+            {formatRole(member.role)}
           </p>
           <p className="font-ui text-xs text-muted-text dark:text-dark-muted">
-            {member.department}
+            {formatDepartment(member.department)}
           </p>
 
           {/* Email */}
