@@ -493,8 +493,7 @@ export default function Team() {
               </select>
 
               {/* Department */}
-              {(editingMember.role === 'Team Lead' ||
-                editingMember.role === 'Intern') && (
+              {['team_lead', 'intern'].includes(editingMember.role) && (
                 <>
                   <label className="text-sm font-medium text-heading-dark dark:text-dark-text">Department</label>
                   <select
@@ -527,7 +526,7 @@ export default function Team() {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                       },
                       body: JSON.stringify({
-                        userId: editingMember.id,
+                        email: editingMember.email,
                         role: editingMember.role,
                         department: editingMember.department,
                       }),
