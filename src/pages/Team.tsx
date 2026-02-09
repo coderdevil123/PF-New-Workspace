@@ -541,7 +541,7 @@ export default function Team() {
                   // ✅ Update local UI immediately
                   setMembers(prev =>
                     prev.map(m =>
-                      m.id === editingMember.id
+                      m.email === editingMember.email
                         ? {
                             ...m,
                             role: editingMember.role,
