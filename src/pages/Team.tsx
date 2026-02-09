@@ -70,36 +70,74 @@ export default function Team() {
   }
 
   // 🔥 SAFE MERGE
-  const merged = defaultTeam.map(defaultMember => {
-    const override = dbMembers.find(
-      (m: any) => m.email === defaultMember.email
-    );
+  // const merged = defaultTeam.map(defaultMember => {
+  //   const override = dbMembers.find(
+  //     (m: any) => m.email === defaultMember.email
+  //   );
 
+  //   return {
+  //     ...defaultMember,
+  //     name: override?.name ?? defaultMember.name,
+  //     phone: override?.phone ?? (defaultMember as any).phone,
+  //     role: override?.role ?? defaultMember.role,          // ✅ FIX
+  //     department: override?.department ?? defaultMember.department,
+  //     bio: override?.bio ?? (defaultMember as any).bio,
+  //     location: override?.location ?? (defaultMember as any).location,
+  //     mattermost: override?.mattermost ?? defaultMember.mattermost,
+  //     avatar_url: override?.avatar_url || defaultMember.image,
+  //   };
+  // });
+
+  // const newUsers = dbMembers
+  //   .filter((db: any) =>
+  //     !defaultTeam.some(def => def.email === db.email)
+  //   )
+  //   .map((db: any) => ({
+  //     ...db,
+  //     role: db.role || 'Member',
+  //     department: db.department || 'General',
+  //     avatar_url: db.avatar_url,
+  //   }));
+
+  // setMembers([...merged, ...newUsers]);
+
+  // ✅ DB IS SOURCE OF TRUTH (ADMIN OVERRIDES SAFE)
+
+// 1️⃣ Fast lookup map
+const dbMap = new Map(
+  dbMembers.map((m: any) => [m.email, m])
+);
+
+// 2️⃣ Merge defaultTeam + DB overrides
+const mergedMembers = defaultTeam.map(defaultMember => {
+  const dbUser = dbMap.get(defaultMember.email);
+
+  if (!dbUser) {
+    // ❗ never logged in → keep default
     return {
       ...defaultMember,
-      name: override?.name ?? defaultMember.name,
-      phone: override?.phone ?? (defaultMember as any).phone,
-      role: override?.role ?? defaultMember.role,          // ✅ FIX
-      department: override?.department ?? defaultMember.department,
-      bio: override?.bio ?? (defaultMember as any).bio,
-      location: override?.location ?? (defaultMember as any).location,
-      mattermost: override?.mattermost ?? defaultMember.mattermost,
-      avatar_url: override?.avatar_url || defaultMember.image,
+      role: defaultMember.role || 'member',
+      department: defaultMember.department || 'general',
     };
-  });
+  }
 
-  const newUsers = dbMembers
-    .filter((db: any) =>
-      !defaultTeam.some(def => def.email === db.email)
-    )
-    .map((db: any) => ({
-      ...db,
-      role: db.role || 'Member',
-      department: db.department || 'General',
-      avatar_url: db.avatar_url,
-    }));
+  // ✅ DB overrides default
+  return {
+    ...defaultMember,
+    ...dbUser,
+    role: dbUser.role || defaultMember.role || 'member',
+    department: dbUser.department || defaultMember.department || 'general',
+    avatar_url: dbUser.avatar_url || defaultMember.image,
+  };
+});
 
-  setMembers([...merged, ...newUsers]);
+// 3️⃣ Users that exist ONLY in DB (logged in later)
+const newDbOnlyUsers = dbMembers.filter(
+  (db: any) => !defaultTeam.some(def => def.email === db.email)
+);
+
+setMembers([...mergedMembers, ...newDbOnlyUsers]);
+
 }
     loadTeam();
   }, []);
