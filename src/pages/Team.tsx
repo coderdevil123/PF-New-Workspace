@@ -79,6 +79,8 @@ export default function Team() {
       ...defaultMember,
       name: override?.name ?? defaultMember.name,
       phone: override?.phone ?? (defaultMember as any).phone,
+      role: override?.role ?? defaultMember.role,          // ✅ FIX
+      department: override?.department ?? defaultMember.department,
       bio: override?.bio ?? (defaultMember as any).bio,
       location: override?.location ?? (defaultMember as any).location,
       mattermost: override?.mattermost ?? defaultMember.mattermost,
