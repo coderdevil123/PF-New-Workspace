@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor } from 'lucide-react';
+import { Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/button';
@@ -103,6 +103,16 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
               Manager
             </Button>
           )} */}
+          {user?.isAdmin && (
+            <Button
+              onClick={() => navigate('/admin')}
+              variant="ghost"
+              className="flex items-center gap-2 rounded-lg hover:bg-light-gray dark:hover:bg-dark-hover"
+            >
+              <Shield className="h-5 w-5 text-mint-accent" />
+              <span className="hidden sm:inline">Admin</span>
+            </Button>
+          )}
           {user && (
             <Tooltip label="Tasks">
               <Button
