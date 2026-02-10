@@ -11,11 +11,13 @@ export default function AdminPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user?.isAdmin) navigate('/workspace');
+    // if (!user?.isAdmin) navigate('/workspace');
+    if (!user) navigate('/login');
     document.title = 'Admin Console | Pristine Forests';
   }, [user, navigate]);
 
-  if (!user?.isAdmin) return null;
+  // if (!user?.isAdmin) return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
