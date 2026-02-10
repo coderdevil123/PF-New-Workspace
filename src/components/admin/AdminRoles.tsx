@@ -5,11 +5,13 @@ import { Button } from '../../components/ui/button';
 type Role = {
   id: string;
   name: string;
+  description?: string;
 };
 
 export default function AdminRoles() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [newRole, setNewRole] = useState('');
+  const [newRoleDesc, setNewRoleDesc] = useState('');
 
   useEffect(() => {
     fetchRoles();
@@ -32,14 +34,22 @@ export default function AdminRoles() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify({ name: newRole }),
+      body: JSON.stringify({
+        name: newRole,
+        description: newRoleDesc,
+      }),
     });
 
     setNewRole('');
+    setNewRoleDesc('');
     fetchRoles();
   };
 
   const deleteRole = async (id: string) => {
+    const ok = confirm(
+      'Deleting this role may affect assigned users. Continue?'
+    );
+    if (!ok) return;
     await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/admin/roles/${id}`,
       {
@@ -47,6 +57,7 @@ export default function AdminRoles() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       }
     );
+
     fetchRoles();
   };
 
@@ -63,6 +74,12 @@ export default function AdminRoles() {
             placeholder="New role name"
             className="flex-1 rounded-lg border px-3 py-2"
           />
+          <input
+            value={newRoleDesc}
+            onChange={e => setNewRoleDesc(e.target.value)}
+            placeholder="Role description"
+            className="flex-1 rounded-lg border px-3 py-2"
+          />
           <Button onClick={createRole}>
             <Plus className="h-4 w-4 mr-1" />
             Add
@@ -73,16 +90,23 @@ export default function AdminRoles() {
           {roles.map(role => (
             <div
               key={role.id}
-              className="flex items-center gap-2 rounded-full border px-3 py-1"
+              className="rounded-xl border px-4 py-2 flex flex-col"
             >
-              {role.name}
-              <button onClick={() => deleteRole(role.id)}>
-                <Trash className="h-3 w-3 text-red-500" />
-              </button>
+              <div className="flex items-center justify-between">
+                <span className="font-medium">{role.name}</span>
+                <button onClick={() => deleteRole(role.id)}>
+                  <Trash className="h-3 w-3 text-red-500" />
+                </button>
+              </div>
+
+              {role.description && (
+                <div className="text-xs text-muted-text mt-1">
+                  {role.description}
+                </div>
+              )}
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );
