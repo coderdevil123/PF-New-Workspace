@@ -33,34 +33,20 @@ export default function AdminAssignments() {
   const loadAll = async () => {
   const token = localStorage.getItem('token');
 
-  try {
-    const [uRes, rRes, dRes] = await Promise.all([
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/assignments`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/roles`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/departments`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-    ]);
+  const res = await fetch(`${URL}/api/admin/assignments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-    const u = await uRes.json();
-    const r = await rRes.json();
-    const d = await dRes.json();
+  const data = await res.json();
 
-    setUsers(Array.isArray(u) ? u : []);
-    setRoles(Array.isArray(r) ? r : []);
-    setDepartments(Array.isArray(d) ? d : []);
-  } catch (err) {
-    console.error('Admin load failed', err);
+  if (!Array.isArray(data)) {
+    console.error('Assignments API error:', data);
     setUsers([]);
-    setRoles([]);
-    setDepartments([]);
+    return;
   }
-};
 
+  setUsers(data);
+};
 
   const getRoleName = (roleId: string | null) => {
     if (!roleId) return 'Member';
