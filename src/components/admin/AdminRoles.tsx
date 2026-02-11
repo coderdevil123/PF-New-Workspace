@@ -72,13 +72,19 @@ export default function AdminRoles() {
             value={newRole}
             onChange={e => setNewRole(e.target.value)}
             placeholder="New role name"
-            className="flex-1 rounded-lg border px-3 py-2"
+            className="flex-1 rounded-lg border px-3 py-2
+           bg-white text-heading-dark
+           dark:bg-dark-bg dark:text-dark-text
+           dark:border-white/10"
           />
           <input
             value={newRoleDesc}
             onChange={e => setNewRoleDesc(e.target.value)}
             placeholder="Role description"
-            className="flex-1 rounded-lg border px-3 py-2"
+            className="flex-1 rounded-lg border px-3 py-2
+           bg-white text-heading-dark
+           dark:bg-dark-bg dark:text-dark-text
+           dark:border-white/10"
           />
           <Button onClick={createRole}>
             <Plus className="h-4 w-4 mr-1" />
