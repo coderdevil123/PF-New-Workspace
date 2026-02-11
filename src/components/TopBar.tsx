@@ -28,7 +28,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const { theme, setTheme, effectiveTheme } = useTheme();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [taskCount, setTaskCount] = useState(0);
-
+  const { isAdmin } = useAuth();
+  
   useEffect(() => {
   if (!user) {
     setAnnouncements([]);
@@ -104,7 +105,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             </Button>
           )} */}
           {/* {user?.isAdmin && ( */}
-          {user && (
+          {isAdmin && (
             <Button
               onClick={() => navigate('/admin')}
               variant="ghost"

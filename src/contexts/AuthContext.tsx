@@ -14,11 +14,13 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (userData: User) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const [isAdmin, setIsAdmin] = useState(false);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
@@ -73,6 +75,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(res => {
+      if (res.ok) setIsAdmin(true);
+      else setIsAdmin(false);
+    })
+    .catch(() => setIsAdmin(false));
+}, []);
+
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
@@ -80,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
