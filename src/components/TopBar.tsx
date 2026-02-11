@@ -105,7 +105,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             </Button>
           )} */}
           {/* {user?.isAdmin && ( */}
-          {isAdmin && (
+          {isAdmin && user && (
             <Button
               onClick={() => navigate('/admin')}
               variant="ghost"
