@@ -63,7 +63,7 @@ export default function AdminRoles() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl mb-4">Roles</h2>
+      <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">Roles</h2>
 
       <div className="rounded-xl border bg-white dark:bg-dark-card p-6 space-y-4">
 

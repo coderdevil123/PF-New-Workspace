@@ -91,7 +91,7 @@ export default function AdminAssignments() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl mb-4">Assignments</h2>
+      <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">Assignments</h2>
 
       <div className="space-y-4">
         {users.map(user => (
