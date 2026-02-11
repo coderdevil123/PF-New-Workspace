@@ -99,14 +99,14 @@ export default function AdminRoles() {
               className="rounded-xl border px-4 py-2 flex flex-col"
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">{role.name}</span>
+                <span className="font-medium text-heading-dark dark:text-dark-text">{role.name}</span>
                 <button onClick={() => deleteRole(role.id)}>
                   <Trash className="h-3 w-3 text-red-500" />
                 </button>
               </div>
 
               {role.description && (
-                <div className="text-xs text-muted-text mt-1">
+                <div className="text-xs text-muted-text dark:text-white/60 mt-1">
                   {role.description}
                 </div>
               )}

@@ -109,10 +109,14 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <Button
               onClick={() => navigate('/admin')}
               variant="ghost"
-              className="flex items-center gap-2 rounded-lg hover:bg-light-gray dark:hover:bg-dark-hover"
-            >
+            className="
+                flex items-center gap-2 rounded-lg
+                text-heading-dark hover:bg-light-gray
+                dark:text-dark-text dark:hover:bg-dark-hover
+              "      
+              >
               <Shield className="h-5 w-5 text-mint-accent" />
-              <span className="hidden sm:inline">Admin</span>
+              <span className="hidden sm:inline text-heading-dark dark:text-dark-text">Admin</span>
             </Button>
           )}
           {user && (
