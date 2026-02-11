@@ -46,15 +46,15 @@ export default function Team() {
 
   useEffect(() => {
     async function loadTeam() {
-  // if (!localStorage.getItem('token')) {
-  //   setMembers(defaultTeam); // fallback
-  //   return;
-  // }
+      const token = localStorage.getItem('token');
+      const endpoint = token
+  ? `${import.meta.env.VITE_BACKEND_URL}/api/team`
+  : `${import.meta.env.VITE_BACKEND_URL}/api/team/public`;
 
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
+  const res = await fetch(endpoint, {
+    headers: token
+    ? { Authorization: `Bearer ${token}` }
+    : undefined,
   });
 
   if (!res.ok) {
@@ -68,40 +68,6 @@ export default function Team() {
     setMembers(defaultTeam);
     return;
   }
-
-  // 🔥 SAFE MERGE
-  // const merged = defaultTeam.map(defaultMember => {
-  //   const override = dbMembers.find(
-  //     (m: any) => m.email === defaultMember.email
-  //   );
-
-  //   return {
-  //     ...defaultMember,
-  //     name: override?.name ?? defaultMember.name,
-  //     phone: override?.phone ?? (defaultMember as any).phone,
-  //     role: override?.role ?? defaultMember.role,          // ✅ FIX
-  //     department: override?.department ?? defaultMember.department,
-  //     bio: override?.bio ?? (defaultMember as any).bio,
-  //     location: override?.location ?? (defaultMember as any).location,
-  //     mattermost: override?.mattermost ?? defaultMember.mattermost,
-  //     avatar_url: override?.avatar_url || defaultMember.image,
-  //   };
-  // });
-
-  // const newUsers = dbMembers
-  //   .filter((db: any) =>
-  //     !defaultTeam.some(def => def.email === db.email)
-  //   )
-  //   .map((db: any) => ({
-  //     ...db,
-  //     role: db.role || 'Member',
-  //     department: db.department || 'General',
-  //     avatar_url: db.avatar_url,
-  //   }));
-
-  // setMembers([...merged, ...newUsers]);
-
-  // ✅ DB IS SOURCE OF TRUTH (ADMIN OVERRIDES SAFE)
 
 // 1️⃣ Fast lookup map
 const dbMap = new Map(
