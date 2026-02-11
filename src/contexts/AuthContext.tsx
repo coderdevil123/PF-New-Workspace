@@ -20,9 +20,9 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const [isAdmin, setIsAdmin] = useState(false);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
