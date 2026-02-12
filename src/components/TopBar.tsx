@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor, Shield } from 'lucide-react';
+import { Bell, Menu, User, LogOut, Settings, Users, Moon, Sun, Monitor, Shield, Briefcase } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '../components/ui/button';
@@ -99,12 +99,23 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       <div className="flex items-center gap-2">
         {/* Theme Toggle Dropdown */}
         <DropdownMenu>
-          {/* {user?.role === 'admin' && (
-            <Button onClick={() => navigate('/manager/tasks')} variant="ghost">
-              Manager
+          {/* {user?.role === 'manager' && ( */}
+          {user && (
+            <Button
+              onClick={() => navigate('/manager')}
+              variant="ghost"
+              className="
+                flex items-center gap-2
+                rounded-lg
+                text-heading-dark dark:text-dark-text
+                hover:bg-light-gray dark:hover:bg-dark-hover
+              "
+            >
+              <Briefcase className="h-5 w-5 text-mint-accent" />
+              <span className="hidden sm:inline">Manager</span>
             </Button>
-          )} */}
-          {/* {user?.isAdmin && ( */}
+          )}
+
           {isAdmin && user && (
             <Button
               onClick={() => navigate('/admin')}

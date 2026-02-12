@@ -16,7 +16,7 @@ import { LanguageProvider } from './contexts/LanguageContext';
 // import { AnnouncementsProvider } from './contexts/AnnouncementsContext';
 import Tasks from './pages/Tasks';
 import AdminPage from './pages/AdminPage';
-// import ManagerTasks from './pages/ManagerTasks';
+import ManagerTasks from './pages/ManagerTasks';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/announcements" element={<Announcements />} />
-            {/* <Route path="/manager/tasks" element={<ManagerTasks />} /> */}
+            <Route path="/manager" element={<ManagerTasks />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/team" element={<Team />} />
