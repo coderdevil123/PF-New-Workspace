@@ -4,12 +4,82 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function ManagerTasks() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+type Task = {
+  id: string;
+  title: string;
+  status: string;
+  priority?: string;
+  created_at?: string;
+  assigned_to_email: string;
+};
 
-  const [department, setDepartment] = useState('');
-  const [memberEmail, setMemberEmail] = useState('');
+type TeamMember = {
+  name: string;
+  email: string;
+  department: string;
+};
+
+export default function ManagerTasks() {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const [department, setDepartment] = useState('');
+    const [memberEmail, setMemberEmail] = useState('');
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [members, setMembers] = useState<TeamMember[]>([]);
+    const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+
+    useEffect(() => {
+        async function loadMembers() {
+            const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/api/team`,
+            {
+                headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            }
+            );
+
+            const data = await res.json();
+            setMembers(Array.isArray(data) ? data : []);
+        }
+
+        loadMembers(); 
+    }, []);
+
+    useEffect(() => {
+        if (!department) {
+            setFilteredMembers([]);
+            return;
+        }
+
+        const filtered = members.filter(
+            m => m.department === department
+        );
+
+        setFilteredMembers(filtered);
+    }, [department, members]);
+
+    const fetchTasks = async () => {
+    const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/manager/tasks`,
+        {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        }
+    );
+
+    const data = await res.json();
+    setTasks(Array.isArray(data) ? data : []);
+    };
+
+    useEffect(() => {
+    fetchTasks();
+    }, []);
+
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -20,6 +90,33 @@ export default function ManagerTasks() {
   }, [user, navigate]);
 
   if (!user) return null;
+
+  const visibleTasks = tasks.filter(task => {
+    if (department) {
+        const member = members.find(
+        m => m.email === task.assigned_to_email
+        );
+        if (!member || member.department !== department) return false;
+    }
+
+    if (memberEmail && task.assigned_to_email !== memberEmail) {
+        return false;
+    }
+
+    if (
+        searchQuery &&
+        !task.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+        return false;
+    }
+
+    if (statusFilter !== 'all' && task.status !== statusFilter) {
+        return false;
+    }
+
+    return true;
+});
+
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -91,20 +188,49 @@ export default function ManagerTasks() {
             value={memberEmail}
             onChange={e => setMemberEmail(e.target.value)}
             className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
-          >
+            >
             <option value="">Select Team Member</option>
-            {/* next step: dynamic members */}
-          </select>
 
+            {filteredMembers.map(member => (
+                <option key={member.email} value={member.email}>
+                {member.name}
+                </option>
+            ))}
+            </select>
         </div>
       </section>
 
       {/* TASK LIST */}
       <section className="px-6 pb-12 lg:px-12">
-        <div className="mx-auto max-w-5xl text-muted-text">
-          Tasks will appear here…
+        <div className="mx-auto max-w-5xl space-y-4">
+
+            {visibleTasks.map(task => (
+            <div
+                key={task.id}
+                className="rounded-xl border p-5 bg-white dark:bg-dark-card"
+            >
+                <h3 className="text-lg font-medium">
+                {task.title}
+                </h3>
+
+                <p className="text-xs text-muted-text mt-1">
+                Assigned to: {task.assigned_to_email}
+                </p>
+
+                <span className="inline-block mt-2 rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700">
+                {task.status.toUpperCase()}
+                </span>
+            </div>
+            ))}
+
+            {visibleTasks.length === 0 && (
+            <p className="text-muted-text">
+                No tasks found for selected filters.
+            </p>
+            )}
+
         </div>
-      </section>
+        </section>
 
     </div>
   );
