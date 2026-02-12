@@ -30,6 +30,12 @@ export default function ManagerTasks() {
     const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [reminderOpen, setReminderOpen] = useState(false);
+    const [reminderDept, setReminderDept] = useState('');
+    const [reminderEmail, setReminderEmail] = useState('');
+    const [reminderMessage, setReminderMessage] = useState('');
+    const [sendingReminder, setSendingReminder] = useState(false);
+
 
     useEffect(() => {
         async function loadMembers() {
@@ -153,11 +159,12 @@ export default function ManagerTasks() {
 
           {/* TASK REMINDER */}
           <Button
+            onClick={() => setReminderOpen(true)}
             className="rounded-full bg-white/10 text-white hover:bg-white/20"
-          >
+            >
             <Bell className="h-4 w-4 mr-2" />
             Task Reminder
-          </Button>
+            </Button>
 
         </div>
       </section>
@@ -231,6 +238,104 @@ export default function ManagerTasks() {
 
         </div>
         </section>
+        {reminderOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-dark-card p-6 shadow-2xl">
+
+            <h3 className="text-xl font-semibold mb-4">
+                Send Task Reminder
+            </h3>
+
+            {/* Department */}
+            <select
+                value={reminderDept}
+                onChange={e => {
+                setReminderDept(e.target.value);
+                setReminderEmail('');
+                }}
+                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            >
+                <option value="">Select Department</option>
+                <option value="technology">Technology</option>
+                <option value="design">Design</option>
+                <option value="marketing">Marketing</option>
+                <option value="operations">Operations</option>
+            </select>
+
+            {/* Team Member */}
+            <select
+                disabled={!reminderDept}
+                value={reminderEmail}
+                onChange={e => setReminderEmail(e.target.value)}
+                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            >
+                <option value="">Select Team Member</option>
+
+                {members
+                .filter(m => m.department === reminderDept)
+                .map(m => (
+                    <option key={m.email} value={m.email}>
+                    {m.name}
+                    </option>
+                ))}
+            </select>
+
+            {/* Message */}
+            <textarea
+                value={reminderMessage}
+                onChange={e => setReminderMessage(e.target.value)}
+                placeholder="Write a short reminder message…"
+                rows={4}
+                className="w-full rounded-lg border px-3 py-2 mb-4 bg-white dark:bg-dark-bg"
+            />
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3">
+                <Button
+                variant="outline"
+                onClick={() => setReminderOpen(false)}
+                >
+                Cancel
+                </Button>
+
+                <Button
+                disabled={!reminderEmail || !reminderMessage || sendingReminder}
+                onClick={async () => {
+                    setSendingReminder(true);
+
+                    await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/announcements`,
+                    {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                        body: JSON.stringify({
+                        title: 'Task Reminder',
+                        content: reminderMessage,
+                        category: 'Task',
+                        recipients: 'specific',
+                        tagged_emails: [reminderEmail],
+                        }),
+                    }
+                    );
+
+                    setSendingReminder(false);
+                    setReminderOpen(false);
+                    setReminderDept('');
+                    setReminderEmail('');
+                    setReminderMessage('');
+                }}
+                className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+                >
+                {sendingReminder ? 'Sending...' : 'Send Reminder'}
+                </Button>
+            </div>
+
+            </div>
+        </div>
+        )}
 
     </div>
   );
