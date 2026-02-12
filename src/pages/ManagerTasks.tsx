@@ -13,12 +13,13 @@ export default function ManagerTasks() {
 
   useEffect(() => {
     if (!user) navigate('/login');
-    if (user && user.role !== 'manager') navigate('/manager');
-
+    // if (user && user.role !== 'manager') navigate('/manager');
+    if (user) navigate('/manager');
+    
     document.title = 'Manager Console | Pristine Forests';
   }, [user, navigate]);
 
-  if (!user || user.role !== 'manager') return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
