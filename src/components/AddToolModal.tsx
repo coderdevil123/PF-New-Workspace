@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Props {
   open: boolean;
@@ -47,6 +48,12 @@ export default function AddToolModal({
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingVideoId, setExistingVideoId] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  const canManageTools =
+    user?.role === 'admin' || user?.role === 'team_lead';
+
+  if (!canManageTools) return null;
 
   useEffect(() => {
     if (tool) {
