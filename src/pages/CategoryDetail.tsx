@@ -84,12 +84,6 @@ export default function CategoryDetail() {
   const [addToolOpen, setAddToolOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const { user } = useAuth();
-
-  const canManageTools =
-    user?.role === 'admin' || user?.role === 'team_lead';
-
-  if (!canManageTools) return null;
 
   const [tools, setTools] = useState<any[]>([]);
 
@@ -213,14 +207,12 @@ export default function CategoryDetail() {
             <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
             Back to Dashboard
           </Button>
-          {canManageTools && (
           <Button
               className="mt-4"
               onClick={() => setAddToolOpen(true)}
             >
               + Add Tool
             </Button>
-          )}
           <div>
             <h1 className="font-display mb-4 text-5xl font-normal text-white animate-slide-up">
               {category.title}
@@ -343,7 +335,6 @@ export default function CategoryDetail() {
                       </div>
                     </div> */}
                     <div className="flex items-center gap-2">
-                      {canManageTools && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -375,8 +366,7 @@ export default function CategoryDetail() {
                     >
                       Delete
                     </Button>
-                      )}
-                    {canManageTools && (
+
                     <Button
                       variant="ghost"
                       size="sm"
@@ -394,7 +384,6 @@ export default function CategoryDetail() {
                     >
                       Edit
                     </Button>
-                    )}
                     </div>
 
                     {/* Actions */}
