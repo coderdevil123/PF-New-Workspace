@@ -13,7 +13,7 @@ export default function ManagerTasks() {
 
   useEffect(() => {
     if (!user) navigate('/login');
-    if (user && user.role !== 'manager') navigate('/workspace');
+    if (user && user.role !== 'manager') navigate('/manager');
 
     document.title = 'Manager Console | Pristine Forests';
   }, [user, navigate]);
