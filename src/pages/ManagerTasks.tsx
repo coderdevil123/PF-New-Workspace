@@ -71,7 +71,7 @@ export default function ManagerTasks() {
         }
 
         const filtered = members.filter(
-            m => m.department === department
+            m => m.department.toLowerCase() === department
         );
 
         setFilteredMembers(filtered);
