@@ -39,7 +39,7 @@ export default function Login() {
       const origin = window.location.origin;
     // Redirect to YOUR BACKEND, not Google
     window.location.href =
-      `https://pf.growthsupercharged.com/auth/google?origin=${encodeURIComponent(origin)}`;
+      `https://backend-for-testing-9h8v.onrender.com/auth/google?origin=${encodeURIComponent(origin)}`;
     return;
     }
 
