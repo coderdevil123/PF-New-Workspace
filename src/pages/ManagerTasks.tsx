@@ -208,9 +208,11 @@ const formatDate = (date?: string) =>
           <select
             value={department}
             onChange={e => {
-              setDepartment(e.target.value);
-              setMemberEmail('');
-            }}
+                  setDepartment(e.target.value);
+                  setMemberEmail('');
+                  setSearchQuery('');
+                  setStatusFilter('all');
+                }}
             className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
           >
             <option value="">Select Department</option>
