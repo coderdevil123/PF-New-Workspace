@@ -34,30 +34,63 @@ export default function Login() {
   //   navigate('/workspace');
   // };
 
-  const handleSocialLogin = (provider: string) => {
-    if (provider === 'Google') {
-      const origin = window.location.origin;
-    // Redirect to YOUR BACKEND, not Google
+const PRIMARY_BACKEND = 'https://pf.growthsupercharged.com';
+const FALLBACK_BACKEND = 'https://backend-for-testing-9h8v.onrender.com';
+
+const handleSocialLogin = async (provider: string) => {
+  if (provider !== 'Google') return;
+
+  const origin = window.location.origin;
+
+  // Try primary backend first
+  try {
+    const res = await fetch(`${PRIMARY_BACKEND}/health`, {
+      method: 'GET',
+      mode: 'no-cors',
+    });
+
+    // If primary backend is reachable, use it
     window.location.href =
-      `https://backend-for-testing-9h8v.onrender.com/auth/google?origin=${encodeURIComponent(origin)}`;
+      `${PRIMARY_BACKEND}/auth/google?origin=${encodeURIComponent(origin)}`;
     return;
-    }
+  } catch (err) {
+    // fallback silently
+    window.location.href =
+      `${FALLBACK_BACKEND}/auth/google?origin=${encodeURIComponent(origin)}`;
+  }
 
-    // Simulate social login for other providers
-    // login({
-    //   name: `User from ${provider}`,
-    //   email: `user@${provider.toLowerCase()}.com`,
-    //   phone: '+1 (555) 123-4567',
-    //   location: 'San Francisco, CA',
-    // });
-
-    toast({
+  toast({
       title: 'Welcome!',
       description: `You have successfully logged in with ${provider}.`,
     });
 
     navigate('/workspace');
-  };
+};
+
+  // const handleSocialLogin = (provider: string) => {
+  //   if (provider === 'Google') {
+  //     const origin = window.location.origin;
+  //   // Redirect to YOUR BACKEND, not Google
+  //   window.location.href =
+  //     `https://backend-for-testing-9h8v.onrender.com/auth/google?origin=${encodeURIComponent(origin)}`;
+  //   return;
+  //   }
+
+  //   // Simulate social login for other providers
+  //   // login({
+  //   //   name: `User from ${provider}`,
+  //   //   email: `user@${provider.toLowerCase()}.com`,
+  //   //   phone: '+1 (555) 123-4567',
+  //   //   location: 'San Francisco, CA',
+  //   // });
+
+  //   toast({
+  //     title: 'Welcome!',
+  //     description: `You have successfully logged in with ${provider}.`,
+  //   });
+
+  //   navigate('/workspace');
+  // };
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
