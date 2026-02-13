@@ -36,6 +36,15 @@ export default function ManagerTasks() {
     const [reminderMessage, setReminderMessage] = useState('');
     const [sendingReminder, setSendingReminder] = useState(false);
 
+    body: JSON.stringify({
+      title: 'Task Reminder',
+      content: reminderMessage,
+      category: 'Task',
+      recipients: 'specific',
+      tagged_emails: [reminderEmail],
+      created_by: user?.email,
+      created_by_name: user?.name,
+    }),
 
     useEffect(() => {
         async function loadMembers() {
@@ -69,23 +78,32 @@ export default function ManagerTasks() {
     }, [department, members]);
 
     const fetchTasks = async () => {
-    const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/manager/tasks`,
-        {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        }
-    );
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/manager/tasks`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
 
-    const data = await res.json();
-    setTasks(Array.isArray(data) ? data : []);
+        if (!res.ok) {
+          setTasks([]);
+          return;
+        }
+
+        const data = await res.json();
+        setTasks(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to load manager tasks', err);
+        setTasks([]);
+      }
     };
 
     useEffect(() => {
     fetchTasks();
     }, []);
-
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -123,6 +141,9 @@ export default function ManagerTasks() {
     return true;
 });
 
+const getMemberName = (email: string) => {
+  return members.find(m => m.email === email)?.name || email;
+};
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -173,6 +194,19 @@ export default function ManagerTasks() {
       <section className="px-6 py-8 lg:px-12">
         <div className="mx-auto max-w-5xl flex gap-4 flex-wrap">
 
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="blocked">Blocked</option>
+            <option value="on-hold">On Hold</option>
+          </select>
+
           {/* Department */}
           <select
             value={department}
@@ -221,7 +255,7 @@ export default function ManagerTasks() {
                 </h3>
 
                 <p className="text-xs text-muted-text mt-1">
-                Assigned to: {task.assigned_to_email}
+                  Assigned to: {getMemberName(task.assigned_to_email)}
                 </p>
 
                 <span className="inline-block mt-2 rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700">
@@ -250,8 +284,10 @@ export default function ManagerTasks() {
             <select
                 value={reminderDept}
                 onChange={e => {
-                setReminderDept(e.target.value);
-                setReminderEmail('');
+                  setDepartment(e.target.value);
+                  setMemberEmail('');
+                  setSearchQuery('');
+                  setStatusFilter('all');
                 }}
                 className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
             >
