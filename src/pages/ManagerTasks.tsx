@@ -37,6 +37,10 @@ export default function ManagerTasks() {
     const [reminderEmail, setReminderEmail] = useState('');
     const [reminderMessage, setReminderMessage] = useState('');
     const [sendingReminder, setSendingReminder] = useState(false);
+    const normalize = (v?: string) => v?.toLowerCase().trim() || '';
+    const [memberTasks, setMemberTasks] = useState<Task[]>([]);
+    const [selectedTaskId, setSelectedTaskId] = useState('');
+    const [reminderStatus, setReminderStatus] = useState('');
 
     body: JSON.stringify({
       title: 'Task Reminder',
@@ -47,6 +51,33 @@ export default function ManagerTasks() {
       created_by: user?.email,
       created_by_name: user?.name,
     }),
+
+    useEffect(() => {
+      if (!department) {
+        setFilteredMembers([]);
+        return;
+      }
+
+      const filtered = members.filter(
+        m => normalize(m.department) === normalize(department)
+      );
+
+      setFilteredMembers(filtered);
+    }, [department, members]);
+
+    useEffect(() => {
+      if (!reminderEmail) {
+        setMemberTasks([]);
+        setSelectedTaskId('');
+        return;
+      }
+
+      const tasksOfMember = tasks.filter(
+        t => t.assigned_to_email === reminderEmail
+      );
+
+      setMemberTasks(tasksOfMember);
+    }, [reminderEmail, tasks]);
 
     useEffect(() => {
         async function loadMembers() {
@@ -224,19 +255,18 @@ const formatDate = (date?: string) =>
 
           {/* Team Member */}
           <select
-            disabled={!department}
             value={memberEmail}
             onChange={e => setMemberEmail(e.target.value)}
             className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
-            >
+          >
             <option value="">Select Team Member</option>
 
-            {filteredMembers.map(member => (
-                <option key={member.email} value={member.email}>
+            {members.map(member => (
+              <option key={member.email} value={member.email}>
                 {member.name}
-                </option>
+              </option>
             ))}
-            </select>
+          </select>
         </div>
       </section>
 
@@ -305,10 +335,8 @@ const formatDate = (date?: string) =>
             <select
                 value={reminderDept}
                 onChange={e => {
-                  setDepartment(e.target.value);
-                  setMemberEmail('');
-                  setSearchQuery('');
-                  setStatusFilter('all');
+                  setReminderDept(e.target.value);
+                  setReminderEmail('');
                 }}
                 className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
             >
@@ -336,6 +364,37 @@ const formatDate = (date?: string) =>
                     </option>
                 ))}
             </select>
+
+            {/* TASK SELECTOR */}
+              <select
+                disabled={!memberTasks.length}
+                value={selectedTaskId}
+                onChange={e => setSelectedTaskId(e.target.value)}
+                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+              >
+                <option value="">Select Task</option>
+
+                {memberTasks.map(task => (
+                  <option key={task.id} value={task.id}>
+                    {task.title}
+                  </option>
+                ))}
+              </select>
+
+                {/* TASK STATUS UPDATE */}
+              <select
+                value={reminderStatus}
+                onChange={e => setReminderStatus(e.target.value)}
+                disabled={!selectedTaskId}
+                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+              >
+                <option value="">Update Task Status (optional)</option>
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="blocked">Blocked</option>
+                <option value="on-hold">On Hold</option>
+              </select>
 
             {/* Message */}
             <textarea
