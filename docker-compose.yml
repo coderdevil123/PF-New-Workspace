@@ -6,7 +6,7 @@ services:
       args:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
-        VITE_BACKEND_URL: http://pf-auth-backend:3000
+        VITE_BACKEND_URL: /api
     container_name: pf-workspace
     ports:
       - "8090:80"
