@@ -3,6 +3,7 @@ import { ArrowLeft, Briefcase, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
+import { formatDate } from '../lib/utils';
 
 type Task = {
   id: string;
@@ -11,6 +12,7 @@ type Task = {
   priority?: string;
   created_at?: string;
   assigned_to_email: string;
+  department?: string;
 };
 
 type TeamMember = {
@@ -116,34 +118,29 @@ export default function ManagerTasks() {
   if (!user) return null;
 
   const visibleTasks = tasks.filter(task => {
-    if (department) {
-        const member = members.find(
-        m => m.email === task.assigned_to_email
-        );
-        if (!member || member.department !== department) return false;
-    }
-
-    if (memberEmail && task.assigned_to_email !== memberEmail) {
-        return false;
-    }
-
+    if (department && task.department !== department) return false;
+    if (memberEmail && task.assigned_to_email !== memberEmail) return false;
     if (
-        searchQuery &&
-        !task.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-        return false;
-    }
-
-    if (statusFilter !== 'all' && task.status !== statusFilter) {
-        return false;
-    }
-
+      searchQuery &&
+      !task.title.toLowerCase().includes(searchQuery.toLowerCase())
+    ) return false;
+    if (statusFilter !== 'all' && task.status !== statusFilter) return false;
     return true;
-});
+  });
+
 
 const getMemberName = (email: string) => {
   return members.find(m => m.email === email)?.name || email;
 };
+
+const formatDate = (date?: string) =>
+  date
+    ? new Date(date).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '';
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -242,25 +239,47 @@ const getMemberName = (email: string) => {
       </section>
 
       {/* TASK LIST */}
-      <section className="px-6 pb-12 lg:px-12">
-        <div className="mx-auto max-w-5xl space-y-4">
-
+          <section className="px-6 pb-12 lg:px-12">
+            <div
+              className="
+                mx-auto max-w-5xl space-y-4
+                max-h-[70vh] overflow-y-auto
+                pr-2
+              "
+            >
             {visibleTasks.map(task => (
             <div
                 key={task.id}
                 className="rounded-xl border p-5 bg-white dark:bg-dark-card"
             >
-                <h3 className="text-lg font-medium">
-                {task.title}
-                </h3>
+                <div className="rounded-xl border p-5 bg-white dark:bg-dark-card">
+                <h3 className="text-lg font-medium">{task.title}</h3>
 
                 <p className="text-xs text-muted-text mt-1">
                   Assigned to: {getMemberName(task.assigned_to_email)}
                 </p>
 
-                <span className="inline-block mt-2 rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700">
-                {task.status.toUpperCase()}
-                </span>
+                <div className="mt-2 flex flex-wrap gap-2 items-center">
+                  {/* STATUS */}
+                  <span className="rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700">
+                    {task.status.toUpperCase()}
+                  </span>
+
+                  {/* PRIORITY */}
+                  {task.priority && (
+                    <span className="rounded-full px-3 py-1 text-xs bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200">
+                      PRIORITY: {task.priority.toUpperCase()}
+                    </span>
+                  )}
+
+                  {/* DATE */}
+                  {task.created_at && (
+                    <span className="text-xs text-muted-text">
+                      {formatDate(task.created_at)}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
             ))}
 
