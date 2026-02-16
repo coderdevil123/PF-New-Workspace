@@ -234,7 +234,10 @@ const formatDate = (date?: string) =>
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -253,7 +256,10 @@ const formatDate = (date?: string) =>
                   setSearchQuery('');
                   setStatusFilter('all');
                 }}
-            className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
           >
             <option value="">Select Department</option>
             <option value="technology">Technology</option>
@@ -266,7 +272,10 @@ const formatDate = (date?: string) =>
           <select
             value={memberEmail}
             onChange={e => setMemberEmail(e.target.value)}
-            className="rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
           >
             <option value="">Select Team Member</option>
 
@@ -283,9 +292,9 @@ const formatDate = (date?: string) =>
           <section className="px-4 sm:px-6 pb-12 lg:px-12">
             <div
               className="
-                mx-auto max-w-5xl space-y-4
+                mx-auto max-w-6xl space-y-4
                 max-h-[70vh] overflow-y-auto
-                pr-2
+                pr-2 overflow-x-visible px-2
               "
             >
             {visibleTasks.map(task => (
@@ -363,7 +372,10 @@ const formatDate = (date?: string) =>
                   setReminderDept(e.target.value);
                   setReminderEmail('');
                 }}
-                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+                className="w-full mb-3 rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
             >
                 <option value="">Select Department</option>
                 <option value="technology">Technology</option>
@@ -377,7 +389,10 @@ const formatDate = (date?: string) =>
                 disabled={!reminderDept}
                 value={reminderEmail}
                 onChange={e => setReminderEmail(e.target.value)}
-                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+                className="w-full mb-3 rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
             >
                 <option value="">Select Team Member</option>
 
@@ -395,7 +410,10 @@ const formatDate = (date?: string) =>
                 disabled={!memberTasks.length}
                 value={selectedTaskId}
                 onChange={e => setSelectedTaskId(e.target.value)}
-                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+                className="w-full mb-3 rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
               >
                 <option value="">Select Task</option>
 
@@ -411,7 +429,10 @@ const formatDate = (date?: string) =>
                 value={reminderStatus}
                 onChange={e => setReminderStatus(e.target.value)}
                 disabled={!selectedTaskId}
-                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+                className="w-full mb-3 rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
               >
                 <option value="">Update Task Status (optional)</option>
                 <option value="pending">Pending</option>
@@ -427,7 +448,10 @@ const formatDate = (date?: string) =>
                 onChange={e => setReminderMessage(e.target.value)}
                 placeholder="Write a short reminder message…"
                 rows={4}
-                className="w-full rounded-lg border px-3 py-2 mb-4 bg-white dark:bg-dark-bg"
+                className="w-full rounded-lg border px-3 py-2 mb-4
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
             />
 
             {/* Actions */}
