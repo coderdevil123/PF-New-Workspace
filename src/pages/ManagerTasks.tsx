@@ -53,17 +53,18 @@ export default function ManagerTasks() {
     }),
 
     useEffect(() => {
-      if (!department) {
-        setFilteredMembers([]);
-        return;
-      }
+  if (!reminderDept) {
+    setFilteredMembers([]);
+    return;
+  }
 
-      const filtered = members.filter(
-        m => normalize(m.department) === normalize(department)
-      );
+  const filtered = members.filter(
+    m => normalize(m.department) === normalize(reminderDept)
+  );
 
-      setFilteredMembers(filtered);
-    }, [department, members]);
+  setFilteredMembers(filtered);
+}, [reminderDept, members]);
+
 
     useEffect(() => {
       if (!reminderEmail) {
@@ -73,7 +74,9 @@ export default function ManagerTasks() {
       }
 
       const tasksOfMember = tasks.filter(
-        t => t.assigned_to_email === reminderEmail
+        t =>
+          t.assigned_to_email === reminderEmail &&
+          normalize(t.department) === normalize(reminderDept)
       );
 
       setMemberTasks(tasksOfMember);
@@ -149,7 +152,10 @@ export default function ManagerTasks() {
   if (!user) return null;
 
   const visibleTasks = tasks.filter(task => {
-    if (department && task.department !== department) return false;
+    if (
+      department &&
+      normalize(task.department) !== normalize(department)
+    ) return false;
     if (memberEmail && task.assigned_to_email !== memberEmail) return false;
     if (
       searchQuery &&
@@ -220,8 +226,11 @@ const formatDate = (date?: string) =>
 
       {/* FILTERS */}
       <section className="px-6 py-8 lg:px-12">
-        <div className="mx-auto max-w-5xl flex gap-4 flex-wrap">
-
+        <div className="
+          mx-auto max-w-5xl
+          flex flex-col sm:flex-row
+          gap-3 sm:gap-4
+        ">
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
@@ -271,7 +280,7 @@ const formatDate = (date?: string) =>
       </section>
 
       {/* TASK LIST */}
-          <section className="px-6 pb-12 lg:px-12">
+          <section className="px-4 sm:px-6 pb-12 lg:px-12">
             <div
               className="
                 mx-auto max-w-5xl space-y-4
@@ -282,18 +291,27 @@ const formatDate = (date?: string) =>
             {visibleTasks.map(task => (
             <div
                 key={task.id}
-                className="rounded-xl border p-5 bg-white dark:bg-dark-card"
-            >
+                className="
+                  flex flex-col
+                  rounded-xl border
+                  bg-white/5 dark:bg-dark-card
+                  p-4 sm:p-6
+                  shadow-card hover:shadow-card-hover
+                  transition-all
+                "
+              >
                 <div className="rounded-xl border p-5 bg-white dark:bg-dark-card">
-                <h3 className="text-lg font-medium">{task.title}</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  {task.title}
+                </h3>
 
-                <p className="text-xs text-muted-text mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Assigned to: {getMemberName(task.assigned_to_email)}
                 </p>
 
                 <div className="mt-2 flex flex-wrap gap-2 items-center">
                   {/* STATUS */}
-                  <span className="rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700">
+                  <span className="rounded-full px-3 py-1 text-xs bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
                     {task.status.toUpperCase()}
                   </span>
 
@@ -325,7 +343,14 @@ const formatDate = (date?: string) =>
         </section>
         {reminderOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-dark-card p-6 shadow-2xl">
+            <div className="
+              w-[92vw] sm:w-full
+              max-w-md
+              rounded-2xl
+              bg-white dark:bg-dark-card
+              p-5 sm:p-6
+              shadow-2xl
+            ">
 
             <h3 className="text-xl font-semibold mb-4">
                 Send Task Reminder
@@ -349,17 +374,21 @@ const formatDate = (date?: string) =>
 
             {/* Team Member */}
             <select
-            value={memberEmail}
-            onChange={e => setMemberEmail(e.target.value)}
-            className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
-          >
-            <option value="">Select Team Member</option>
-            {members.map(member => (
-              <option key={member.email} value={member.email}>
-                {member.name}
-              </option>
-            ))}
-          </select>
+                disabled={!reminderDept}
+                value={reminderEmail}
+                onChange={e => setReminderEmail(e.target.value)}
+                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+            >
+                <option value="">Select Team Member</option>
+
+                {members
+                .filter(m => m.department === reminderDept)
+                .map(m => (
+                    <option key={m.email} value={m.email}>
+                    {m.name}
+                    </option>
+                ))}
+            </select>
 
             {/* TASK SELECTOR */}
               <select
