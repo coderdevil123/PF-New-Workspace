@@ -349,21 +349,17 @@ const formatDate = (date?: string) =>
 
             {/* Team Member */}
             <select
-                disabled={!reminderDept}
-                value={reminderEmail}
-                onChange={e => setReminderEmail(e.target.value)}
-                className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
-            >
-                <option value="">Select Team Member</option>
-
-                {members
-                .filter(m => m.department === reminderDept)
-                .map(m => (
-                    <option key={m.email} value={m.email}>
-                    {m.name}
-                    </option>
-                ))}
-            </select>
+            value={memberEmail}
+            onChange={e => setMemberEmail(e.target.value)}
+            className="w-full mb-3 rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg"
+          >
+            <option value="">Select Team Member</option>
+            {members.map(member => (
+              <option key={member.email} value={member.email}>
+                {member.name}
+              </option>
+            ))}
+          </select>
 
             {/* TASK SELECTOR */}
               <select
