@@ -65,6 +65,16 @@ export default function ManagerTasks() {
   setFilteredMembers(filtered);
 }, [reminderDept, members]);
 
+    useEffect(() => {
+    if (!selectedTaskId) return;
+
+    const task = tasks.find(t => t.id === selectedTaskId);
+    if (!task) return;
+
+    setReminderStatus(task.status);
+    setReminderEmail(task.assigned_to_email);
+    setReminderDept(task.department || '');
+  }, [selectedTaskId]);
 
     useEffect(() => {
       if (!reminderEmail) {
@@ -279,7 +289,7 @@ const formatDate = (date?: string) =>
           >
             <option value="">Select Team Member</option>
 
-            {members.map(member => (
+            {filteredMembers.map(member => (
               <option key={member.email} value={member.email}>
                 {member.name}
               </option>
@@ -328,8 +338,27 @@ const formatDate = (date?: string) =>
 
                   {/* PRIORITY */}
                   {task.priority && (
-                    <span className="rounded-full px-3 py-1 text-xs bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        task.priority === 'high'
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200'
+                          : task.priority === 'medium'
+                          ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200'
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200'
+                      }`}
+                    >
                       PRIORITY: {task.priority.toUpperCase()}
+                    </span>
+                  )}
+
+                  {/* DEPARTMENT */}
+                  {task.department && (
+                    <span className="
+                      rounded-full px-3 py-1 text-xs
+                      bg-blue-100 text-blue-700
+                      dark:bg-blue-900/40 dark:text-blue-200
+                    ">
+                      {task.department.toUpperCase()}
                     </span>
                   )}
 
