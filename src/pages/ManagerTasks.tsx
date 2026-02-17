@@ -54,7 +54,7 @@ export default function ManagerTasks() {
 
     useEffect(() => {
   if (!reminderDept) {
-    setFilteredMembers([]);
+    setFilteredMembers(members);
     return;
   }
 
@@ -303,26 +303,22 @@ const formatDate = (date?: string) =>
           <section className="px-4 sm:px-6 pb-12 lg:px-12">
             <div
               className="
-                mx-auto max-w-6xl space-y-4
-                max-h-[70vh] overflow-y-auto
-                pr-2 overflow-x-visible px-2
+                mx-auto max-w-5xl space-y-6
               "
             >
             {visibleTasks.map(task => (
             <div
                 key={task.id}
                 className="
-                  flex flex-col sm:flex-row
-                  sm:justify-between
-                  gap-4 sm:gap-6
-                  rounded-xl border
+                  w-full
+                  rounded-2xl border
                   bg-white/5 dark:bg-dark-card
                   p-4 sm:p-6
                   shadow-card hover:shadow-card-hover
                   transition-all
                 "
               >
-                <div className="rounded-xl border p-5 bg-white dark:bg-dark-card">
+                <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {task.title}
                 </h3>
@@ -429,9 +425,10 @@ const formatDate = (date?: string) =>
             >
                 <option value="">Select Team Member</option>
 
-                {members
-                .filter(m => m.department === reminderDept)
-                .map(m => (
+                {(reminderDept
+                  ? members.filter(m => normalize(m.department) === normalize(reminderDept))
+                  : members
+                ).map(m => (
                     <option key={m.email} value={m.email}>
                     {m.name}
                     </option>
