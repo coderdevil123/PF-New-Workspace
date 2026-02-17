@@ -301,7 +301,9 @@ const formatDate = (date?: string) =>
             <div
                 key={task.id}
                 className="
-                  flex flex-col
+                  flex flex-col sm:flex-row
+                  sm:justify-between
+                  gap-4 sm:gap-6
                   rounded-xl border
                   bg-white/5 dark:bg-dark-card
                   p-4 sm:p-6
@@ -464,42 +466,63 @@ const formatDate = (date?: string) =>
                 </Button>
 
                 <Button
-                disabled={!reminderEmail || !reminderMessage || sendingReminder}
-                onClick={async () => {
+                  disabled={!reminderEmail || !reminderMessage || sendingReminder}
+                  onClick={async () => {
                     setSendingReminder(true);
+                    const token = localStorage.getItem('token');
 
-                    await fetch(
-                    `${import.meta.env.VITE_BACKEND_URL}/api/announcements`,
-                    {
-                        method: 'POST',
-                        headers: {
+                    // 1️⃣ Update task status
+                    if (selectedTaskId && reminderStatus) {
+                      await fetch(
+                        `${import.meta.env.VITE_BACKEND_URL}/api/manager/update-task-status`,
+                        {
+                          method: 'PATCH',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`,
+                          },
+                          body: JSON.stringify({
+                            taskId: selectedTaskId,
+                            status: reminderStatus,
+                          }),
+                        }
+                      );
+                    }
+
+                    // 2️⃣ Announcement
+                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+                      method: 'POST',
+                      headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                        },
-                        body: JSON.stringify({
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({
                         title: 'Task Reminder',
                         content: reminderMessage,
                         category: 'Task',
                         recipients: 'specific',
                         tagged_emails: [reminderEmail],
-                        }),
-                    }
-                    );
+                        related_task_id: selectedTaskId || null,
+                        created_by: user?.email,
+                        created_by_name: user?.name,
+                      }),
+                    });
 
+                    // 3️⃣ Reset
                     setSendingReminder(false);
                     setReminderOpen(false);
                     setReminderDept('');
                     setReminderEmail('');
+                    setSelectedTaskId('');
+                    setReminderStatus('');
                     setReminderMessage('');
-                }}
-                className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+                  }}
                 >
-                {sendingReminder ? 'Sending...' : 'Send Reminder'}
+                  {sendingReminder ? 'Sending...' : 'Send Reminder'}
                 </Button>
+              </div>
             </div>
-
-            </div>
-        </div>
+          </div>
         )}
 
     </div>
