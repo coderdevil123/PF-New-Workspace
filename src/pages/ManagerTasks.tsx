@@ -299,6 +299,7 @@ const formatDate = (date?: string) =>
       </section>
 
       {/* TASK LIST */}
+      <div className="mx-auto max-w-6xl space-y-4 max-h-[70vh] overflow-y-auto overflow-x-visible px-2">
           <section className="px-4 sm:px-6 pb-12 lg:px-12">
             <div
               className="
@@ -379,8 +380,9 @@ const formatDate = (date?: string) =>
             </p>
             )}
 
-        </div>
+          </div>
         </section>
+      </div>
         {reminderOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="
