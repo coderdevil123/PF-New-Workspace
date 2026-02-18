@@ -41,6 +41,7 @@ export default function ManagerTasks() {
     const [memberTasks, setMemberTasks] = useState<Task[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState('');
     const [reminderStatus, setReminderStatus] = useState('');
+    const [dateFilter, setDateFilter] = useState('');
 
     body: JSON.stringify({
       title: 'Task Reminder',
@@ -166,15 +167,28 @@ export default function ManagerTasks() {
       department &&
       normalize(task.department) !== normalize(department)
     ) return false;
-    if (memberEmail && task.assigned_to_email !== memberEmail) return false;
+
+    if (memberEmail && task.assigned_to_email !== memberEmail)
+      return false;
+
     if (
       searchQuery &&
       !task.title.toLowerCase().includes(searchQuery.toLowerCase())
-    ) return false;
-    if (statusFilter !== 'all' && task.status !== statusFilter) return false;
+    )
+      return false;
+
+    if (statusFilter !== 'all' && task.status !== statusFilter)
+      return false;
+
+    if (
+      dateFilter &&
+      task.created_at &&
+      !task.created_at.startsWith(dateFilter)
+    )
+      return false;
+
     return true;
   });
-
 
 const getMemberName = (email: string) => {
   return members.find(m => m.email === email)?.name || email;
@@ -241,6 +255,17 @@ const formatDate = (date?: string) =>
           flex flex-col sm:flex-row
           gap-3 sm:gap-4
         ">
+
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={e => setDateFilter(e.target.value)}
+            className="rounded-lg border px-3 py-2
+                        bg-white dark:bg-dark-bg
+                        text-gray-900 dark:text-white
+                        focus:outline-none focus:ring-2 focus:ring-mint-accent"
+          />
+
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
@@ -365,6 +390,24 @@ const formatDate = (date?: string) =>
                       {formatDate(task.created_at)}
                     </span>
                   )}
+
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      // 🔥 Auto-fill popup
+                      setReminderDept(task.department || '');
+                      setReminderEmail(task.assigned_to_email);
+                      setSelectedTaskId(task.id);
+                      setReminderStatus(task.status);
+
+                      setReminderOpen(true);
+                    }}
+                    className="mt-3"
+                  >
+                    Reminder
+                  </Button>
                 </div>
               </div>
             </div>
