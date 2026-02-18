@@ -8,14 +8,64 @@ type Role = {
   description?: string;
 };
 
+type Department = {
+  id: string;
+  name: string;
+};
+
 export default function AdminRoles() {
   const [roles, setRoles] = useState<Role[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [newRole, setNewRole] = useState('');
   const [newRoleDesc, setNewRoleDesc] = useState('');
+  const [newDepartment, setNewDepartment] = useState('');
 
   useEffect(() => {
     fetchRoles();
+    fetchDepartments();
   }, []);
+
+  const fetchDepartments = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/departments`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+
+    setDepartments(await res.json());
+  };
+
+  const createDepartment = async () => {
+    if (!newDepartment.trim()) return;
+
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/departments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ name: newDepartment }),
+    });
+
+    setNewDepartment('');
+    fetchDepartments();
+  };
+
+  const deleteDepartment = async (id: string) => {
+    const ok = confirm('Delete this department?');
+    if (!ok) return;
+
+    await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/admin/departments/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    fetchDepartments();
+  };
 
   const fetchRoles = async () => {
     const res = await fetch(
@@ -110,6 +160,46 @@ export default function AdminRoles() {
                   {role.description}
                 </div>
               )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <h2 className="font-display mt-12 mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">
+        Departments
+      </h2>
+
+      <div className="rounded-xl border bg-white dark:bg-dark-card p-6 space-y-4">
+
+        <div className="flex gap-3">
+          <input
+            value={newDepartment}
+            onChange={e => setNewDepartment(e.target.value)}
+            placeholder="New department name"
+            className="flex-1 rounded-lg border px-3 py-2
+            bg-white text-heading-dark
+            dark:bg-dark-bg dark:text-dark-text
+            dark:border-white/10"
+          />
+
+          <Button onClick={createDepartment}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {departments.map(dept => (
+            <div
+              key={dept.id}
+              className="rounded-xl border px-4 py-2 flex items-center gap-3"
+            >
+              <span className="font-medium text-heading-dark dark:text-dark-text">
+                {dept.name}
+              </span>
+
+              <button onClick={() => deleteDepartment(dept.id)}>
+                <Trash className="h-3 w-3 text-red-500" />
+              </button>
             </div>
           ))}
         </div>
