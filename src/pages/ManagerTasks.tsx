@@ -257,6 +257,17 @@ const formatDate = (date?: string) =>
         ">
 
           <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="rounded-lg border px-3 py-2
+                      bg-white dark:bg-dark-bg
+                      text-gray-900 dark:text-white
+                      focus:outline-none focus:ring-2 focus:ring-mint-accent"
+          />
+
+          <input
             type="date"
             value={dateFilter}
             onChange={e => setDateFilter(e.target.value)}
@@ -316,7 +327,7 @@ const formatDate = (date?: string) =>
 
             {filteredMembers.map(member => (
               <option key={member.email} value={member.email}>
-                {member.name}
+                {member.name || member.email}
               </option>
             ))}
           </select>
