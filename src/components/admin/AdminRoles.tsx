@@ -26,13 +26,24 @@ export default function AdminRoles() {
   }, []);
 
   const fetchDepartments = async () => {
+  try {
     const res = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/admin/departments`,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
 
-    setDepartments(await res.json());
-  };
+    if (!res.ok) {
+      setDepartments([]);
+      return;
+    }
+
+    const data = await res.json();
+    setDepartments(Array.isArray(data) ? data : []);
+  } catch {
+    setDepartments([]);
+  }
+};
+
 
   const createDepartment = async () => {
     if (!newDepartment.trim()) return;
@@ -68,12 +79,24 @@ export default function AdminRoles() {
   };
 
   const fetchRoles = async () => {
+  try {
     const res = await fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/admin/roles`,
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
-    setRoles(await res.json());
-  };
+
+    if (!res.ok) {
+      setRoles([]);
+      return;
+    }
+
+    const data = await res.json();
+    setRoles(Array.isArray(data) ? data : []);
+  } catch {
+    setRoles([]);
+  }
+};
+
 
   const createRole = async () => {
     if (!newRole.trim()) return;
