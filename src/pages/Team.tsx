@@ -152,12 +152,12 @@ export default function Team() {
                 <p className="font-sans text-lg text-white/80">The talented people behind Pristine Forests</p>
               </div>
             </div>
-            {isAdmin && (
+            {/* {isAdmin && (
               <Button onClick={() => setRbacOpen(true)}
                 className="rounded-full bg-mint-accent text-forest-dark font-semibold hover:bg-mint-accent/90">
                 Manage Roles
               </Button>
-            )}
+            )} */}
           </div>
         </div>
       </section>
