@@ -50,7 +50,7 @@ export default function Team() {
   const [editingMember, setEditingMember]   = useState<TeamMember | null>(null);
   const [rbacOpen, setRbacOpen]             = useState(false);
   const tiltRef = useRef<HTMLDivElement | null>(null);
-  const isAdmin = user?.role === 'admin';
+  // const isAdmin = user?.role === 'admin';
 
   // ── Load team ─────────────────────────────────────────────────────────────
   useEffect(() => {
