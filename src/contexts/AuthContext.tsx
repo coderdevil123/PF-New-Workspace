@@ -7,7 +7,7 @@ interface User {
   avatar_url?: string;
   phone?: string;
   location?: string;
-  role?: 'admin' | 'user' | 'intern' | 'team_lead';
+  role?: string;
   department?: string;
 }
 
@@ -22,76 +22,85 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
+
+  // ── Hydrate user from localStorage instantly (no flicker on refresh) ────────
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
 
-  const isAuthenticated = !!user;
+  // ── Derive isAdmin purely from user.role — single source of truth ────────────
+  // Also check localStorage directly so it's available immediately on refresh
+  const isAdmin = user?.role === 'admin';
 
-  // 🔥 FETCH ROLE FROM BACKEND
+  // ── ONE API call: fetch role + enrich user object ────────────────────────────
   useEffect(() => {
-  const token = localStorage.getItem('token');
-  const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-  if (!token || !savedUser) return;
-
-  const enrichUserWithRole = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/team/me`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    // If we already have a role saved, skip the fetch — avoids flicker
+    const saved = localStorage.getItem('user');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed?.role) {
+          setUser(parsed); // role already in localStorage, use it immediately
+          return;          // no need to fetch
         }
-      );
-
-      if (!res.ok) return;
-
-      const profile = await res.json();
-      const parsedUser = JSON.parse(savedUser);
-
-      // ⬇️ NORMALIZE ROLE CASE
-      const updatedUser = {
-        ...parsedUser,
-        role: profile.role, // Admin | Team Lead | Intern | User
-        department: profile.department,
-      };
-
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    } catch (err) {
-      console.error(err);
+      } catch {}
     }
-  };
 
-  enrichUserWithRole();
-}, []); // 👈 RUN ONLY ONCE
+    // Role not cached yet — fetch it once
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => { if (!res.ok) throw new Error('Not ok'); return res.json(); })
+      .then(profile => {
+        setUser(prev => {
+          if (!prev) return prev;
+          const enriched = {
+            ...prev,
+            role:       profile.role,
+            department: profile.department,
+          };
+          // Persist enriched user — next refresh won't need to re-fetch
+          localStorage.setItem('user', JSON.stringify(enriched));
+          return enriched;
+        });
+      })
+      .catch(() => {}); // silent fail — app still works, just no admin button
+  }, []); // run once on mount
 
+  // ── Login: save user + immediately fetch role ────────────────────────────────
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
+
+    // Fetch role right after login so admin button shows without page refresh
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => { if (!res.ok) throw new Error('Not ok'); return res.json(); })
+      .then(profile => {
+        const enriched = {
+          ...userData,
+          role:       profile.role,
+          department: profile.department,
+        };
+        setUser(enriched);
+        localStorage.setItem('user', JSON.stringify(enriched));
+      })
+      .catch(() => {});
   };
 
-  useEffect(() => {
-  const token = localStorage.getItem('token');
-  if (!token) return;
-
-  fetch(`${import.meta.env.VITE_BACKEND_URL}/api/admin/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(res => {
-      if (res.ok) setIsAdmin(true);
-      else setIsAdmin(false);
-    })
-    .catch(() => setIsAdmin(false));
-}, []);
-
-
+  // ── Logout: clear everything ─────────────────────────────────────────────────
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
@@ -99,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -107,8 +116,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 }
