@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 interface JwtPayload {
   google_id: string;
@@ -18,32 +18,21 @@ export default function OAuthSuccess() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
+    const token  = params.get('token');
 
     if (!token) {
-      toast({
-        title: 'Authentication Failed',
-        description: 'No token received',
-        variant: 'destructive',
-      });
+      toast({ title: 'Authentication Failed', description: 'No token received', variant: 'destructive' });
       navigate('/login');
       return;
     }
 
-    // 🔐 Decode JWT
-    const decoded = jwtDecode<JwtPayload>(token);
-
-    // ✅ Store token
+    // ── Store token FIRST so login()'s fetch has it available ────────────────
     localStorage.setItem('token', token);
 
-    // ✅ LOGIN WITH USER DATA (NOT TOKEN)
-    login(decoded);
+    const decoded = jwtDecode<JwtPayload>(token);
+    login(decoded); // login() will now immediately find the token and fetch role
 
-    toast({
-      title: 'Welcome!',
-      description: 'Logged in successfully with Google',
-    });
-
+    toast({ title: 'Welcome!', description: 'Logged in successfully with Google' });
     navigate('/workspace');
   }, []);
 

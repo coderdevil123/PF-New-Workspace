@@ -23,84 +23,58 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 
-  // ── Hydrate user from localStorage instantly (no flicker on refresh) ────────
   const [user, setUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem('user');
       return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   });
 
-  // ── Derive isAdmin purely from user.role — single source of truth ────────────
-  // Also check localStorage directly so it's available immediately on refresh
   const isAdmin = user?.role === 'admin';
 
-  // ── ONE API call: fetch role + enrich user object ────────────────────────────
+  // ── ALWAYS re-fetch role on mount — never trust stale localStorage ───────────
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    // If we already have a role saved, skip the fetch — avoids flicker
-    const saved = localStorage.getItem('user');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed?.role) {
-          setUser(parsed); // role already in localStorage, use it immediately
-          return;          // no need to fetch
-        }
-      } catch {}
-    }
-
-    // Role not cached yet — fetch it once
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => { if (!res.ok) throw new Error('Not ok'); return res.json(); })
+      .then(res => { if (!res.ok) throw new Error('not ok'); return res.json(); })
       .then(profile => {
+        if (!profile?.role) return;
         setUser(prev => {
           if (!prev) return prev;
-          const enriched = {
-            ...prev,
-            role:       profile.role,
-            department: profile.department,
-          };
-          // Persist enriched user — next refresh won't need to re-fetch
+          const enriched = { ...prev, role: profile.role, department: profile.department };
           localStorage.setItem('user', JSON.stringify(enriched));
           return enriched;
         });
       })
-      .catch(() => {}); // silent fail — app still works, just no admin button
-  }, []); // run once on mount
+      .catch(() => {});
+  }, []); // runs once on mount — always fetches fresh role
 
-  // ── Login: save user + immediately fetch role ────────────────────────────────
   const login = (userData: User) => {
+    // Save basic user immediately so UI shows logged-in state
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
 
-    // Fetch role right after login so admin button shows without page refresh
+    // Fetch role right after — token is already in localStorage at this point
     const token = localStorage.getItem('token');
     if (!token) return;
 
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/team/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => { if (!res.ok) throw new Error('Not ok'); return res.json(); })
+      .then(res => { if (!res.ok) throw new Error('not ok'); return res.json(); })
       .then(profile => {
-        const enriched = {
-          ...userData,
-          role:       profile.role,
-          department: profile.department,
-        };
+        if (!profile?.role) return;
+        const enriched = { ...userData, role: profile.role, department: profile.department };
         setUser(enriched);
         localStorage.setItem('user', JSON.stringify(enriched));
       })
       .catch(() => {});
   };
 
-  // ── Logout: clear everything ─────────────────────────────────────────────────
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
