@@ -38,6 +38,75 @@ export default function Announcements() {
   const safeAnnouncements = Array.isArray(announcements) ? announcements : [];
 
   // ── Single parallel load on mount ─────────────────────────────────────────
+
+  useEffect(() => {
+  if (!user?.email) return;
+
+  const channel = supabase
+    .channel('announcements-all')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'announcements' },
+      payload => {
+        if (payload.eventType === 'INSERT') {
+          const a = payload.new;
+          if (a.recipients === 'all' || a.tagged_emails?.includes(user.email)) {
+            setAnnouncements(prev => [{ ...a, is_read: false, is_pinned: false }, ...prev]);
+            toast({ title: 'New announcement', description: a.title });
+          }
+        }
+        if (payload.eventType === 'DELETE') {
+          setAnnouncements(prev => prev.filter(a => a.id !== payload.old.id));
+        }
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'announcement_reads',
+        filter: `user_email=eq.${user.email}`,
+      },
+      payload => {
+        setAnnouncements(prev =>
+          prev.map(a =>
+            a.id === payload.new.announcement_id ? { ...a, is_read: true } : a
+          )
+        );
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'announcement_pins',
+        filter: `user_email=eq.${user.email}`,
+      },
+      payload => {
+        if (payload.eventType === 'INSERT') {
+          setAnnouncements(prev =>
+            prev.map(a =>
+              a.id === payload.new.announcement_id ? { ...a, is_pinned: true } : a
+            )
+          );
+        }
+        if (payload.eventType === 'DELETE') {
+          setAnnouncements(prev =>
+            prev.map(a =>
+              a.id === payload.old.announcement_id ? { ...a, is_pinned: false } : a
+            )
+          );
+        }
+      }
+    )
+    .subscribe();
+
+  return () => { supabase.removeChannel(channel); };
+}, [user?.email]);
+
+
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
     window.scrollTo(0, 0);
@@ -63,67 +132,67 @@ export default function Announcements() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  // ── Realtime: new / deleted announcements ─────────────────────────────────
-  useEffect(() => {
-    if (!user?.email) return;
-    const channel = supabase
-      .channel('realtime-announcements')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, payload => {
-        if (payload.eventType === 'INSERT') {
-          const a = payload.new;
-          if (a.recipients === 'all' || a.tagged_emails?.includes(user.email)) {
-            setAnnouncements(prev => [{ ...a, is_read: false, is_pinned: false }, ...prev]);
-            toast({ title: 'New announcement', description: a.title });
-          }
-        }
-        if (payload.eventType === 'DELETE') {
-          setAnnouncements(prev => prev.filter(a => a.id !== payload.old.id));
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user?.email]);
+  // // ── Realtime: new / deleted announcements ─────────────────────────────────
+  // useEffect(() => {
+  //   if (!user?.email) return;
+  //   const channel = supabase
+  //     .channel('realtime-announcements')
+  //     .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, payload => {
+  //       if (payload.eventType === 'INSERT') {
+  //         const a = payload.new;
+  //         if (a.recipients === 'all' || a.tagged_emails?.includes(user.email)) {
+  //           setAnnouncements(prev => [{ ...a, is_read: false, is_pinned: false }, ...prev]);
+  //           toast({ title: 'New announcement', description: a.title });
+  //         }
+  //       }
+  //       if (payload.eventType === 'DELETE') {
+  //         setAnnouncements(prev => prev.filter(a => a.id !== payload.old.id));
+  //       }
+  //     })
+  //     .subscribe();
+  //   return () => { supabase.removeChannel(channel); };
+  // }, [user?.email]);
 
-  // ── Realtime: read status ─────────────────────────────────────────────────
-  useEffect(() => {
-    if (!user?.email) return;
-    const channel = supabase
-      .channel('realtime-reads')
-      .on('postgres_changes', {
-        event: 'INSERT', schema: 'public', table: 'announcement_reads',
-        filter: `user_email=eq.${user.email}`,
-      }, payload => {
-        setAnnouncements(prev =>
-          prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_read: true } : a)
-        );
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user?.email]);
+  // // ── Realtime: read status ─────────────────────────────────────────────────
+  // useEffect(() => {
+  //   if (!user?.email) return;
+  //   const channel = supabase
+  //     .channel('realtime-reads')
+  //     .on('postgres_changes', {
+  //       event: 'INSERT', schema: 'public', table: 'announcement_reads',
+  //       filter: `user_email=eq.${user.email}`,
+  //     }, payload => {
+  //       setAnnouncements(prev =>
+  //         prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_read: true } : a)
+  //       );
+  //     })
+  //     .subscribe();
+  //   return () => { supabase.removeChannel(channel); };
+  // }, [user?.email]);
 
-  // ── Realtime: pin / unpin ─────────────────────────────────────────────────
-  useEffect(() => {
-    if (!user?.email) return;
-    const channel = supabase
-      .channel('realtime-pins')
-      .on('postgres_changes', {
-        event: '*', schema: 'public', table: 'announcement_pins',
-        filter: `user_email=eq.${user.email}`,
-      }, payload => {
-        if (payload.eventType === 'INSERT') {
-          setAnnouncements(prev =>
-            prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_pinned: true } : a)
-          );
-        }
-        if (payload.eventType === 'DELETE') {
-          setAnnouncements(prev =>
-            prev.map(a => a.id === payload.old.announcement_id ? { ...a, is_pinned: false } : a)
-          );
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user?.email]);
+  // // ── Realtime: pin / unpin ─────────────────────────────────────────────────
+  // useEffect(() => {
+  //   if (!user?.email) return;
+  //   const channel = supabase
+  //     .channel('realtime-pins')
+  //     .on('postgres_changes', {
+  //       event: '*', schema: 'public', table: 'announcement_pins',
+  //       filter: `user_email=eq.${user.email}`,
+  //     }, payload => {
+  //       if (payload.eventType === 'INSERT') {
+  //         setAnnouncements(prev =>
+  //           prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_pinned: true } : a)
+  //         );
+  //       }
+  //       if (payload.eventType === 'DELETE') {
+  //         setAnnouncements(prev =>
+  //           prev.map(a => a.id === payload.old.announcement_id ? { ...a, is_pinned: false } : a)
+  //         );
+  //       }
+  //     })
+  //     .subscribe();
+  //   return () => { supabase.removeChannel(channel); };
+  // }, [user?.email]);
 
   // ── Derived data ──────────────────────────────────────────────────────────
   const sortedAnnouncements = [...safeAnnouncements].sort((a, b) => {
