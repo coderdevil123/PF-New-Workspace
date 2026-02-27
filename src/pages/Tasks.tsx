@@ -435,7 +435,7 @@ export default function Tasks() {
       {/* ── TASK DETAIL DIALOG ── */}
       {selectedTaskView && (
         <Dialog open onOpenChange={() => setSelectedTaskView(null)}>
-          <DialogContent className="max-w-xl rounded-2xl border border-border bg-white dark:bg-dark-card text-gray-900 dark:text-gray-100 shadow-2xl">
+          <DialogContent className="max-w-xl max-h-[80vh] overflow-hidden rounded-2xl border border-border bg-white dark:bg-dark-card text-gray-900 dark:text-gray-100 shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-2xl font-semibold text-heading-dark dark:text-white">{selectedTaskView.title}</DialogTitle>
             </DialogHeader>
@@ -454,9 +454,26 @@ export default function Tasks() {
               )}
             </div>
             <hr className="my-5 border-border" />
-            <div>
-              <h3 className="text-sm font-semibold text-mint-accent mb-2">Meeting Summary</h3>
-              <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">{selectedTaskView.meeting_summary || 'No summary available.'}</p>
+            <div className="mt-2">
+              <h3 className="text-sm font-semibold text-mint-accent mb-2">
+                Meeting Summary
+              </h3>
+
+              <div className="
+                  max-h-64
+                  overflow-y-auto
+                  rounded-lg
+                  border border-border
+                  bg-light-gray dark:bg-dark-hover
+                  p-4
+                  text-sm
+                  leading-relaxed
+                  text-gray-700 dark:text-gray-300
+                  whitespace-pre-wrap
+                "
+              >
+                {selectedTaskView.meeting_summary || 'No summary available.'}
+              </div>
             </div>
             {selectedTaskView.description && (
               <div className="mt-6">
