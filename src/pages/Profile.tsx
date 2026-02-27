@@ -191,23 +191,43 @@ const uploadAvatar = async (file: File) => {
   };
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
-    const chunks: BlobPart[] = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000,
+          channelCount: 1
+        }
+      });
 
-    recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunks.push(e.data);
-    };
+      const options = {
+        mimeType: 'audio/webm;codecs=opus',
+        audioBitsPerSecond: 128000
+      };
 
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'audio/mp3' });
-      const url = URL.createObjectURL(blob);
-      setAudioURL(url);
-    };
+      const recorder = new MediaRecorder(stream, options);
+      const chunks: BlobPart[] = [];
 
-    recorder.start();
-    setMediaRecorder(recorder);
-    setIsRecording(true);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        setAudioURL(url);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+
+    } catch (err) {
+      console.error("Mic error:", err);
+    }
   };
 
   const stopRecording = () => {
@@ -502,7 +522,12 @@ const uploadAvatar = async (file: File) => {
                     <Button
                       onClick={() => setVoiceDialogOpen(true)}
                       variant="outline"
-                      className="rounded-lg border-border bg-light-gray dark:bg-dark-hover w-full justify-start"
+                      className="
+                        w-full justify-start rounded-lg border border-border
+                        bg-light-gray text-heading-dark
+                        dark:bg-dark-hover dark:text-dark-text
+                        hover:bg-white dark:hover:bg-dark-card
+                      "
                     >
                       🎙 Record Voice Sample
                     </Button>
@@ -570,8 +595,10 @@ const uploadAvatar = async (file: File) => {
       <Dialog open={voiceDialogOpen} onOpenChange={setVoiceDialogOpen}>
         <DialogContent className="max-w-2xl bg-white dark:bg-dark-card">
           <DialogHeader>
-            <DialogTitle>Reading Sample</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogTitle className="text-heading-dark dark:text-dark-text">
+              Reading Sample
+            </DialogTitle>
+            <DialogDescription className="text-body-text dark:text-dark-muted">
               Please read the following paragraph clearly and naturally.
             </DialogDescription>
           </DialogHeader>
