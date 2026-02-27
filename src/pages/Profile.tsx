@@ -27,6 +27,8 @@ const mapProfile = (data: any) => ({
   joinDate: data.created_at
     ? new Date(data.created_at).toLocaleDateString()
     : '—',
+  voice_sample_url: data.voice_sample_url || null,
+  voice_sample_uploaded_at: data.voice_sample_uploaded_at || null,
 });
 
 export default function Profile() {
@@ -44,6 +46,8 @@ export default function Profile() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [voiceUploadedAt, setVoiceUploadedAt] = useState<string | null>(null);
+  const [voiceFromServer, setVoiceFromServer] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -161,6 +165,41 @@ const uploadAvatar = async (file: File) => {
   setEditData((prev: any) => ({ ...prev, avatar: data.avatar_url }));
 };
 
+  const sendRecording = async () => {
+    if (!audioURL) return;
+
+    const response = await fetch(audioURL);
+    const blob = await response.blob();
+
+    const form = new FormData();
+    form.append('voice', blob, 'voice.webm');
+
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: form,
+    });
+
+    if (!res.ok) {
+      toast({
+        title: 'Upload failed',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const data = await res.json();
+
+    setVoiceFromServer(data.voice_sample_url);
+    setVoiceUploadedAt(data.voice_sample_uploaded_at);
+    setAudioURL(null);
+
+    toast({
+      title: 'Recording sent successfully'
+    });
+  };
 
   const handleCancel = () => {
     setEditData(profileData);
@@ -235,8 +274,21 @@ const uploadAvatar = async (file: File) => {
     setIsRecording(false);
   };
 
-  const deleteRecording = () => {
+  const deleteRecording = async () => {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+
+    setVoiceFromServer(null);
+    setVoiceUploadedAt(null);
     setAudioURL(null);
+
+    toast({
+      title: 'Recording deleted'
+    });
   };
 
   const retryRecording = () => {
@@ -663,10 +715,25 @@ const uploadAvatar = async (file: File) => {
                     Delete
                   </Button>
 
-                  <Button className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90">
+                  <Button
+                      onClick={sendRecording}
+                      className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+                    >
                     Send
                   </Button>
                 </div>
+              </div>
+            )}
+            {voiceFromServer && (
+              <div className="mt-6 border-t pt-4">
+                <p className="text-sm text-muted-text mb-2">
+                  Recorded on {new Date(voiceUploadedAt!).toLocaleString()}
+                </p>
+                <audio
+                  controls
+                  src={`${import.meta.env.VITE_BACKEND_URL}${voiceFromServer}`}
+                  className="w-full"
+                />
               </div>
             )}
           </div>
