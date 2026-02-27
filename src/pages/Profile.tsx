@@ -40,6 +40,10 @@ export default function Profile() {
 
   const [profileData, setProfileData] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
+  const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -184,6 +188,40 @@ const uploadAvatar = async (file: File) => {
     if (hasUnsavedChanges) {
       setShowDialog(true);
     }
+  };
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
+    const chunks: BlobPart[] = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'audio/mp3' });
+      const url = URL.createObjectURL(blob);
+      setAudioURL(url);
+    };
+
+    recorder.start();
+    setMediaRecorder(recorder);
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    mediaRecorder?.stop();
+    setIsRecording(false);
+  };
+
+  const deleteRecording = () => {
+    setAudioURL(null);
+  };
+
+  const retryRecording = () => {
+    setAudioURL(null);
+    startRecording();
   };
 
   return (
@@ -455,6 +493,20 @@ const uploadAvatar = async (file: File) => {
                       </div>
                     )}
                   </div>
+
+                  <div>
+                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
+                      Voice Sample
+                    </label>
+
+                    <Button
+                      onClick={() => setVoiceDialogOpen(true)}
+                      variant="outline"
+                      className="rounded-lg border-border bg-light-gray dark:bg-dark-hover w-full justify-start"
+                    >
+                      🎙 Record Voice Sample
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -513,6 +565,84 @@ const uploadAvatar = async (file: File) => {
               Save Changes
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={voiceDialogOpen} onOpenChange={setVoiceDialogOpen}>
+        <DialogContent className="max-w-2xl bg-white dark:bg-dark-card">
+          <DialogHeader>
+            <DialogTitle>Reading Sample</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Please read the following paragraph clearly and naturally.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-64 overflow-y-auto rounded-lg border border-border bg-light-gray dark:bg-dark-hover p-4 text-sm leading-relaxed text-heading-dark dark:text-dark-text space-y-3">
+            <p>
+              Hello, this is my voice sample for identification and verification purposes.
+              I am speaking in a calm, natural tone at a comfortable pace...
+            </p>
+
+            <p>
+              The quick brown fox jumps over the lazy dog near the quiet river bank at sunset.
+              She sells sea shells by the seashore...
+            </p>
+
+            <p>
+              Red leather, yellow leather.
+              Unique New York, unique New York.
+              Freshly fried flying fish.
+            </p>
+
+            <p>
+              Clear communication requires clarity, confidence, and consistency in delivery.
+            </p>
+
+            <p>
+              Thank you for listening. This concludes my voice enrollment sample.
+            </p>
+          </div>
+
+          {/* Recording Controls */}
+          <div className="mt-6 flex flex-col gap-4">
+
+            {!isRecording && !audioURL && (
+              <Button
+                onClick={startRecording}
+                className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+              >
+                🎙 Start Recording
+              </Button>
+            )}
+
+            {isRecording && (
+              <Button
+                onClick={stopRecording}
+                variant="destructive"
+              >
+                ⏹ Stop Recording
+              </Button>
+            )}
+
+            {audioURL && (
+              <div className="space-y-4">
+                <audio controls src={audioURL} className="w-full" />
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={retryRecording}>
+                    Retry
+                  </Button>
+
+                  <Button variant="outline" onClick={deleteRecording}>
+                    Delete
+                  </Button>
+
+                  <Button className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90">
+                    Send
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

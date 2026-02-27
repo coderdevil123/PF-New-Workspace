@@ -15,25 +15,6 @@ export default function Login() {
     password: '',
   });
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-    
-  //   // Simulate login
-  //   login({
-  //     name: formData.email.split('@')[0],
-  //     email: formData.email,
-  //     phone: '+1 (555) 123-4567',
-  //     location: 'San Francisco, CA',
-  //   });
-
-  //   toast({
-  //     title: 'Welcome back!',
-  //     description: 'You have successfully logged in.',
-  //   });
-
-  //   navigate('/workspace');
-  // };
-
   const handleSocialLogin = (provider: string) => {
     if (provider === 'Google') {
       const origin = window.location.origin;
