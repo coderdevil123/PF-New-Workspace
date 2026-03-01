@@ -272,8 +272,8 @@ export default function Tasks() {
 
       {/* ── TASK LIST ── */}
       <section className="flex-1 px-6 py-6 lg:px-12 overflow-hidden">
-        <div className="mx-auto max-w-6xl h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+        <div className="mx-auto max-w-7xl h-full flex flex-col px-2 sm:px-4">
+          <div className="flex-1 overflow-y-auto space-y-8 px-4 sm:px-6 pr-3">
 
           {/* Initial spinner */}
           {initialLoading && (
@@ -289,7 +289,7 @@ export default function Tasks() {
               className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-6 rounded-xl border bg-white dark:bg-dark-card p-4 sm:p-6 shadow-card hover:shadow-card-hover transition-all relative cursor-pointer">
 
               {/* LEFT */}
-              <div className="flex-1 cursor-pointer" onClick={e => { e.stopPropagation(); setSelectedTaskView(task); }}>
+              <div className="flex-1 space-y-3 cursor-pointer" onClick={e => { e.stopPropagation(); setSelectedTaskView(task); }}>
                 <h3 className={`text-lg font-medium ${task.status === 'completed' ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
                   {task.title}
                 </h3>
@@ -299,7 +299,7 @@ export default function Tasks() {
                   </span>
                 )}
                 {task.created_at && (
-                  <div className="mt-3 text-xs text-muted-text">{formatTaskDate(task.created_at)}</div>
+                  <div className="text-sm text-muted-text pt-1">{formatTaskDate(task.created_at)}</div>
                 )}
               </div>
 
