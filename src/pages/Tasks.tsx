@@ -273,21 +273,7 @@ export default function Tasks() {
       {/* ── TASK LIST ── */}
       <section className="flex-1 px-6 py-6 lg:px-12 overflow-hidden">
         <div className="mx-auto max-w-6xl h-full flex flex-col">
-          <div className="relative flex-1">
-            <div className="
-              h-full
-              overflow-y-auto
-              space-y-6
-              pr-3
-              rounded-3xl
-              border border-white/20
-              bg-white/60
-              dark:bg-white/5
-              backdrop-blur-xl
-              shadow-[0_8px_30px_rgba(0,0,0,0.08)]
-              dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]
-              p-6
-            ">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
 
           {/* Initial spinner */}
           {initialLoading && (
@@ -300,16 +286,7 @@ export default function Tasks() {
           {/* Task cards */}
           {!initialLoading && activeTab === 'tasks' && tasks.map(task => (
             <div key={task.id}
-              className="rounded-3xl
-                border border-white/20
-                bg-white/70
-                dark:bg-white/5
-                backdrop-blur-lg
-                p-6
-                shadow-[0_6px_20px_rgba(0,0,0,0.06)]
-                dark:shadow-[0_6px_20px_rgba(0,0,0,0.5)]
-                hover:scale-[1.01]
-                transition-all duration-300">
+              className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-6 rounded-xl border bg-white dark:bg-dark-card p-4 sm:p-6 shadow-card hover:shadow-card-hover transition-all relative cursor-pointer">
 
               {/* LEFT */}
               <div className="flex-1 cursor-pointer" onClick={e => { e.stopPropagation(); setSelectedTaskView(task); }}>
@@ -452,7 +429,6 @@ export default function Tasks() {
               ))}
             </div>
           )}
-            </div>
           </div>
         </div>
       </section>

@@ -265,22 +265,7 @@ export default function ManagerTasks() {
       {/* TASK LIST */}
       <section className="flex-1 px-4 sm:px-6 pb-6 lg:px-12 overflow-hidden">
         <div className="mx-auto max-w-6xl h-full flex flex-col">
-          <div className="relative flex-1">
-            {/* Glass Container */}
-            <div className="
-              h-full
-              overflow-y-auto
-              space-y-6
-              pr-3
-              rounded-3xl
-              border border-white/20
-              bg-white/60
-              dark:bg-white/5
-              backdrop-blur-xl
-              shadow-[0_8px_30px_rgba(0,0,0,0.08)]
-              dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]
-              p-6
-            ">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
 
           {/* Initial loading */}
           {initialLoading && (
@@ -294,19 +279,8 @@ export default function ManagerTasks() {
           {!initialLoading && tasks.map(task => (
             <div
               key={task.id}
-              className="
-                w-full
-                rounded-3xl
-                border border-white/20
-                bg-white/70
-                dark:bg-white/5
-                backdrop-blur-lg
-                p-6
-                shadow-[0_6px_20px_rgba(0,0,0,0.06)]
-                dark:shadow-[0_6px_20px_rgba(0,0,0,0.5)]
-                hover:scale-[1.01]
-                transition-all duration-300
-              ">
+              className="w-full rounded-2xl border bg-white dark:bg-dark-card p-4 sm:p-6 shadow-card hover:shadow-card-hover transition-all"
+            >
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">{task.title}</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Assigned to: {getMemberName(task.assigned_to_email)}
@@ -374,17 +348,6 @@ export default function ManagerTasks() {
               ✓ All {total} tasks loaded
             </p>
           )}
-            </div>
-            {/* Bottom Fade Blur */}
-              <div className="
-                pointer-events-none
-                absolute bottom-0 left-0 right-0
-                h-16
-                bg-gradient-to-t
-                from-white
-                dark:from-dark-bg
-                to-transparent
-              "/>
           </div>
         </div>
       </section>
