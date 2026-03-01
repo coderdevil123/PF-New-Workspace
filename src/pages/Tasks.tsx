@@ -191,8 +191,7 @@ export default function Tasks() {
   if (!user) return null;
 
   return (
-    <div className="min-h-full bg-white dark:bg-dark-bg">
-
+    <div className="h-screen flex flex-col bg-white dark:bg-dark-bg overflow-hidden">
       {/* ── HEADER ── */}
       <section className="relative overflow-hidden bg-forest-gradient px-6 py-8 lg:px-12">
         <div className="absolute inset-0 opacity-10">
@@ -272,8 +271,9 @@ export default function Tasks() {
       </section>
 
       {/* ── TASK LIST ── */}
-      <section className="px-6 py-6 lg:px-12">
-        <div className="mx-auto max-w-5xl space-y-4">
+      <section className="flex-1 px-6 py-6 lg:px-12 overflow-hidden">
+        <div className="mx-auto max-w-5xl h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
 
           {/* Initial spinner */}
           {initialLoading && (
@@ -429,6 +429,7 @@ export default function Tasks() {
               ))}
             </div>
           )}
+          </div>
         </div>
       </section>
 
