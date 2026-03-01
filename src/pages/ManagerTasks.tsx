@@ -264,8 +264,8 @@ export default function ManagerTasks() {
 
       {/* TASK LIST */}
       <section className="flex-1 px-4 sm:px-6 pb-6 lg:px-12 overflow-hidden">
-        <div className="mx-auto max-w-6xl h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+        <div className="mx-auto max-w-7xl h-full flex flex-col px-2 sm:px-4">
+          <div className="flex-1 overflow-y-auto space-y-8 px-4 sm:px-6 pr-3">
 
           {/* Initial loading */}
           {initialLoading && (
