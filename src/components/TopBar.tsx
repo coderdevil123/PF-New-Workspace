@@ -21,8 +21,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const { theme, setTheme } = useTheme();
 
   // ── Derive isAdmin directly from user object — always reactive ──────────────
-  const isAdmin = user?.role === 'admin';
-
+  const isAdmin = user?.is_admin === true;
+  
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [announcements, setAnnouncements]       = useState<any[]>([]);
   const [annLoading, setAnnLoading]             = useState(false);

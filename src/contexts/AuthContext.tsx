@@ -9,6 +9,7 @@ interface User {
   location?: string;
   role?: string;
   department?: string;
+  is_admin?: boolean; 
 }
 
 interface AuthContextType {
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!profile?.role) return;
         setUser(prev => {
           if (!prev) return prev;
-          const enriched = { ...prev, role: profile.role, department: profile.department };
+          const enriched = { ...prev, role: profile.role, department: profile.department, is_admin: profile.is_admin };
           localStorage.setItem('user', JSON.stringify(enriched));
           return enriched;
         });
@@ -68,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(res => { if (!res.ok) throw new Error('not ok'); return res.json(); })
       .then(profile => {
         if (!profile?.role) return;
-        const enriched = { ...userData, role: profile.role, department: profile.department };
+        const enriched = { ...userData, role: profile.role, department: profile.department, is_admin: profile.is_admin };
         setUser(enriched);
         localStorage.setItem('user', JSON.stringify(enriched));
       })
