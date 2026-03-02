@@ -11,6 +11,7 @@ type TeamMember = {
   name: string; email: string; role: string; department: string;
   bio?: string; phone?: string; location?: string;
   mattermost?: string; image?: string; avatar_url?: string;
+  is_admin?: boolean;
 };
 
 const formatRole = (role: string) => {
@@ -389,9 +390,17 @@ function MemberCard({ member, index, onClick }: {
           </div>
         </div>
         <div className="p-4 sm:p-5">
-          <h3 className="font-display mb-1 text-base sm:text-lg font-normal text-heading-dark dark:text-dark-text transition-colors group-hover:text-forest-green dark:group-hover:text-mint-accent">
-            {member.name}
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-display mb-1 text-base sm:text-lg font-normal text-heading-dark dark:text-dark-text">
+              {member.name}
+            </h3>
+
+            {member.is_admin && (
+              <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-full bg-mint-accent text-forest-dark">
+                A
+              </span>
+            )}
+          </div>
           <p className="font-ui mb-1 text-xs sm:text-sm font-medium text-mint-accent">
             {formatRole(member.role)}
           </p>
