@@ -29,6 +29,7 @@ const mapProfile = (data: any) => ({
     : '—',
   voice_sample_url: data.voice_sample_url || null,
   voice_sample_uploaded_at: data.voice_sample_uploaded_at || null,
+  voice_status: data.status || false,
 });
 
 export default function Profile() {
@@ -567,9 +568,17 @@ const uploadAvatar = async (file: File) => {
                   </div>
 
                   <div>
-                    <label className="font-ui mb-2 block text-sm font-medium text-body-text">
-                      Voice Sample
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="font-ui text-sm font-medium text-body-text">
+                        Voice Sample
+                      </label>
+
+                      {profileData.voice_status && (
+                        <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
+                          ✓ Verified
+                        </span>
+                      )}
+                    </div>
 
                     <Button
                       onClick={() => setVoiceDialogOpen(true)}
