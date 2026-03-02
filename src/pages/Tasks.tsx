@@ -272,7 +272,6 @@ export default function Tasks() {
             <option value="pending">Pending</option>
             <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>
-            <option value="wrong">Wrong</option>
             <option value="blocked">Blocked</option>
             <option value="on-hold">On Hold</option>
           </select>
@@ -403,7 +402,7 @@ export default function Tasks() {
                         setActiveTab('reassign');
                         setOpenReassignDropdownTaskId(null);
                       }}
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-hover"
+                      className="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover"
                     >
                       Go to Reassignment Inbox
                     </button>
@@ -436,7 +435,7 @@ export default function Tasks() {
                               setOpenWrongSubmenuTaskId(null);
                               setOpenReassignDropdownTaskId(null);
                             }}
-                            className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-soft-mint dark:hover:bg-mint-accent/20"
+                            className="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover"
                           >
                             Task is correct but assigned to wrong member
                           </button>
@@ -449,7 +448,7 @@ export default function Tasks() {
                               setOpenWrongSubmenuTaskId(null);
                               setOpenReassignDropdownTaskId(null);
                             }}
-                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-hover"
+                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover"
                           >
                             Task assigned correctly but details are wrong
                           </button>
