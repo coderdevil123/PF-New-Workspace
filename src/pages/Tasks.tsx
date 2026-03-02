@@ -153,13 +153,29 @@ export default function Tasks() {
 
   // ── Close summary on outside click ───────────────────────────────────────
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest('[data-summary-bubble]'))
-        setOpenSummaryTaskId(null);
-    };
-    window.addEventListener('click', handler);
-    return () => window.removeEventListener('click', handler);
-  }, []);
+  const handler = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+
+    // Summary bubble
+    if (!target.closest('[data-summary-bubble]')) {
+      setOpenSummaryTaskId(null);
+    }
+
+    // Status dropdown
+    if (!target.closest('[data-status-dropdown]')) {
+      setOpenDropdownTaskId(null);
+    }
+
+    // Reassignment dropdown
+    if (!target.closest('[data-reassign-dropdown]')) {
+      setOpenReassignDropdownTaskId(null);
+      setOpenWrongSubmenuTaskId(null);
+    }
+  };
+
+  window.addEventListener('click', handler);
+  return () => window.removeEventListener('click', handler);
+}, []);
 
   // ── Optimistic task update ────────────────────────────────────────────────
   const updateTask = async (id: string, updates: Partial<Task>) => {
@@ -315,9 +331,18 @@ export default function Tasks() {
                     setOpenReassignDropdownTaskId(null);
                     setOpenDropdownTaskId(openDropdownTaskId === task.id ? null : task.id);
                   }}
-                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover transition"
+                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg hover:bg-gray-100 dark:hover:bg-dark-hover transition flex items-center gap-2"
                 >
-                  Status ▾
+                  {task.status ? (
+                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[task.status]}`}>
+                      {task.status.toUpperCase()}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 dark:text-gray-400">
+                      SET STATUS
+                    </span>
+                  )}
+                  <span className="text-xs">▾</span>
                 </button>
 
                 {openDropdownTaskId === task.id && (
@@ -329,7 +354,7 @@ export default function Tasks() {
                           updateTask(task.id, { status: option });
                           setOpenDropdownTaskId(null);
                         }}
-                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover ${task.status === option ? STATUS_STYLES[option] : ''}`}
+                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover ${task.status === option ? STATUS_STYLES[option] : ''}`}
                       >
                         {option.charAt(0).toUpperCase() + option.slice(1)}
                         {task.status === option && <Check className="h-4 w-4" />}
@@ -347,7 +372,7 @@ export default function Tasks() {
                     setOpenDropdownTaskId(null);
                     setOpenReassignDropdownTaskId(openReassignDropdownTaskId === task.id ? null : task.id);
                   }}
-                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover transition"
+                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover transition"
                 >
                   Reassignment ▾
                 </button>
@@ -376,7 +401,7 @@ export default function Tasks() {
                             openWrongSubmenuTaskId === task.id ? null : task.id
                           )
                         }
-                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover"
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover"
                       >
                         Wrong <span className="text-xs">▸</span>
                       </button>
@@ -480,6 +505,18 @@ export default function Tasks() {
           {/* ── REASSIGN TAB ── */}
           {!initialLoading && activeTab === 'reassign' && (
             <div className="space-y-4 py-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Reassignment Inbox
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab('tasks')}
+                >
+                  ← Back to Tasks
+                </Button>
+              </div>
               {reassignRequests.length === 0 && (
                 <p className="text-muted-text text-center py-10">No reassignment requests 🎉</p>
               )}
