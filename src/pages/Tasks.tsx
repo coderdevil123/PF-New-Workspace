@@ -377,9 +377,12 @@ export default function Tasks() {
                   Reassignment ▾
                 </button>
 
-                {openReassignDropdownTaskId === task.id && (
-                  <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
-
+                {openReassignDropdownTaskId === task.id && (                
+                    <div
+                      data-reassign-dropdown
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 z-30 mt-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2"
+                    >
                     {/* Go to Inbox */}
                     <button
                       onClick={() => {
@@ -396,18 +399,23 @@ export default function Tasks() {
                     {/* Wrong Submenu Trigger */}
                     <div className="relative">
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setOpenWrongSubmenuTaskId(
                             openWrongSubmenuTaskId === task.id ? null : task.id
-                          )
-                        }
+                          );
+                        }}
                         className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-dark-hover"
                       >
                         Wrong <span className="text-xs">▸</span>
                       </button>
 
                       {openWrongSubmenuTaskId === task.id && (
-                        <div className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
+                        <div
+                            data-reassign-dropdown
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2"
+                          >
                           <button
                             onClick={() => {
                               setReassignModalTask(task);
