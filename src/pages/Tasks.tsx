@@ -3,6 +3,7 @@ import { ArrowLeft, CheckSquare, Check, Pencil, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '../components/ui/dialog';
@@ -42,6 +43,7 @@ const PRIORITY_STYLES: Record<TaskPriority, string> = {
 export default function Tasks() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const location = useLocation();
 
   // ── Data ─────────────────────────────────────────────────────────────────
   const [tasks, setTasks]                       = useState<Task[]>([]);
@@ -202,6 +204,18 @@ export default function Tasks() {
     fetch(`${API}/api/tasks/reassign/inbox`, { headers: { Authorization: `Bearer ${getToken()}` } })
       .then(r => r.json()).then(d => setReassignRequests(Array.isArray(d) ? d : []));
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const taskId = params.get('taskId');
+
+    if (taskId && tasks.length > 0) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        setSelectedTaskView(task);
+      }
+    }
+  }, [location.search, tasks]);
 
   const hasActiveFilters = statusFilter !== 'all' || searchQuery || dateFilter || dateRange !== 'all';
 

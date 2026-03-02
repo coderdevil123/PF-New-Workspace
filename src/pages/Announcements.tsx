@@ -132,68 +132,6 @@ export default function Announcements() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  // // ── Realtime: new / deleted announcements ─────────────────────────────────
-  // useEffect(() => {
-  //   if (!user?.email) return;
-  //   const channel = supabase
-  //     .channel('realtime-announcements')
-  //     .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, payload => {
-  //       if (payload.eventType === 'INSERT') {
-  //         const a = payload.new;
-  //         if (a.recipients === 'all' || a.tagged_emails?.includes(user.email)) {
-  //           setAnnouncements(prev => [{ ...a, is_read: false, is_pinned: false }, ...prev]);
-  //           toast({ title: 'New announcement', description: a.title });
-  //         }
-  //       }
-  //       if (payload.eventType === 'DELETE') {
-  //         setAnnouncements(prev => prev.filter(a => a.id !== payload.old.id));
-  //       }
-  //     })
-  //     .subscribe();
-  //   return () => { supabase.removeChannel(channel); };
-  // }, [user?.email]);
-
-  // // ── Realtime: read status ─────────────────────────────────────────────────
-  // useEffect(() => {
-  //   if (!user?.email) return;
-  //   const channel = supabase
-  //     .channel('realtime-reads')
-  //     .on('postgres_changes', {
-  //       event: 'INSERT', schema: 'public', table: 'announcement_reads',
-  //       filter: `user_email=eq.${user.email}`,
-  //     }, payload => {
-  //       setAnnouncements(prev =>
-  //         prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_read: true } : a)
-  //       );
-  //     })
-  //     .subscribe();
-  //   return () => { supabase.removeChannel(channel); };
-  // }, [user?.email]);
-
-  // // ── Realtime: pin / unpin ─────────────────────────────────────────────────
-  // useEffect(() => {
-  //   if (!user?.email) return;
-  //   const channel = supabase
-  //     .channel('realtime-pins')
-  //     .on('postgres_changes', {
-  //       event: '*', schema: 'public', table: 'announcement_pins',
-  //       filter: `user_email=eq.${user.email}`,
-  //     }, payload => {
-  //       if (payload.eventType === 'INSERT') {
-  //         setAnnouncements(prev =>
-  //           prev.map(a => a.id === payload.new.announcement_id ? { ...a, is_pinned: true } : a)
-  //         );
-  //       }
-  //       if (payload.eventType === 'DELETE') {
-  //         setAnnouncements(prev =>
-  //           prev.map(a => a.id === payload.old.announcement_id ? { ...a, is_pinned: false } : a)
-  //         );
-  //       }
-  //     })
-  //     .subscribe();
-  //   return () => { supabase.removeChannel(channel); };
-  // }, [user?.email]);
-
   // ── Derived data ──────────────────────────────────────────────────────────
   const sortedAnnouncements = [...safeAnnouncements].sort((a, b) => {
     if (a.is_pinned && !b.is_pinned) return -1;
@@ -373,11 +311,18 @@ export default function Announcements() {
           {!loading && filteredAnnouncements.map((announcement: any, index: number) => {
             const isRead = announcement.is_read;
             return (
-              <div key={announcement.id}
-                className={`group relative overflow-hidden rounded-2xl border bg-white dark:bg-dark-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover animate-slide-up ${
+              <div
+                key={announcement.id}
+                onClick={() => {
+                  if (announcement.related_task_id) {
+                    navigate(`/tasks?taskId=${announcement.related_task_id}`);
+                  }
+                }}
+                className={`group relative overflow-hidden rounded-2xl border bg-white dark:bg-dark-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover animate-slide-up cursor-pointer ${
                   isRead ? 'border-border opacity-60' : 'border-mint-accent/30'
                 }`}
-                style={{ animationDelay: `${index * 0.05}s` }}>
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
                 <div className={`h-2 bg-gradient-to-r ${getCategoryColor(announcement.category)}`} />
                 <div className="p-8">
                   <div className="mb-4 flex items-start justify-between">
@@ -407,20 +352,32 @@ export default function Announcements() {
                       </h3>
                     </div>
                     <div className="flex gap-2 ml-4 flex-shrink-0">
-                      <Button onClick={() => handleTogglePin(announcement.id)} variant="ghost" size="sm"
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePin(announcement.id);
+                        }} variant="ghost" size="sm"
                         className={`h-8 w-8 rounded-lg p-0 transition ${announcement.is_pinned ? 'text-mint-accent' : 'text-muted-foreground hover:text-foreground'}`}
                         title="Pin / Unpin">
                         <Pin className="h-4 w-4" />
                       </Button>
                       {!isRead && (
-                        <Button onClick={() => handleMarkAsRead(announcement.id)} variant="ghost" size="sm"
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMarkAsRead(announcement.id);
+                          }} variant="ghost" size="sm"
                           className="h-8 w-8 rounded-lg p-0 text-green-600 hover:bg-green-100 dark:hover:bg-green-500/20"
                           title="Mark as read">
                           <Check className="h-4 w-4" />
                         </Button>
                       )}
                       {announcement.created_by === user?.email && (
-                        <Button onClick={() => handleDeleteAnnouncement(announcement.id)} variant="ghost" size="sm"
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteAnnouncement(announcement.id);
+                          }} variant="ghost" size="sm"
                           className="h-8 w-8 rounded-lg p-0 text-destructive hover:bg-destructive/10"
                           title="Delete announcement">
                           <Trash2 className="h-4 w-4" />
