@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import AdminRoles from '../components/admin/AdminRoles';
 import AdminAssignments from '../components/admin/AdminAssignments';
 
-type Role = { id: string; name: string; description?: string };
+type Role = { id: string; name: string; description?: string; position: number };
 type Department = { id: string; name: string };
 
 const API = import.meta.env.VITE_BACKEND_URL;

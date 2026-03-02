@@ -88,10 +88,29 @@ export default function Team() {
   }, []);
 
   // ── Grouped by role ───────────────────────────────────────────────────────
-  const leadership = members.filter(m => m.role === 'admin');
-  const heads      = members.filter(m => m.role === 'team_lead');
-  const interns    = members.filter(m => m.role === 'intern');
-  const others     = members.filter(m => !['admin', 'team_lead', 'intern'].includes(m.role));
+  // const leadership = members.filter(m => m.role === 'admin');
+  // const heads      = members.filter(m => m.role === 'team_lead');
+  // const interns    = members.filter(m => m.role === 'intern');
+  // const others     = members.filter(m => !['admin', 'team_lead', 'intern'].includes(m.role));
+  const groupedByRole = members.reduce((acc: any, member: any) => {
+    const role = member.role || 'Member';
+    const position = member.role_position ?? 999;
+
+    if (!acc[role]) {
+      acc[role] = {
+        role,
+        position,
+        members: []
+      };
+    }
+
+    acc[role].members.push(member);
+    return acc;
+  }, {});
+
+  const sortedSections = Object.values(groupedByRole)
+    .filter((section: any) => section.members.length > 0)
+    .sort((a: any, b: any) => a.position - b.position);
 
   const handleMattermostClick = (mattermost: string) => {
     window.open(`https://chat.pristineforests.com/pristine-forests/messages/${mattermost}`, '_blank');
@@ -163,10 +182,13 @@ export default function Team() {
       </section>
 
       {/* ── TEAM SECTIONS ── */}
-      {renderSection('Leadership', leadership)}
-      {renderSection('Department Heads', heads, 'border-t border-border bg-light-gray dark:bg-dark-card')}
-      {renderSection('Interns', interns)}
-      {(!loading && others.length > 0) && renderSection('Team Members', others)}
+      {sortedSections.map((section: any, index: number) =>
+        renderSection(
+          formatRole(section.role),
+          section.members,
+          index % 2 === 1 ? 'border-t border-border bg-light-gray dark:bg-dark-card' : ''
+        )
+      )}
 
       {/* ── MEMBER DETAIL MODAL ── */}
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
