@@ -66,6 +66,7 @@ export default function Tasks() {
   const [openWrongSubmenuTaskId, setOpenWrongSubmenuTaskId] = useState<string | null>(null);
   const [openSummaryTaskId, setOpenSummaryTaskId]           = useState<string | null>(null);
   const [summaryPosition, setSummaryPosition]               = useState<{ top: number; left: number } | null>(null);
+  const [openReassignDropdownTaskId, setOpenReassignDropdownTaskId] = useState<string | null>(null);
 
   // ── Filters ───────────────────────────────────────────────────────────────
   const [statusFilter, setStatusFilter] = useState<'all' | TaskStatus>('all');
@@ -303,73 +304,154 @@ export default function Tasks() {
                 )}
               </div>
 
-              {/* RIGHT: Status */}
-              <div className="flex flex-col items-end gap-2 relative">
-                <button onClick={e => { e.stopPropagation(); setOpenDropdownTaskId(openDropdownTaskId === task.id ? null : task.id); }}
-                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover transition">
-                  <span className={`rounded-full px-3 py-1 text-sm font-medium ${task.status ? STATUS_STYLES[task.status] : 'bg-gray-200 text-gray-700'}`}>
-                    {task.status ? task.status.toUpperCase() : 'SET STATUS'} ▾
-                  </span>
+              {/* RIGHT ACTION BUTTONS */}
+            <div className="flex items-center gap-3 relative">
+
+              {/* ───────── STATUS BUTTON ───────── */}
+              <div className="relative">
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOpenReassignDropdownTaskId(null);
+                    setOpenDropdownTaskId(openDropdownTaskId === task.id ? null : task.id);
+                  }}
+                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover transition"
+                >
+                  Status ▾
                 </button>
 
                 {openDropdownTaskId === task.id && (
-                  <div className="absolute left-0 z-30 mt-10 w-56 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
+                  <div className="absolute right-0 z-30 mt-2 w-56 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
                     {(['pending', 'in-progress', 'completed', 'blocked', 'on-hold'] as TaskStatus[]).map(option => (
-                      <button key={option}
-                        onClick={() => { updateTask(task.id, { status: option }); setOpenDropdownTaskId(null); }}
-                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover ${task.status === option ? STATUS_STYLES[option] : ''}`}>
+                      <button
+                        key={option}
+                        onClick={() => {
+                          updateTask(task.id, { status: option });
+                          setOpenDropdownTaskId(null);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover ${task.status === option ? STATUS_STYLES[option] : ''}`}
+                      >
                         {option.charAt(0).toUpperCase() + option.slice(1)}
                         {task.status === option && <Check className="h-4 w-4" />}
                       </button>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ───────── REASSIGNMENT BUTTON ───────── */}
+              <div className="relative">
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOpenDropdownTaskId(null);
+                    setOpenReassignDropdownTaskId(openReassignDropdownTaskId === task.id ? null : task.id);
+                  }}
+                  className="rounded-lg border px-4 py-2 text-sm bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-hover transition"
+                >
+                  Reassignment ▾
+                </button>
+
+                {openReassignDropdownTaskId === task.id && (
+                  <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
+
+                    {/* Go to Inbox */}
+                    <button
+                      onClick={() => {
+                        setActiveTab('reassign');
+                        setOpenReassignDropdownTaskId(null);
+                      }}
+                      className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-hover"
+                    >
+                      Go to Reassignment Inbox
+                    </button>
+
+                    <hr className="my-2 border-gray-200 dark:border-dark-border" />
+
+                    {/* Wrong Submenu Trigger */}
                     <div className="relative">
-                      <button onClick={() => setOpenWrongSubmenuTaskId(openWrongSubmenuTaskId === task.id ? null : task.id)}
-                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover">
+                      <button
+                        onClick={() =>
+                          setOpenWrongSubmenuTaskId(
+                            openWrongSubmenuTaskId === task.id ? null : task.id
+                          )
+                        }
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-hover"
+                      >
                         Wrong <span className="text-xs">▸</span>
                       </button>
+
                       {openWrongSubmenuTaskId === task.id && (
-                        <div className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border bg-white dark:bg-dark-card text-gray-800 dark:text-gray-100 shadow-xl p-2">
-                          <button onClick={() => { setReassignModalTask(task); setOpenWrongSubmenuTaskId(null); setOpenDropdownTaskId(null); }}
-                            className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-soft-mint dark:hover:bg-mint-accent/20">
+                        <div className="absolute right-full top-0 z-40 mr-2 w-64 rounded-xl border bg-white dark:bg-dark-card shadow-xl p-2">
+                          <button
+                            onClick={() => {
+                              setReassignModalTask(task);
+                              setOpenWrongSubmenuTaskId(null);
+                              setOpenReassignDropdownTaskId(null);
+                            }}
+                            className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-soft-mint dark:hover:bg-mint-accent/20"
+                          >
                             Task is correct but assigned to wrong member
                           </button>
-                          <button onClick={() => { setEditingTask(task); setEditTitle(task.title); setEditDescription(task.description || ''); setOpenWrongSubmenuTaskId(null); setOpenDropdownTaskId(null); }}
-                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-hover">
+
+                          <button
+                            onClick={() => {
+                              setEditingTask(task);
+                              setEditTitle(task.title);
+                              setEditDescription(task.description || '');
+                              setOpenWrongSubmenuTaskId(null);
+                              setOpenReassignDropdownTaskId(null);
+                            }}
+                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-dark-hover"
+                          >
                             Task assigned correctly but details are wrong
                           </button>
                         </div>
                       )}
                     </div>
-                    <hr className="my-2 border-gray-200 dark:border-dark-border" />
-                    <button onClick={() => { setEditingTask(task); setEditTitle(task.title); setEditDescription(task.description || ''); setOpenDropdownTaskId(null); }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-mint-accent">
-                      <Pencil className="h-4 w-4" />
-                    </button>
                   </div>
                 )}
               </div>
 
-              {/* Summary */}
-              <div className="relative mt-2 flex justify-end">
-                <button onClick={e => {
-                  e.stopPropagation();
-                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                  setSummaryPosition({ top: rect.bottom + 8, left: Math.min(rect.left, window.innerWidth - 320) });
-                  setOpenSummaryTaskId(openSummaryTaskId === task.id ? null : task.id);
-                }} className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-hover transition">
-                  <Info className="h-3.5 w-3.5" /> Summary
+              {/* ───────── SUMMARY BUTTON (SLIM) ───────── */}
+              <div className="relative">
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                    setSummaryPosition({
+                      top: rect.bottom + 8,
+                      left: Math.min(rect.left, window.innerWidth - 320),
+                    });
+                    setOpenSummaryTaskId(
+                      openSummaryTaskId === task.id ? null : task.id
+                    );
+                  }}
+                  className="rounded-md border px-3 py-1 text-xs bg-white dark:bg-dark-bg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-hover transition flex items-center gap-1"
+                >
+                  <Info className="h-3 w-3" />
+                  Summary
                 </button>
+
                 {openSummaryTaskId === task.id && summaryPosition && (
-                  <div data-summary-bubble onClick={e => e.stopPropagation()}
+                  <div
+                    data-summary-bubble
+                    onClick={e => e.stopPropagation()}
                     className="fixed z-[9999] w-72 max-h-48 overflow-y-auto rounded-xl border border-black/5 dark:border-white/10 bg-white dark:bg-dark-card text-sm text-gray-800 dark:text-gray-100 p-4 shadow-[0_6px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.6)]"
-                    style={{ top: summaryPosition.top, left: summaryPosition.left }}>
-                    <div className="mb-2 font-medium text-mint-accent">Meeting Summary</div>
-                    <p className="leading-relaxed">{task.meeting_summary || 'No summary available.'}</p>
+                    style={{ top: summaryPosition.top, left: summaryPosition.left }}
+                  >
+                    <div className="mb-2 font-medium text-mint-accent">
+                      Meeting Summary
+                    </div>
+                    <p className="leading-relaxed">
+                      {task.meeting_summary || 'No summary available.'}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
 
           {/* Empty state */}
           {!initialLoading && activeTab === 'tasks' && tasks.length === 0 && (
