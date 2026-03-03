@@ -157,21 +157,35 @@ export default function Profile() {
     });
   };
 
-const uploadAvatar = async (file: File) => {
-  const form = new FormData();
-  form.append('avatar', file);
+  const uploadAvatar = async (file: File) => {
+    const form = new FormData();
+    form.append('avatar', file);
 
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/avatar`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: form,
-  });
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/avatar`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: form,
+    });
 
-  const data = await res.json();
-  setEditData((prev: any) => ({ ...prev, avatar: data.avatar_url }));
-};
+    const data = await res.json();
+
+    // ✅ Update both states
+    setEditData((prev: any) => ({
+      ...prev,
+      avatar: data.avatar_url,
+    }));
+
+    setProfileData((prev: any) => ({
+      ...prev,
+      avatar: data.avatar_url,
+    }));
+
+    toast({
+      title: 'Profile Image Updated successfully',
+    });
+  };
 
   const handleUploadAudio = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -447,7 +461,7 @@ const uploadAvatar = async (file: File) => {
                   <div className="relative mx-auto mb-6 h-24 w-24 sm:h-32 sm:w-32">
                     {profileData.avatar ? (
                       <img
-                        src={profileData.avatar}
+                        src={`${import.meta.env.VITE_BACKEND_URL}${profileData.avatar}?t=${Date.now()}`}
                         alt={profileData.name}
                         className="h-full w-full rounded-full object-cover shadow-lg"
                       />
