@@ -56,6 +56,7 @@ export default function Profile() {
   const [voiceUploadedAt, setVoiceUploadedAt] = useState<string | null>(null);
   const [voiceFromServer, setVoiceFromServer] = useState<string | null>(null);
   const [voiceProcessing, setVoiceProcessing] = useState(false);
+  const [avatarVersion, setAvatarVersion] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -171,7 +172,6 @@ export default function Profile() {
 
     const data = await res.json();
 
-    // ✅ Update both states
     setEditData((prev: any) => ({
       ...prev,
       avatar: data.avatar_url,
@@ -181,6 +181,9 @@ export default function Profile() {
       ...prev,
       avatar: data.avatar_url,
     }));
+
+    // ✅ Only update version once
+    setAvatarVersion(prev => prev + 1);
 
     toast({
       title: 'Profile Image Updated successfully',
@@ -461,7 +464,7 @@ export default function Profile() {
                   <div className="relative mx-auto mb-6 h-24 w-24 sm:h-32 sm:w-32">
                     {profileData.avatar ? (
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}${profileData.avatar}?t=${Date.now()}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL}${profileData.avatar}?v=${avatarVersion}`}
                         alt={profileData.name}
                         className="h-full w-full rounded-full object-cover shadow-lg"
                       />
