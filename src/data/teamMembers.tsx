@@ -1,17 +1,17 @@
 export const teamMembers = [
-//   // Founders
-//   {
-//     id: 1,
-//     name: 'Rohan',
-//     role: 'Founder',
-//     department: 'Leadership',
-//     email: 'rohan@pristineforests.com',
-//     // phone: '+1 (555) 100-0001',
-//     mattermost: '@rohan',
-//     // bio: 'Visionary entrepreneur with a passion for building innovative workspace solutions. Leading Pristine Forests with a focus on empowering teams through integrated technology.',
-//     image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Rohan.jpg',
-//     order: 1,
-//   },
+  // Founders
+  {
+    id: 1,
+    name: 'Rohan',
+    role: 'Founder',
+    department: 'Leadership',
+    email: 'rohan@pristineforests.com',
+    // phone: '+1 (555) 100-0001',
+    mattermost: '@rohan',
+    // bio: 'Visionary entrepreneur with a passion for building innovative workspace solutions. Leading Pristine Forests with a focus on empowering teams through integrated technology.',
+    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Rohan.jpg',
+    order: 1,
+  },
 //   {
 //     id: 2,
 //     name: 'Gayatri',

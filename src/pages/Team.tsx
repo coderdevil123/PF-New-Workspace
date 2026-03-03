@@ -68,21 +68,21 @@ export default function Team() {
       .then(dbMembers => {
         if (!Array.isArray(dbMembers)) { setMembers(defaultTeam); return; }
 
-        // const dbMap = new Map(dbMembers.map((m: any) => [m.email, m]));
+        const dbMap = new Map(dbMembers.map((m: any) => [m.email, m]));
 
-        // const merged = defaultTeam.map(def => {
-        //   const db = dbMap.get(def.email);
-        //   if (!db) return { ...def, role: def.role || 'member', department: def.department || 'general' };
-        //   return {
-        //     ...def, ...db,
-        //     role:       db.role       || def.role       || 'member',
-        //     department: db.department || def.department || 'general',
-        //     avatar_url: db.avatar_url || def.image,
-        //   };
-        // });
+        const merged = defaultTeam.map(def => {
+          const db = dbMap.get(def.email);
+          if (!db) return { ...def, role: def.role || 'member', department: def.department || 'general' };
+          return {
+            ...def, ...db,
+            role:       db.role       || def.role       || 'member',
+            department: db.department || def.department || 'general',
+            avatar_url: db.avatar_url || def.image,
+          };
+        });
 
-        // const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
-        // setMembers([...merged, ...dbOnly]);
+        const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
+        setMembers([...merged, ...dbOnly]);
       })
       .catch(() => setMembers(defaultTeam))
       .finally(() => setLoading(false));
