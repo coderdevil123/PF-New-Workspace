@@ -55,6 +55,7 @@ export default function Profile() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [voiceUploadedAt, setVoiceUploadedAt] = useState<string | null>(null);
   const [voiceFromServer, setVoiceFromServer] = useState<string | null>(null);
+  const [voiceProcessing, setVoiceProcessing] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -189,38 +190,70 @@ const uploadAvatar = async (file: File) => {
   };
 
   const sendRecording = async (recording: LocalRecording) => {
-  const form = new FormData();
-  form.append('voice', recording.blob, 'voice.webm');
+    const form = new FormData();
+    form.append('voice', recording.blob, 'voice.webm');
+    setVoiceProcessing(true);   // ✅ START processing
 
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: form,
-  });
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: form,
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-  if (!res.ok) {
-    toast({
-      title: 'Recording Failed',
-      description: data.error || 'Enrollment failed',
-      variant: 'destructive'
-    });
-    return;
-  }
+      if (!res.ok) {
+        // ❌ Mark as not verified
+        setProfileData((prev: any) => ({
+          ...prev,
+          voice_status: false,
+        }));
 
-  setVoiceFromServer(data.voice_sample_url);
-  setVoiceUploadedAt(data.voice_sample_uploaded_at);
+        toast({
+          title: 'Voice Sample Failed',
+          description: data.error || 'Voice validation failed',
+          variant: 'destructive',
+        });
 
-  toast({
-    title: 'Recording Sent Successfully'
-  });
+        return;
+      }
 
-  // remove sent recording
-  setRecordings(prev => prev.filter(r => r.id !== recording.id));
-};
+      // ✅ Mark verified
+      setProfileData((prev: any) => ({
+        ...prev,
+        voice_status: true,
+        voice_sample_url: data.voice_sample_url,
+        voice_sample_uploaded_at: data.voice_sample_uploaded_at,
+      }));
+
+      setVoiceFromServer(data.voice_sample_url);
+      setVoiceUploadedAt(data.voice_sample_uploaded_at);
+
+      toast({
+        title: 'Voice Verified Successfully',
+      });
+
+      setRecordings(prev => prev.filter(r => r.id !== recording.id));
+
+    } catch (err: any) {
+      setProfileData((prev: any) => ({
+        ...prev,
+        voice_status: false,
+      }));
+
+      toast({
+        title: 'Voice Sample Failed',
+        description: err.message || 'Network error',
+        variant: 'destructive',
+      });
+    }
+      finally {
+      setVoiceProcessing(false);   // ✅ ALWAYS STOP processing
+    }
+  };
 
   const handleCancel = () => {
     setEditData(profileData);
@@ -602,11 +635,21 @@ const uploadAvatar = async (file: File) => {
                         Voice Sample
                       </label>
 
-                      {profileData.voice_status && (
-                        <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1">
-                          ✓ Verified
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {voiceProcessing ? (
+                          <span className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">
+                            ⏳ Verifying...
+                          </span>
+                        ) : profileData.voice_status ? (
+                          <span className="text-green-600 dark:text-green-400 text-sm font-medium">
+                            ✓ Verified
+                          </span>
+                        ) : (
+                          <span className="text-red-600 dark:text-red-400 text-sm font-medium">
+                            ✕ Not Verified
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <Button

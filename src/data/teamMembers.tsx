@@ -138,18 +138,18 @@ export const teamMembers = [
   },
 
   // Interns - Tech
-  {
-    id: 12,
-    name: 'Ginish',
-    role: 'Intern',
-    department: 'Technology',
-    email: 'ginish.garg@pristineforests.com',
-    // phone: '+1 (555) 300-0006',
-    mattermost: '@ginish',
-    // bio: 'Tech intern with strong programming skills and enthusiasm for learning new technologies. Contributing to development projects.',
-    image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Ginish.jpg',
-    order: 12,
-  },
+  // {
+  //   id: 12,
+  //   name: 'Ginish',
+  //   role: 'Intern',
+  //   department: 'Technology',
+  //   email: 'ginish.garg@pristineforests.com',
+  //   // phone: '+1 (555) 300-0006',
+  //   mattermost: '@ginish',
+  //   // bio: 'Tech intern with strong programming skills and enthusiasm for learning new technologies. Contributing to development projects.',
+  //   image: 'https://nbwuslsqngivtonoaked.supabase.co/storage/v1/object/public/team/Ginish.jpg',
+  //   order: 12,
+  // },
   {
     id: 13,
     name: 'Aryan',
