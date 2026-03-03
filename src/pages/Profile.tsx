@@ -192,7 +192,14 @@ const uploadAvatar = async (file: File) => {
   const sendRecording = async (recording: LocalRecording) => {
     const form = new FormData();
     form.append('voice', recording.blob, 'voice.webm');
-    setVoiceProcessing(true);   // ✅ START processing
+
+    // ⏳ Immediately show processing
+    setVoiceProcessing(true);
+
+    toast({
+      title: 'Processing voice sample',
+      description: 'Please wait while we verify your recording...',
+    });
 
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
@@ -206,14 +213,13 @@ const uploadAvatar = async (file: File) => {
       const data = await res.json();
 
       if (!res.ok) {
-        // ❌ Mark as not verified
         setProfileData((prev: any) => ({
           ...prev,
           voice_status: false,
         }));
 
         toast({
-          title: 'Voice Sample Failed',
+          title: 'Recording failed',
           description: data.error || 'Voice validation failed',
           variant: 'destructive',
         });
@@ -221,7 +227,7 @@ const uploadAvatar = async (file: File) => {
         return;
       }
 
-      // ✅ Mark verified
+      // ✅ Success
       setProfileData((prev: any) => ({
         ...prev,
         voice_status: true,
@@ -233,7 +239,8 @@ const uploadAvatar = async (file: File) => {
       setVoiceUploadedAt(data.voice_sample_uploaded_at);
 
       toast({
-        title: 'Voice Verified Successfully',
+        title: 'Recording stored successfully',
+        description: 'Your voice sample has been verified.',
       });
 
       setRecordings(prev => prev.filter(r => r.id !== recording.id));
@@ -245,13 +252,12 @@ const uploadAvatar = async (file: File) => {
       }));
 
       toast({
-        title: 'Voice Sample Failed',
+        title: 'Recording failed',
         description: err.message || 'Network error',
         variant: 'destructive',
       });
-    }
-      finally {
-      setVoiceProcessing(false);   // ✅ ALWAYS STOP processing
+    } finally {
+      setVoiceProcessing(false);
     }
   };
 
