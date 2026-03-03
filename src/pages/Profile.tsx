@@ -782,14 +782,21 @@ const uploadAvatar = async (file: File) => {
 
                 <label className="cursor-pointer">
                   <input
-                    type="file"
-                    accept="audio/*"
-                    className="hidden"
-                    onChange={handleUploadAudio}
-                  />
-                  <Button variant="outline">
-                    📂 Upload Audio
-                  </Button>
+                  type="file"
+                  accept="audio/*"
+                  id="voice-upload"
+                  className="hidden"
+                  onChange={handleUploadAudio}
+                />
+
+                  <label htmlFor="voice-upload">
+                    <Button
+                      type="button"
+                      variant="outline"
+                    >
+                      📂 Upload Audio
+                    </Button>
+                  </label>
                 </label>
               </div>
             )}
