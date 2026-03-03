@@ -32,6 +32,12 @@ const mapProfile = (data: any) => ({
   voice_status: data.status || false,
 });
 
+interface LocalRecording {
+  id: string;
+  url: string;
+  blob: Blob;
+}
+
 export default function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -45,7 +51,7 @@ export default function Profile() {
   const [editData, setEditData] = useState<any>(null);
   const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [recordings, setRecordings] = useState<LocalRecording[]>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [voiceUploadedAt, setVoiceUploadedAt] = useState<string | null>(null);
   const [voiceFromServer, setVoiceFromServer] = useState<string | null>(null);
@@ -166,41 +172,55 @@ const uploadAvatar = async (file: File) => {
   setEditData((prev: any) => ({ ...prev, avatar: data.avatar_url }));
 };
 
-  const sendRecording = async () => {
-    if (!audioURL) return;
+  const handleUploadAudio = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const response = await fetch(audioURL);
-    const blob = await response.blob();
+    const url = URL.createObjectURL(file);
 
-    const form = new FormData();
-    form.append('voice', blob, 'voice.webm');
-
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: form,
-    });
-
-    if (!res.ok) {
-      toast({
-        title: 'Upload failed',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    const data = await res.json();
-
-    setVoiceFromServer(data.voice_sample_url);
-    setVoiceUploadedAt(data.voice_sample_uploaded_at);
-    setAudioURL(null);
-
-    toast({
-      title: 'Recording sent successfully'
-    });
+    setRecordings(prev => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        url,
+        blob: file
+      }
+    ]);
   };
+
+  const sendRecording = async (recording: LocalRecording) => {
+  const form = new FormData();
+  form.append('voice', recording.blob, 'voice.webm');
+
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: form,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    toast({
+      title: 'Recording Failed',
+      description: data.error || 'Enrollment failed',
+      variant: 'destructive'
+    });
+    return;
+  }
+
+  setVoiceFromServer(data.voice_sample_url);
+  setVoiceUploadedAt(data.voice_sample_uploaded_at);
+
+  toast({
+    title: 'Recording Sent Successfully'
+  });
+
+  // remove sent recording
+  setRecordings(prev => prev.filter(r => r.id !== recording.id));
+};
 
   const handleCancel = () => {
     setEditData(profileData);
@@ -257,7 +277,16 @@ const uploadAvatar = async (file: File) => {
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'audio/webm' });
         const url = URL.createObjectURL(blob);
-        setAudioURL(url);
+
+        setRecordings(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            url,
+            blob
+          }
+        ]);
+
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -275,27 +304,27 @@ const uploadAvatar = async (file: File) => {
     setIsRecording(false);
   };
 
-  const deleteRecording = async () => {
-    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
+  // const deleteRecording = async () => {
+  //   await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
+  //     method: 'DELETE',
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //     },
+  //   });
 
-    setVoiceFromServer(null);
-    setVoiceUploadedAt(null);
-    setAudioURL(null);
+  //   setVoiceFromServer(null);
+  //   setVoiceUploadedAt(null);
+  //   setAudioURL(null);
 
-    toast({
-      title: 'Recording deleted'
-    });
-  };
+  //   toast({
+  //     title: 'Recording deleted'
+  //   });
+  // };
 
-  const retryRecording = () => {
-    setAudioURL(null);
-    startRecording();
-  };
+  // const retryRecording = () => {
+  //   setAudioURL(null);
+  //   startRecording();
+  // };
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
@@ -693,13 +722,27 @@ const uploadAvatar = async (file: File) => {
           {/* Recording Controls */}
           <div className="mt-6 flex flex-col gap-4">
 
-            {!isRecording && !audioURL && (
-              <Button
-                onClick={startRecording}
-                className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
-              >
-                🎙 Start Recording
-              </Button>
+            {!isRecording && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={startRecording}
+                  className="bg-mint-accent text-forest-dark"
+                >
+                  🎙 Start Recording
+                </Button>
+
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    className="hidden"
+                    onChange={handleUploadAudio}
+                  />
+                  <Button variant="outline">
+                    📂 Upload Audio
+                  </Button>
+                </label>
+              </div>
             )}
 
             {isRecording && (
@@ -711,26 +754,31 @@ const uploadAvatar = async (file: File) => {
               </Button>
             )}
 
-            {audioURL && (
+            {recordings.length > 0 && (
               <div className="space-y-4">
-                <audio controls src={audioURL} className="w-full" />
+                {recordings.map((rec) => (
+                  <div key={rec.id} className="border p-3 rounded-lg">
+                    <audio controls src={rec.url} className="w-full mb-3" />
 
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={retryRecording}>
-                    Retry
-                  </Button>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setRecordings(prev => prev.filter(r => r.id !== rec.id));
+                        }}
+                      >
+                        Delete
+                      </Button>
 
-                  <Button variant="outline" onClick={deleteRecording}>
-                    Delete
-                  </Button>
-
-                  <Button
-                      onClick={sendRecording}
-                      className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
-                    >
-                    Send
-                  </Button>
-                </div>
+                      <Button
+                        onClick={() => sendRecording(rec)}
+                        className="bg-mint-accent text-forest-dark"
+                      >
+                        Send
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
             {voiceFromServer && (
