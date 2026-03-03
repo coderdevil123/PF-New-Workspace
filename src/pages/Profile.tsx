@@ -784,7 +784,7 @@ const uploadAvatar = async (file: File) => {
             {voiceFromServer && (
               <div className="mt-6 border-t pt-4">
                 <p className="text-sm text-muted-text mb-2">
-                  Recorded on {new Date(voiceUploadedAt!).toLocaleString()}
+                  Recorded on {voiceUploadedAt ? new Date(voiceUploadedAt).toLocaleString() : ''}
                 </p>
                 <audio
                   controls
