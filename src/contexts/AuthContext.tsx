@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { return null; }
   });
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.is_admin === true;
 
   // ── ALWAYS re-fetch role on mount — never trust stale localStorage ───────────
   useEffect(() => {
