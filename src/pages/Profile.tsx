@@ -382,6 +382,11 @@ export default function Profile() {
   //   startRecording();
   // };
 
+  const avatarSrc =
+  profileData.avatar?.startsWith("http")
+    ? profileData.avatar
+    : `${import.meta.env.VITE_UPLOADS_URL}${profileData.avatar.replace("/uploads", "")}`;
+
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
       {/* Header */}
@@ -464,7 +469,7 @@ export default function Profile() {
                   <div className="relative mx-auto mb-6 h-24 w-24 sm:h-32 sm:w-32">
                     {profileData.avatar ? (
                       <img
-                        src={`https://pf.growthsupercharged.com${profileData.avatar}?v=${avatarVersion}`}
+                        src={`${avatarSrc}?v=${avatarVersion}`}
                         alt={profileData.name}
                         className="h-full w-full rounded-full object-cover shadow-lg"
                       />
