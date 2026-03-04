@@ -385,7 +385,7 @@ export default function Profile() {
   const avatarSrc =
   profileData.avatar?.startsWith("http")
     ? profileData.avatar
-    : `${import.meta.env.VITE_UPLOADS_URL}${profileData.avatar.replace("/uploads", "")}`;
+    : `${import.meta.env.VITE_UPLOADS_URL}${profileData.avatar}`;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
