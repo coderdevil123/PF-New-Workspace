@@ -384,7 +384,7 @@ export default function Profile() {
 
   const uploadsBase =
   import.meta.env.VITE_UPLOADS_URL ||
-  `${import.meta.env.VITE_BACKEND_URL}/uploads`;
+  `${import.meta.env.VITE_BACKEND_URL}`;
 
   const avatarSrc =
     profileData.avatar?.startsWith("http")
