@@ -382,10 +382,14 @@ export default function Profile() {
   //   startRecording();
   // };
 
+  const uploadsBase =
+  import.meta.env.VITE_UPLOADS_URL ||
+  `${import.meta.env.VITE_BACKEND_URL}/uploads`;
+
   const avatarSrc =
-  profileData.avatar?.startsWith("http")
-    ? profileData.avatar
-    : `${import.meta.env.VITE_UPLOADS_URL}${profileData.avatar}`;
+    profileData.avatar?.startsWith("http")
+      ? profileData.avatar
+      : `${uploadsBase}${profileData.avatar}`;
 
   return (
     <div className="min-h-full bg-white dark:bg-dark-bg">
