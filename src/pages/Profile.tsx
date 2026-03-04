@@ -464,7 +464,7 @@ export default function Profile() {
                   <div className="relative mx-auto mb-6 h-24 w-24 sm:h-32 sm:w-32">
                     {profileData.avatar ? (
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}${profileData.avatar}?v=${avatarVersion}`}
+                        src={`https://pf.growthsupercharged.com${profileData.avatar}?v=${avatarVersion}`}
                         alt={profileData.name}
                         className="h-full w-full rounded-full object-cover shadow-lg"
                       />
