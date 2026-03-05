@@ -165,7 +165,7 @@ export default function Announcements() {
         content:      newAnnouncement.content,
         category:     newAnnouncement.category,
         recipients:   newAnnouncement.recipients,
-        taggedEmails: newAnnouncement.recipients === 'specific' ? newAnnouncement.taggedUsers : null,
+        tagged_emails: newAnnouncement.recipients === 'specific' ? newAnnouncement.taggedUsers : null,
       }),
     })
       .then(r => { if (!r.ok) throw new Error('Create failed'); return r.json(); })
