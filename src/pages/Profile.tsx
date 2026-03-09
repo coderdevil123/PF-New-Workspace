@@ -771,26 +771,31 @@ export default function Profile() {
           <div className="max-h-64 overflow-y-auto rounded-lg border border-border bg-light-gray dark:bg-dark-hover p-4 text-sm leading-relaxed text-heading-dark dark:text-dark-text space-y-3">
             <p>
               Hello, this is my voice sample for identification and verification purposes.
-              I am speaking in a calm, natural tone at a comfortable pace...
+              I am speaking in a calm, natural tone at a comfortable pace, similar to how I normally speak in everyday conversation.
+            <p>
+              I will continue speaking for about a minute so the system can capture the full range of my voice, including pitch, rhythm, pronunciation, and natural variation.
+              Every person’s voice has subtle characteristics that make it unique, such as tone, pacing, breath control, and emphasis on certain words.
             </p>
-
             <p>
               The quick brown fox jumps over the lazy dog near the quiet river bank at sunset.
-              She sells sea shells by the seashore...
+              She sells sea shells by the seashore, and surely the shells she sells are shiny silver shells.
+              Peter Piper picked a peck of pickled peppers, and a peck of pickled peppers Peter Piper picked.
             </p>
-
             <p>
               Red leather, yellow leather.
               Unique New York, unique New York.
               Freshly fried flying fish.
             </p>
-
-            <p>
               Clear communication requires clarity, confidence, and consistency in delivery.
-            </p>
-
+              Security systems should be reliable, robust, and resistant to impersonation attempts.
             <p>
-              Thank you for listening. This concludes my voice enrollment sample.
+              I am continuing to speak naturally without exaggerating my pronunciation or forcing any particular tone.
+              This recording is being made in a quiet environment with minimal background noise.
+            </p>
+            <p>    
+              I will now slightly vary my intonation while keeping my voice steady and relaxed.
+              Thank you for listening. This concludes my voice enrollment sample. 
+            </p>
             </p>
           </div>
 
