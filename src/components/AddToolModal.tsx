@@ -50,8 +50,7 @@ export default function AddToolModal({
   const [existingVideoId, setExistingVideoId] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const canManageTools =
-    user?.role === 'admin' || user?.role === 'team_lead';
+  const canManageTools = user?.is_admin === true;
 
   if (!canManageTools) return null;
 
