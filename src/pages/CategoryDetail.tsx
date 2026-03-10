@@ -493,12 +493,12 @@ export default function CategoryDetail() {
       <AddToolModal
         open={addToolOpen}
         onClose={() => {
-          setSelectedTool(null);
+          setEditTool(null);
           setAddToolOpen(false);
         }}
         onSuccess={loadTools}
         category={categoryId}
-        tool={selectedTool}
+        tool={editTool}
       />
       <AuthRequiredModal
         open={authModalOpen}
