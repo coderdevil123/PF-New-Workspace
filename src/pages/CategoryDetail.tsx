@@ -84,7 +84,8 @@ export default function CategoryDetail() {
   const [addToolOpen, setAddToolOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const { user } = useAuth();
+  const isAdmin = user?.is_admin === true;
 
   const [tools, setTools] = useState<any[]>([]);
 
