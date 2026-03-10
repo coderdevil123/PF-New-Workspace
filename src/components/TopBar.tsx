@@ -78,7 +78,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       <div className="flex items-center gap-2">
 
         {/* Manager button — visible to all logged-in users */}
-        {user && (
+        {isAdmin && (
           <Button onClick={() => navigate('/manager')} variant="ghost"
             className="flex items-center gap-2 rounded-lg text-heading-dark dark:text-dark-text hover:bg-light-gray dark:hover:bg-dark-hover">
             <Briefcase className="h-5 w-5 text-mint-accent" />
