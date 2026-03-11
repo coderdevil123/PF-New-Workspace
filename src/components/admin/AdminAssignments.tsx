@@ -107,12 +107,20 @@ export default function AdminAssignments({ roles, departments }: Props) {
             <Button
               variant="outline"
               disabled={savingEmail === user.email}
-              onClick={() =>
-                updateAssignment({
+              onClick={() => {
+                const updated = {
                   ...user,
                   is_visible: !(user.is_visible ?? true)
-                })
-              }
+                };
+
+                // update UI instantly
+                setUsers(prev =>
+                  prev.map(u => u.email === user.email ? updated : u)
+                );
+
+                // persist to backend
+                updateAssignment(updated);
+              }}
             >
               {user.is_visible === false ? "Unhide" : "Hide"}
             </Button>
