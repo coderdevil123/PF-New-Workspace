@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { Plus, Trash } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog";
+import {
+  DndContext,
+  closestCenter
+} from "@dnd-kit/core";
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove
+} from "@dnd-kit/sortable";
 
 type Role = { id: string; name: string; description?: string; position: number };
 type Department = { id: string; name: string };
@@ -74,6 +84,33 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
     setEditingRole(null);
   };
 
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = roles.findIndex(r => r.id === active.id);
+    const newIndex = roles.findIndex(r => r.id === over.id);
+
+    const newRoles = arrayMove(roles, oldIndex, newIndex);
+
+    const updatedRoles = newRoles.map((r, index) => ({
+      ...r,
+      position: index + 1
+    }));
+
+    onRolesChange(updatedRoles);
+
+    await fetch(`${API}/api/admin/roles/reorder`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ roles: updatedRoles })
+    });
+  };
+
   const createDepartment = async () => {
     if (!newDepartment.trim()) return;
     await fetch(`${API}/api/admin/departments`, {
@@ -115,8 +152,14 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
           <Button onClick={createRole}><Plus className="h-4 w-4 mr-1" /> Add</Button>
         </div>
         <div className="flex flex-wrap gap-2">
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={roles.map(r => r.id)} strategy={verticalListSortingStrategy}>
           {roles.map(role => (
-            <div key={role.id} className="rounded-xl border px-4 py-2 flex flex-col">
+            <div
+              key={role.id}
+              id={role.id}
+              className="rounded-xl border px-4 py-2 flex flex-col cursor-grab"
+            >
               <div className="flex items-center justify-between">
                 <span className="font-medium text-heading-dark dark:text-dark-text">{role.name}</span>
                 <div className="flex gap-2">
@@ -135,6 +178,8 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
               </div>
             </div>
           ))}
+          </SortableContext>
+          </DndContext>
         </div>
       </div>
 
