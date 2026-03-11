@@ -135,7 +135,12 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}`
       },
-      body: JSON.stringify({ roles: updatedRoles })
+      body: JSON.stringify({
+        roles: updatedRoles.map(r => ({
+          id: r.id,
+          position: r.position
+        }))
+      })
     });
   };
 
