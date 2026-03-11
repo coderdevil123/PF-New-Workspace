@@ -12,6 +12,8 @@ import {
   verticalListSortingStrategy,
   arrayMove
 } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Role = { id: string; name: string; description?: string; position: number };
 type Department = { id: string; name: string };
@@ -24,6 +26,32 @@ interface Props {
   departments: Department[];
   onRolesChange: (roles: Role[]) => void;
   onDepartmentsChange: (depts: Department[]) => void;
+}
+
+function SortableRole({ role, children }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({ id: role.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  );
 }
 
 export default function AdminRoles({ roles, departments, onRolesChange, onDepartmentsChange }: Props) {
@@ -155,9 +183,8 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={roles.map(r => r.id)} strategy={verticalListSortingStrategy}>
           {roles.map(role => (
+          <SortableRole key={role.id} role={role}>
             <div
-              key={role.id}
-              id={role.id}
               className="rounded-xl border px-4 py-2 flex flex-col cursor-grab"
             >
               <div className="flex items-center justify-between">
@@ -177,6 +204,7 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
                 Ranking: {role.position}
               </div>
             </div>
+            </SortableRole>
           ))}
           </SortableContext>
           </DndContext>
