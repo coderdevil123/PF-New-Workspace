@@ -64,16 +64,28 @@ export default function Team() {
       ? `${import.meta.env.VITE_BACKEND_URL}/api/team`
       : `${import.meta.env.VITE_BACKEND_URL}/api/team/public`;
 
-    fetch(endpoint, { headers: token ? { Authorization: `Bearer ${token}` } : undefined })
-      .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
-      .then(dbMembers => {
-        if (!Array.isArray(dbMembers)) {
-          setMembers(defaultTeam);
-          return;
-        }
+    fetch(endpoint, {
+  headers: token ? { Authorization: `Bearer ${token}` } : undefined
+})
+  .then(r => {
+    if (!r.ok) throw new Error("Failed");
+    return r.json();
+  })
+  .then(dbMembers => {
+    if (!Array.isArray(dbMembers)) {
+      setMembers(defaultTeam);
+      return;
+    }
 
-        setMembers(dbMembers);
-      })
+    setMembers(dbMembers);
+  })
+  .catch(err => {
+    console.error("Team fetch error:", err);
+    setMembers(defaultTeam);
+  })
+  .finally(() => {
+    setLoading(false);
+  });
 
 //         const dbMap = new Map(dbMembers.map((m: any) => [m.email, m]));
 
@@ -101,8 +113,6 @@ export default function Team() {
 
 // const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
 // setMembers([...merged, ...dbOnly]);
-  .catch(() => setMembers(defaultTeam))
-  .finally(() => setLoading(false))
   }, []);
 
   // ── Grouped by role ───────────────────────────────────────────────────────
