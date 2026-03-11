@@ -55,14 +55,18 @@ export default function AddToolModal({
   if (!canManageTools) return null;
 
   useEffect(() => {
+    if (!open) return;
+
     if (tool) {
-      setName(tool.name);
-      setToolUrl(tool.url);
+      setName(tool.name || '');
+      setToolUrl(tool.url || '');
       setYoutubeUrl('');
       setExistingVideoId(tool.tutorial_video || null);
       setDescription(tool.description || '');
+    } else {
+      resetForm();
     }
-  }, [tool]);
+  }, [tool, open]);
   
   function resetForm() {
     setName('');
@@ -70,6 +74,7 @@ export default function AddToolModal({
     setYoutubeUrl('');
     setDescription('');
     setImageFile(null);
+    setExistingVideoId(null);
   }
   
   async function handleSubmit() {
