@@ -61,19 +61,42 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
     onDepartmentsChange(departments.filter(d => d.id !== id));
   };
 
-  const openEditRole = (role: Role) => {
+  const openEditRole = async (role: Role) => {
     const newName = prompt('Edit role name:', role.name);
     if (newName === null) return;
-    
+
     const newDesc = prompt('Edit role description:', role.description || '');
     if (newDesc === null) return;
-    
+
     const newPosition = prompt('Edit ranking:', role.position.toString());
     if (newPosition === null) return;
-    
-    const updatedRole = { ...role, name: newName, description: newDesc, position: Number(newPosition) };
-    onRolesChange(roles.map(r => r.id === role.id ? updatedRole : r));
+
+    const res = await fetch(`${API}/api/admin/roles/${role.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({
+        name: newName,
+        description: newDesc,
+        position: Number(newPosition)
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.error);
+      return;
+    }
+
+    const data = await fetch(`${API}/api/admin/roles`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    }).then(r => r.json());
+
+    onRolesChange(data);
   };
+
   return (
     <div>
       <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">Roles</h2>

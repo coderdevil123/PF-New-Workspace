@@ -106,14 +106,12 @@ export default function AdminAssignments({ roles, departments }: Props) {
             </select>
             <Button
               variant="outline"
+              disabled={savingEmail === user.email}
               onClick={() =>
-                setUsers(prev =>
-                  prev.map(u =>
-                    u.email === user.email
-                      ? { ...u, is_visible: !(u.is_visible ?? true) }
-                      : u
-                  )
-                )
+                updateAssignment({
+                  ...user,
+                  is_visible: !(user.is_visible ?? true)
+                })
               }
             >
               {user.is_visible === false ? "Unhide" : "Hide"}
