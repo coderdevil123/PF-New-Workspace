@@ -73,12 +73,23 @@ export default function Team() {
 
         const merged = defaultTeam.map(def => {
           const db = dbMap.get(def.email);
-          if (!db) return { ...def, role: def.role || 'member', department: def.department || 'general' };
+
+          if (!db) {
+            return {
+              ...def,
+              role: def.role || 'member',
+              department: def.department || 'general',
+              is_visible: true
+            };
+          }
+
           return {
-            ...def, ...db,
-            role:       db.role       || def.role       || 'member',
+            ...def,
+            ...db,
+            role: db.role || def.role || 'member',
             department: db.department || def.department || 'general',
             avatar_url: db.avatar_url || def.image,
+            is_visible: db.is_visible ?? true
           };
         });
 
@@ -95,7 +106,7 @@ export default function Team() {
   // const interns    = members.filter(m => m.role === 'intern');
   // const others     = members.filter(m => !['admin', 'team_lead', 'intern'].includes(m.role));
   const visibleMembers = members.filter(m => m.is_visible !== false);
-  const groupedByRole = members.reduce((acc: any, member: any) => {
+  const groupedByRole = visibleMembers.reduce((acc: any, member: any) => {
     const role = member.role || 'Member';
     const position = member.role_position ?? 999;
 
