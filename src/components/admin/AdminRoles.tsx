@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog";
 
 type Role = { id: string; name: string; description?: string; position: number };
 type Department = { id: string; name: string };
@@ -20,6 +21,7 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
   const [newRoleDesc, setNewRoleDesc]   = useState('');
   const [newDepartment, setNewDepartment] = useState('');
   const [newRolePosition, setNewRolePosition] = useState(999);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
   const createRole = async () => {
     if (roles.some(r => r.position === newRolePosition)) {
@@ -43,6 +45,35 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
     onRolesChange(roles.filter(r => r.id !== id));
   };
 
+  const updateRole = async () => {
+    if (!editingRole) return;
+
+    if (roles.some(r => r.id !== editingRole.id && r.position === editingRole.position)) {
+      alert("This rank is already assigned to another role");
+      return;
+    }
+
+    await fetch(`${API}/api/admin/roles/${editingRole.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({
+        name: editingRole.name,
+        description: editingRole.description,
+        position: editingRole.position
+      })
+    });
+
+    const data = await fetch(`${API}/api/admin/roles`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    }).then(r => r.json());
+
+    onRolesChange(Array.isArray(data) ? data : []);
+    setEditingRole(null);
+  };
+
   const createDepartment = async () => {
     if (!newDepartment.trim()) return;
     await fetch(`${API}/api/admin/departments`, {
@@ -61,40 +92,8 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
     onDepartmentsChange(departments.filter(d => d.id !== id));
   };
 
-  const openEditRole = async (role: Role) => {
-    const newName = prompt('Edit role name:', role.name);
-    if (newName === null) return;
-
-    const newDesc = prompt('Edit role description:', role.description || '');
-    if (newDesc === null) return;
-
-    const newPosition = prompt('Edit ranking:', role.position.toString());
-    if (newPosition === null) return;
-
-    const res = await fetch(`${API}/api/admin/roles/${role.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getToken()}`
-      },
-      body: JSON.stringify({
-        name: newName,
-        description: newDesc,
-        position: Number(newPosition)
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      alert(err.error);
-      return;
-    }
-
-    const data = await fetch(`${API}/api/admin/roles`, {
-      headers: { Authorization: `Bearer ${getToken()}` }
-    }).then(r => r.json());
-
-    onRolesChange(data);
+  const openEditRole = (role: Role) => {
+    setEditingRole(role);
   };
 
   return (
@@ -155,6 +154,64 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
           ))}
         </div>
       </div>
+      <Dialog open={!!editingRole} onOpenChange={() => setEditingRole(null)}>
+        <DialogContent className="
+          max-w-lg rounded-2xl
+          bg-white dark:bg-dark-card
+          border border-border dark:border-dark-border
+          text-heading-dark dark:text-dark-text
+          space-y-5
+        ">
+          <DialogTitle className="font-display text-xl">
+            Edit Role
+          </DialogTitle>
+
+          {editingRole && (
+            <>
+              <input
+                value={editingRole.name}
+                onChange={e =>
+                  setEditingRole({ ...editingRole, name: e.target.value })
+                }
+                placeholder="Role Name"
+                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
+              />
+
+              <input
+                value={editingRole.description || ""}
+                onChange={e =>
+                  setEditingRole({ ...editingRole, description: e.target.value })
+                }
+                placeholder="Description"
+                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
+              />
+
+              <input
+                type="number"
+                value={editingRole.position}
+                onChange={e =>
+                  setEditingRole({ ...editingRole, position: Number(e.target.value) })
+                }
+                placeholder="Ranking"
+                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
+              />
+
+              <div className="flex justify-end gap-3 pt-3">
+                <Button variant="outline" onClick={() => setEditingRole(null)}>
+                  Cancel
+                </Button>
+
+                <Button
+                  onClick={updateRole}
+                  className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
