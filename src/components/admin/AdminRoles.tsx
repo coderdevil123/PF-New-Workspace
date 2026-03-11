@@ -22,6 +22,10 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
   const [newRolePosition, setNewRolePosition] = useState(999);
 
   const createRole = async () => {
+    if (roles.some(r => r.position === newRolePosition)) {
+      alert("This rank is already assigned to another role");
+      return;
+    }
     if (!newRole.trim()) return;
     await fetch(`${API}/api/admin/roles`, {
       method: 'POST',
@@ -57,6 +61,19 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
     onDepartmentsChange(departments.filter(d => d.id !== id));
   };
 
+  const openEditRole = (role: Role) => {
+    const newName = prompt('Edit role name:', role.name);
+    if (newName === null) return;
+    
+    const newDesc = prompt('Edit role description:', role.description || '');
+    if (newDesc === null) return;
+    
+    const newPosition = prompt('Edit ranking:', role.position.toString());
+    if (newPosition === null) return;
+    
+    const updatedRole = { ...role, name: newName, description: newDesc, position: Number(newPosition) };
+    onRolesChange(roles.map(r => r.id === role.id ? updatedRole : r));
+  };
   return (
     <div>
       <h2 className="font-display mb-8 text-2xl sm:text-3xl font-normal text-heading-dark dark:text-dark-text">Roles</h2>
@@ -70,7 +87,7 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
             type="number"
             value={newRolePosition}
             onChange={e => setNewRolePosition(Number(e.target.value))}
-            placeholder="Position / Rank"
+            placeholder="Ranking"
             className="w-32 rounded-lg border px-3 py-2 bg-white text-heading-dark dark:bg-dark-bg dark:text-dark-text dark:border-white/10"
           />
           <Button onClick={createRole}><Plus className="h-4 w-4 mr-1" /> Add</Button>
@@ -80,9 +97,20 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
             <div key={role.id} className="rounded-xl border px-4 py-2 flex flex-col">
               <div className="flex items-center justify-between">
                 <span className="font-medium text-heading-dark dark:text-dark-text">{role.name}</span>
-                <button onClick={() => deleteRole(role.id)}><Trash className="h-3 w-3 text-red-500" /></button>
+                <div className="flex gap-2">
+                  <button onClick={() => openEditRole(role)}>
+                    ✏️
+                  </button>
+
+                  <button onClick={() => deleteRole(role.id)}>
+                    <Trash className="h-3 w-3 text-red-500" />
+                  </button>
+                </div>
               </div>
               {role.description && <div className="text-xs text-muted-text dark:text-white/60 mt-1">{role.description}</div>}
+              <div className="text-xs text-muted-text dark:text-white/60 mt-1">
+                Ranking: {role.position}
+              </div>
             </div>
           ))}
         </div>

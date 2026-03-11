@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Check } from 'lucide-react';
 
-type Assignment = { email: string; name: string; role_id: string | null; department_id: string | null, is_admin?: boolean };
+type Assignment = {
+  email: string;
+  name: string;
+  role_id: string | null;
+  department_id: string | null;
+  is_admin?: boolean;
+  is_visible?: boolean;
+};
 type Role = { id: string; name: string };
 type Department = { id: string; name: string };
 
@@ -35,7 +42,13 @@ export default function AdminAssignments({ roles, departments }: Props) {
     await fetch(`${API}/api/admin/assignments`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ email: user.email, role_id: user.role_id, department_id: user.department_id, is_admin: user.is_admin || false }),
+      body: JSON.stringify({
+        email: user.email,
+        role_id: user.role_id,
+        department_id: user.department_id,
+        is_admin: user.is_admin || false,
+        is_visible: user.is_visible ?? true
+      })   
     });
     setSavingEmail(null);
     setSavedEmail(user.email);
@@ -91,6 +104,20 @@ export default function AdminAssignments({ roles, departments }: Props) {
               <option value="false">Not Admin</option>
               <option value="true">Admin</option>
             </select>
+            <Button
+              variant="outline"
+              onClick={() =>
+                setUsers(prev =>
+                  prev.map(u =>
+                    u.email === user.email
+                      ? { ...u, is_visible: !(u.is_visible ?? true) }
+                      : u
+                  )
+                )
+              }
+            >
+              {user.is_visible === false ? "Unhide" : "Hide"}
+            </Button>
             <Button disabled={savingEmail === user.email} onClick={() => updateAssignment(user)} className="min-w-[90px]">
               {savingEmail === user.email ? 'Saving...' : savedEmail === user.email ? <><Check className="h-4 w-4 mr-1" />Saved</> : 'Save'}
             </Button>
