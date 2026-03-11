@@ -101,6 +101,8 @@ export default function Team() {
 
 // const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
 // setMembers([...merged, ...dbOnly]);
+  .catch(() => setMembers(defaultTeam))
+  .finally(() => setLoading(false))
   }, []);
 
   // ── Grouped by role ───────────────────────────────────────────────────────
