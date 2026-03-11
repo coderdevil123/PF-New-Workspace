@@ -67,37 +67,40 @@ export default function Team() {
     fetch(endpoint, { headers: token ? { Authorization: `Bearer ${token}` } : undefined })
       .then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); })
       .then(dbMembers => {
-        if (!Array.isArray(dbMembers)) { setMembers(defaultTeam); return; }
+        if (!Array.isArray(dbMembers)) {
+          setMembers(defaultTeam);
+          return;
+        }
 
-        const dbMap = new Map(dbMembers.map((m: any) => [m.email, m]));
-
-        const merged = defaultTeam.map(def => {
-          const db = dbMap.get(def.email);
-
-          if (!db) {
-            return {
-              ...def,
-              role: def.role || 'member',
-              department: def.department || 'general',
-              is_visible: true
-            };
-          }
-
-          return {
-            ...def,
-            ...db,
-            role: db.role || def.role || 'member',
-            department: db.department || def.department || 'general',
-            avatar_url: db.avatar_url || def.image,
-            is_visible: db.is_visible ?? true
-          };
-        });
-
-        const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
-        setMembers([...merged, ...dbOnly]);
+        setMembers(dbMembers);
       })
-      .catch(() => setMembers(defaultTeam))
-      .finally(() => setLoading(false));
+
+//         const dbMap = new Map(dbMembers.map((m: any) => [m.email, m]));
+
+//       const merged = defaultTeam.map(def => {
+//         const db = dbMap.get(def.email);
+
+//         if (!db) {
+//           return {
+//             ...def,
+//             role: def.role || 'member',
+//             department: def.department || 'general',
+//             is_visible: true
+//           };
+//         }
+
+//         return {
+//           ...def,
+//           ...db,
+//           role: db.role || def.role || 'member',
+//           department: db.department || def.department || 'general',
+//           avatar_url: db.avatar_url || def.image,
+//           is_visible: db.is_visible ?? true
+//         };
+//       });
+
+// const dbOnly = dbMembers.filter((db: any) => !defaultTeam.some(def => def.email === db.email));
+// setMembers([...merged, ...dbOnly]);
   }, []);
 
   // ── Grouped by role ───────────────────────────────────────────────────────
