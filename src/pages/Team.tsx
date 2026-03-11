@@ -12,6 +12,7 @@ type TeamMember = {
   bio?: string; phone?: string; location?: string;
   mattermost?: string; image?: string; avatar_url?: string;
   is_admin?: boolean;
+  is_visible?: boolean;
 };
 
 const formatRole = (role: string) => {
@@ -93,6 +94,7 @@ export default function Team() {
   // const heads      = members.filter(m => m.role === 'team_lead');
   // const interns    = members.filter(m => m.role === 'intern');
   // const others     = members.filter(m => !['admin', 'team_lead', 'intern'].includes(m.role));
+  const visibleMembers = members.filter(m => m.is_visible !== false);
   const groupedByRole = members.reduce((acc: any, member: any) => {
     const role = member.role || 'Member';
     const position = member.role_position ?? 999;
