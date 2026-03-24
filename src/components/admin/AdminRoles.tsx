@@ -9,7 +9,7 @@ import {
 
 import {
   SortableContext,
-  verticalListSortingStrategy,
+  rectSortingStrategy, // <-- CHANGED from verticalListSortingStrategy
   arrayMove
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
@@ -60,6 +60,9 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
   const [newDepartment, setNewDepartment] = useState('');
   const [newRolePosition, setNewRolePosition] = useState(999);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
+
+  // --- NEW: Always guarantee roles are sorted by position mathematically ---
+  const sortedRoles = [...roles].sort((a, b) => (a.position || 999) - (b.position || 999));
 
   const createRole = async () => {
     if (roles.some(r => r.position === newRolePosition)) {
@@ -117,10 +120,11 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
 
     if (!over || active.id === over.id) return;
 
-    const oldIndex = roles.findIndex(r => r.id === active.id);
-    const newIndex = roles.findIndex(r => r.id === over.id);
+    // Use the mathematically sorted array to find correct indexes
+    const oldIndex = sortedRoles.findIndex(r => r.id === active.id);
+    const newIndex = sortedRoles.findIndex(r => r.id === over.id);
 
-    const newRoles = arrayMove(roles, oldIndex, newIndex);
+    const newRoles = arrayMove(sortedRoles, oldIndex, newIndex);
 
     const updatedRoles = newRoles.map((r, index) => ({
       ...r,
@@ -129,19 +133,26 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
 
     onRolesChange(updatedRoles);
 
-    await fetch(`${API}/api/admin/roles/reorder`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`
-      },
-      body: JSON.stringify({
-        roles: updatedRoles.map(r => ({
-          id: r.id,
-          position: r.position
-        }))
-      })
-    });
+    try {
+      const res = await fetch(`${API}/api/admin/roles/reorder`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          roles: updatedRoles.map(r => ({
+            id: r.id,
+            position: r.position
+          }))
+        })
+      });
+      
+      if (!res.ok) throw new Error("Failed to update database");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save new ranking order to the database.");
+    }
   };
 
   const createDepartment = async () => {
@@ -186,16 +197,17 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
         </div>
         <div className="flex flex-wrap gap-2">
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={roles.map(r => r.id)} strategy={verticalListSortingStrategy}>
-          {roles.map(role => (
+            {/* CHANGED: Use rectSortingStrategy and pass sortedRoles */}
+            <SortableContext items={sortedRoles.map(r => r.id)} strategy={rectSortingStrategy}>
+          {sortedRoles.map(role => (
           <SortableRole key={role.id} role={role}>
             <div
-              className="rounded-xl border px-4 py-2 flex flex-col cursor-grab"
+              className="rounded-xl border px-4 py-2 flex flex-col cursor-grab bg-white dark:bg-dark-card"
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium text-heading-dark dark:text-dark-text">{role.name}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => openEditRole(role)}>
+                  <button onClick={() => openEditRole(role)} className="ml-2">
                     ✏️
                   </button>
 
@@ -233,58 +245,17 @@ export default function AdminRoles({ roles, departments, onRolesChange, onDepart
         </div>
       </div>
       <Dialog open={!!editingRole} onOpenChange={() => setEditingRole(null)}>
-        <DialogContent className="
-          max-w-lg rounded-2xl
-          bg-white dark:bg-dark-card
-          border border-border dark:border-dark-border
-          text-heading-dark dark:text-dark-text
-          space-y-5
-        ">
-          <DialogTitle className="font-display text-xl">
-            Edit Role
-          </DialogTitle>
-
+        {/* Dialog Content remains exactly the same */}
+        <DialogContent className="max-w-lg rounded-2xl bg-white dark:bg-dark-card border border-border dark:border-dark-border text-heading-dark dark:text-dark-text space-y-5">
+          <DialogTitle className="font-display text-xl">Edit Role</DialogTitle>
           {editingRole && (
             <>
-              <input
-                value={editingRole.name}
-                onChange={e =>
-                  setEditingRole({ ...editingRole, name: e.target.value })
-                }
-                placeholder="Role Name"
-                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
-              />
-
-              <input
-                value={editingRole.description || ""}
-                onChange={e =>
-                  setEditingRole({ ...editingRole, description: e.target.value })
-                }
-                placeholder="Description"
-                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
-              />
-
-              <input
-                type="number"
-                value={editingRole.position}
-                onChange={e =>
-                  setEditingRole({ ...editingRole, position: Number(e.target.value) })
-                }
-                placeholder="Ranking"
-                className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10"
-              />
-
+              <input value={editingRole.name} onChange={e => setEditingRole({ ...editingRole, name: e.target.value })} placeholder="Role Name" className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10" />
+              <input value={editingRole.description || ""} onChange={e => setEditingRole({ ...editingRole, description: e.target.value })} placeholder="Description" className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10" />
+              <input type="number" value={editingRole.position} onChange={e => setEditingRole({ ...editingRole, position: Number(e.target.value) })} placeholder="Ranking" className="w-full rounded-lg border px-3 py-2 bg-white dark:bg-dark-bg dark:border-white/10" />
               <div className="flex justify-end gap-3 pt-3">
-                <Button variant="outline" onClick={() => setEditingRole(null)}>
-                  Cancel
-                </Button>
-
-                <Button
-                  onClick={updateRole}
-                  className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90"
-                >
-                  Save Changes
-                </Button>
+                <Button variant="outline" onClick={() => setEditingRole(null)}>Cancel</Button>
+                <Button onClick={updateRole} className="bg-mint-accent text-forest-dark hover:bg-mint-accent/90">Save Changes</Button>
               </div>
             </>
           )}
