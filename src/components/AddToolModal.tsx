@@ -60,8 +60,12 @@ export default function AddToolModal({
     if (tool) {
       setName(tool.name || '');
       setToolUrl(tool.url || '');
-      setYoutubeUrl('');
-      setExistingVideoId(tool.tutorial_video || null);
+      
+      // ✅ FIX: Reconstruct the YouTube URL from the saved Video ID
+      const videoId = tool.tutorial_video || tool.tutorialVideo;
+      setYoutubeUrl(videoId ? `https://www.youtube.com/watch?v=${videoId}` : '');
+      setExistingVideoId(videoId || null);
+      
       setDescription(tool.description || '');
     } else {
       resetForm();
@@ -78,46 +82,59 @@ export default function AddToolModal({
   }
   
   async function handleSubmit() {
-  if (!name || !toolUrl || !category) return;
+    if (!name || !toolUrl || !category) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  const newVideoId = extractYoutubeId(youtubeUrl);
+    const newVideoId = extractYoutubeId(youtubeUrl);
+    const finalVideoId = newVideoId || existingVideoId || '';
 
-  const payload = {
-    name,
-    description,
-    url: toolUrl,
-    category,
-    tutorial_video: newVideoId || existingVideoId,
-  };
+    // ✅ FIX: Use FormData to properly handle text AND image files
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('url', toolUrl);
+    formData.append('category', category);
+    formData.append('tutorial_video', finalVideoId);
 
-  const endpoint = tool
-    ? `${import.meta.env.VITE_BACKEND_URL}/api/tools/${tool.id}`
-    : `${import.meta.env.VITE_BACKEND_URL}/api/tools`;
+    // Only append the image if a new one was selected
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
 
-  const method = tool ? 'PUT' : 'POST';
+    const endpoint = tool
+      ? `${import.meta.env.VITE_BACKEND_URL}/api/tools/${tool.id}`
+      : `${import.meta.env.VITE_BACKEND_URL}/api/tools`;
 
-  const res = await fetch(endpoint, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify(payload),
-  });
+    const method = tool ? 'PUT' : 'POST';
 
-  setLoading(false);
+    try {
+      const res = await fetch(endpoint, {
+        method,
+        headers: {
+          // ⚠️ DO NOT set 'Content-Type': 'application/json' here!
+          // Fetch automatically sets the correct multipart/form-data boundary for FormData
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
 
-  if (!res.ok) {
-    console.error('Tool save failed');
-    return;
+      if (!res.ok) {
+        console.error('Tool save failed');
+        alert('Failed to save the tool. Please try again.');
+        return;
+      }
+
+      resetForm();
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error('Error saving tool:', error);
+      alert('A network error occurred.');
+    } finally {
+      setLoading(false);
+    }
   }
-
-  resetForm();
-  onSuccess();
-  onClose();
-}
 
   const inputClass =
   "w-full rounded-lg border border-border bg-light-gray px-4 py-2 text-sm " +
@@ -141,7 +158,7 @@ export default function AddToolModal({
         border border-border dark:border-dark-border
         shadow-xl
         space-y-5">
-        {/* ✅ Accessibility fix */}
+        
         <DialogTitle className="font-display text-2xl font-normal text-heading-dark dark:text-white">
           {tool ? 'Edit Tool' : 'Add Tool'}
         </DialogTitle>
