@@ -27,25 +27,39 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const [announcements, setAnnouncements]       = useState<any[]>([]);
   const [annLoading, setAnnLoading]             = useState(false);
 
-  // ── Fetch announcements only when notification dropdown opens ───────────────
-  // This avoids an API call on every page load / navigation
+  // ── Fetch announcements immediately and poll for real-time updates ──────────
   useEffect(() => {
-    if (!notificationOpen || !user) return;
-    if (announcements.length > 0) return; // already loaded, don't re-fetch
+    if (!user) {
+      setAnnouncements([]);
+      return;
+    }
 
-    setAnnLoading(true);
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-    })
-      .then(r => r.json())
-      .then(data => setAnnouncements(Array.isArray(data) ? data : []))
-      .catch(() => setAnnouncements([]))
-      .finally(() => setAnnLoading(false));
-  }, [notificationOpen, user]);
+    const fetchAnnouncements = async (showLoading = false) => {
+      if (showLoading) setAnnLoading(true);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        const data = await response.json();
+        setAnnouncements(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Failed to fetch announcements:', error);
+      } finally {
+        if (showLoading) setAnnLoading(false);
+      }
+    };
 
-  // Clear announcements cache when user logs out
-  useEffect(() => {
-    if (!user) setAnnouncements([]);
+    // Initial fetch on component mount (show loading state if opening menu quickly)
+    fetchAnnouncements(true);
+
+    // Poll for updates every 30 seconds (30000 ms) for real-time feel
+    // (We pass 'false' so it updates silently in the background without loading spinners)
+    const intervalId = setInterval(() => {
+      fetchAnnouncements(false);
+    }, 30000); 
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
   }, [user]);
 
   const handleLogout = () => {
@@ -166,8 +180,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              {/* Loading state */}
-              {annLoading && (
+              {/* Loading state - only shows on initial load now */}
+              {annLoading && latestAnnouncements.length === 0 && (
                 <div className="p-6 text-center">
                   <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-mint-accent border-t-transparent" />
                   <p className="mt-2 text-xs text-muted-foreground">Loading...</p>
