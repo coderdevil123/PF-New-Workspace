@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { ArrowLeft, CheckSquare, Check, Pencil, Info } from 'lucide-react';
+import { ArrowLeft, CheckSquare, Check, Pencil, Info, Clock, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,6 +38,55 @@ const PRIORITY_STYLES: Record<TaskPriority, string> = {
   high:   'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200',
   medium: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200',
   low:    'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200',
+};
+
+// ── Helper Component to Beautifully Format the JSON Summary ─────────────────
+const MeetingSummaryFormatter = ({ summary }: { summary?: string }) => {
+  if (!summary) return <span className="text-muted-text text-sm">No summary available.</span>;
+
+  try {
+    const parsed = JSON.parse(summary);
+    if (Array.isArray(parsed)) {
+      return (
+        <div className="space-y-5">
+          {parsed.map((block, idx) => (
+            <div key={idx} className="border-b border-border/50 pb-5 last:border-0 last:pb-0">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 flex-1">
+                  {block.topic}
+                </h4>
+                {block.time_range && (
+                  <span className="flex items-center gap-1 rounded-full bg-mint-accent/10 px-2.5 py-1 text-xs font-medium text-mint-accent border border-mint-accent/20 whitespace-nowrap">
+                    <Clock className="h-3 w-3" />
+                    {block.time_range}
+                  </span>
+                )}
+              </div>
+              
+              {Array.isArray(block.points) && (
+                <ul className="list-outside list-disc space-y-1.5 text-gray-700 dark:text-gray-300 ml-4 mb-3">
+                  {block.points.map((pt: string, i: number) => (
+                    <li key={i} className="text-sm leading-relaxed pl-1">{pt}</li>
+                  ))}
+                </ul>
+              )}
+              
+              {block.participants && block.participants.length > 0 && (
+                <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-text bg-black/5 dark:bg-white/5 w-fit px-2 py-1 rounded-md">
+                  <Users className="h-3 w-3" />
+                  <span>{block.participants.join(', ')}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+  } catch (e) {
+    // If it's not JSON, just fall back to rendering it as plain text
+  }
+
+  return <div className="whitespace-pre-wrap leading-relaxed text-sm">{summary}</div>;
 };
 
 export default function Tasks() {
@@ -158,17 +207,12 @@ export default function Tasks() {
   const handler = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
 
-    // Summary bubble
     if (!target.closest('[data-summary-bubble]')) {
       setOpenSummaryTaskId(null);
     }
-
-    // Status dropdown
     if (!target.closest('[data-status-dropdown]')) {
       setOpenDropdownTaskId(null);
     }
-
-    // Reassignment dropdown
     if (!target.closest('[data-reassign-dropdown]')) {
       setOpenReassignDropdownTaskId(null);
       setOpenWrongSubmenuTaskId(null);
@@ -249,13 +293,6 @@ export default function Tasks() {
                 </div>
               </div>
             </div>
-            {/* <Button onClick={() => setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')}
-              className="relative rounded-full bg-white/10 px-5 py-2 text-white hover:bg-white/20 transition">
-              Reassignment Inbox
-              {reassignRequests.length > 0 && (
-                <span className="ml-2 rounded-full bg-red-500 px-2 text-xs">{reassignRequests.length}</span>
-              )}
-            </Button> */}
           </div>
         </div>
       </section>
@@ -337,7 +374,7 @@ export default function Tasks() {
             <div className="flex items-center gap-3 relative">
 
               {/* ───────── STATUS BUTTON ───────── */}
-              <div className="relative">
+              <div className="relative" data-status-dropdown>
                 <button
                   onClick={e => {
                     e.stopPropagation();
@@ -467,7 +504,7 @@ export default function Tasks() {
                     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
                     setSummaryPosition({
                       top: rect.bottom + 8,
-                      left: Math.min(rect.left, window.innerWidth - 320),
+                      left: Math.min(rect.left, window.innerWidth - 350), // Adjusted slightly to fit wider popover
                     });
                     setOpenSummaryTaskId(
                       openSummaryTaskId === task.id ? null : task.id
@@ -483,15 +520,14 @@ export default function Tasks() {
                   <div
                     data-summary-bubble
                     onClick={e => e.stopPropagation()}
-                    className="fixed z-[9999] w-72 max-h-48 overflow-y-auto rounded-xl border border-black/5 dark:border-white/10 bg-white dark:bg-dark-card text-sm text-gray-800 dark:text-gray-100 p-4 shadow-[0_6px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.6)]"
+                    className="fixed z-[9999] w-80 max-h-64 overflow-y-auto rounded-xl border border-black/5 dark:border-white/10 bg-white dark:bg-dark-card text-sm text-gray-800 dark:text-gray-100 p-4 shadow-[0_6px_16px_rgba(0,0,0,0.15)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.6)]"
                     style={{ top: summaryPosition.top, left: summaryPosition.left }}
                   >
-                    <div className="mb-2 font-medium text-mint-accent">
-                      Meeting Summary
+                    <div className="mb-4 pb-2 border-b border-border/50 font-medium text-mint-accent">
+                      Meeting Summary Highlights
                     </div>
-                    <p className="leading-relaxed">
-                      {task.meeting_summary || 'No summary available.'}
-                    </p>
+                    {/* Inject the new formatter here! */}
+                    <MeetingSummaryFormatter summary={task.meeting_summary} />
                   </div>
                 )}
               </div>
@@ -576,51 +612,43 @@ export default function Tasks() {
       {/* ── TASK DETAIL DIALOG ── */}
       {selectedTaskView && (
         <Dialog open onOpenChange={() => setSelectedTaskView(null)}>
-          <DialogContent className="max-w-xl max-h-[80vh] overflow-hidden rounded-2xl border border-border bg-white dark:bg-dark-card text-gray-900 dark:text-gray-100 shadow-2xl">
-            <DialogHeader>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl border border-border bg-white dark:bg-dark-card text-gray-900 dark:text-gray-100 shadow-2xl flex flex-col">
+            <DialogHeader className="shrink-0 pb-4">
               <DialogTitle className="text-2xl font-semibold text-heading-dark dark:text-white">{selectedTaskView.title}</DialogTitle>
+              <div className="flex flex-wrap gap-4 mt-4">
+                {selectedTaskView.priority && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-text uppercase tracking-wider">Priority</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_STYLES[selectedTaskView.priority]}`}>{selectedTaskView.priority}</span>
+                  </div>
+                )}
+                {selectedTaskView.status && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-text uppercase tracking-wider">Status</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[selectedTaskView.status]}`}>{selectedTaskView.status}</span>
+                  </div>
+                )}
+              </div>
             </DialogHeader>
-            <div className="flex flex-wrap gap-3 mt-3">
-              {selectedTaskView.priority && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-muted-text">Task Priority</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${PRIORITY_STYLES[selectedTaskView.priority]}`}>{selectedTaskView.priority.toUpperCase()}</span>
-                </div>
-              )}
-              {selectedTaskView.status && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-muted-text">Current Status</span>
-                  <span className={`rounded-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[selectedTaskView.status]}`}>{selectedTaskView.status.toUpperCase()}</span>
-                </div>
-              )}
-            </div>
-            <hr className="my-5 border-border" />
-            <div className="mt-2">
-              <h3 className="text-sm font-semibold text-mint-accent mb-2">
-                Meeting Summary
+            
+            <div className="flex-1 overflow-y-auto pr-2 mt-2 custom-scrollbar">
+              <h3 className="text-sm font-semibold text-mint-accent mb-3 sticky top-0 bg-white dark:bg-dark-card py-2 z-10 border-b border-border/50">
+                Detailed Meeting Summary
               </h3>
 
-              <div className="
-                  max-h-64
-                  overflow-y-auto
-                  rounded-lg
-                  border border-border
-                  bg-light-gray dark:bg-dark-hover
-                  p-4
-                  text-sm
-                  leading-relaxed
-                  text-gray-700 dark:text-gray-300
-                  whitespace-pre-wrap
-                "
-              >
-                {selectedTaskView.meeting_summary || 'No summary available.'}
+              <div className="rounded-xl border border-border bg-light-gray/50 dark:bg-dark-hover/50 p-5 shadow-inner">
+                {/* Inject the new formatter here too! */}
+                <MeetingSummaryFormatter summary={selectedTaskView.meeting_summary} />
               </div>
             </div>
+
             {selectedTaskView.description && (
-              <div className="mt-6">
-                <h3 className="text-sm font-semibold text-mint-accent mb-2">Jellyfin Recording</h3>
+              <div className="shrink-0 mt-6 pt-4 border-t border-border">
                 <a href={selectedTaskView.description} target="_blank" rel="noopener noreferrer"
-                  className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 underline underline-offset-4 hover:text-blue-500">Open Recording</a>
+                  className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 transition group">
+                  <span className="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded-md group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 transition">▶</span>
+                  Open Jellyfin Recording
+                </a>
               </div>
             )}
           </DialogContent>
