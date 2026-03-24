@@ -65,22 +65,22 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const ThemeIcon            = themeIcons[theme];
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-white dark:bg-dark-bg px-6 shadow-sm">
+    <header className="flex h-16 items-center justify-between border-b border-border bg-white dark:bg-dark-bg px-3 sm:px-6 shadow-sm">
       {/* Left */}
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-4">
         <Button onClick={onMenuClick} variant="ghost" size="sm"
-          className="text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent lg:hidden">
+          className="text-body-text dark:text-dark-muted hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent lg:hidden px-2 sm:px-3">
           <Menu className="h-5 w-5" strokeWidth={1.5} />
         </Button>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-0.5 sm:gap-2">
 
         {/* Manager button — visible to all logged-in users */}
         {isAdmin && (
-          <Button onClick={() => navigate('/manager')} variant="ghost"
-            className="flex items-center gap-2 rounded-lg text-heading-dark dark:text-dark-text hover:bg-light-gray dark:hover:bg-dark-hover">
+          <Button onClick={() => navigate('/manager')} variant="ghost" size="sm"
+            className="flex items-center gap-1.5 sm:gap-2 rounded-lg text-heading-dark dark:text-dark-text hover:bg-light-gray dark:hover:bg-dark-hover px-1.5 sm:px-3">
             <Briefcase className="h-5 w-5 text-mint-accent" />
             <span className="hidden sm:inline">Manager</span>
           </Button>
@@ -88,8 +88,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
         {/* Admin button — only shown when user.role === 'admin' */}
         {isAdmin && user && (
-          <Button onClick={() => navigate('/admin')} variant="ghost"
-            className="flex items-center gap-2 rounded-lg text-heading-dark dark:text-dark-text hover:bg-light-gray dark:hover:bg-dark-hover">
+          <Button onClick={() => navigate('/admin')} variant="ghost" size="sm"
+            className="flex items-center gap-1.5 sm:gap-2 rounded-lg text-heading-dark dark:text-dark-text hover:bg-light-gray dark:hover:bg-dark-hover px-1.5 sm:px-3">
             <Shield className="h-5 w-5 text-mint-accent" />
             <span className="hidden sm:inline">Admin</span>
           </Button>
@@ -99,7 +99,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         {user && (
           <Tooltip label="Tasks">
             <Button onClick={() => navigate('/tasks')} variant="ghost" size="sm"
-              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105">
+              className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105 px-1.5 sm:px-3">
               <CheckSquare className="h-5 w-5" strokeWidth={1.5} />
             </Button>
           </Tooltip>
@@ -110,7 +110,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <Tooltip label="Theme">
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm"
-                className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105">
+                className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105 px-1.5 sm:px-3">
                 <ThemeIcon className="h-5 w-5" strokeWidth={1.5} />
               </Button>
             </DropdownMenuTrigger>
@@ -134,7 +134,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         {/* Team */}
         <Tooltip label="Team">
           <Button onClick={() => navigate('/team')} variant="ghost" size="sm"
-            className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105">
+            className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105 px-1.5 sm:px-3">
             <Users className="h-5 w-5" strokeWidth={1.5} />
           </Button>
         </Tooltip>
@@ -145,17 +145,17 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <Tooltip label="Notifications">
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm"
-                  className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105">
+                  className="relative rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:text-forest-green dark:hover:text-mint-accent hover:scale-105 px-1.5 sm:px-3">
                   <Bell className="h-5 w-5" strokeWidth={1.5} />
                   {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-mint-accent text-xs font-bold text-white shadow-lg">
+                    <span className="absolute -right-0.5 -top-0.5 sm:-right-1 sm:-top-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-mint-accent text-[10px] sm:text-xs font-bold text-white shadow-lg">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
             </Tooltip>
-            <DropdownMenuContent align="end" className="w-80 bg-popover text-popover-foreground">
+            <DropdownMenuContent align="end" className="w-[300px] sm:w-80 bg-popover text-popover-foreground">
               <DropdownMenuLabel className="flex items-center justify-between text-popover-foreground">
                 <span>Notifications</span>
                 {unreadCount > 0 && (
@@ -218,8 +218,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           <Tooltip label="Account">
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm"
-                className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:scale-105">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent shadow-md">
+                className="rounded-lg text-body-text dark:text-dark-muted transition-all hover:bg-light-gray dark:hover:bg-dark-hover hover:scale-105 px-1.5 sm:px-3">
+                <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-forest-green to-mint-accent shadow-md">
                   <User className="h-4 w-4 text-white" strokeWidth={1.5} />
                 </div>
               </Button>
