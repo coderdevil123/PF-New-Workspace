@@ -212,7 +212,10 @@ export default function CategoryDetail() {
           {isAdmin && (
           <Button
               className="mt-4"
-              onClick={() => setAddToolOpen(true)}
+              onClick={() => {
+                  setEditTool(null);
+                  setAddToolOpen(true);
+                }}
             >
               + Add Tool
             </Button>
@@ -378,7 +381,7 @@ export default function CategoryDetail() {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setSelectedTool(tool);
+                        setEditTool(tool);
                         setAddToolOpen(true);
                       }}
                       className="
