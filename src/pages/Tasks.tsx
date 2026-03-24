@@ -249,13 +249,13 @@ export default function Tasks() {
                 </div>
               </div>
             </div>
-            <Button onClick={() => setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')}
+            {/* <Button onClick={() => setActiveTab(activeTab === 'tasks' ? 'reassign' : 'tasks')}
               className="relative rounded-full bg-white/10 px-5 py-2 text-white hover:bg-white/20 transition">
               Reassignment Inbox
               {reassignRequests.length > 0 && (
                 <span className="ml-2 rounded-full bg-red-500 px-2 text-xs">{reassignRequests.length}</span>
               )}
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>
