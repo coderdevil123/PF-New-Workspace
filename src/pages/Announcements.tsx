@@ -157,6 +157,7 @@ export default function Announcements() {
       toast({ title: 'Missing Information', description: 'Please fill in all required fields.', variant: 'destructive' });
       return;
     }
+    
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -169,10 +170,30 @@ export default function Announcements() {
       }),
     })
       .then(r => { if (!r.ok) throw new Error('Create failed'); return r.json(); })
-      .then(() => {
+      .then((responseData) => {
         toast({ title: 'Announcement Created', description: 'Your announcement has been published.' });
         setCreateModalOpen(false);
         setNewAnnouncement({ title: '', category: 'Tool Update', content: '', recipients: 'all', taggedUsers: [] });
+
+        // --- NEW FIX: Update the UI immediately ---
+        // Some backends nest the returned object inside 'data' or 'announcement'
+        const createdItem = responseData?.data || responseData?.announcement || responseData;
+
+        if (createdItem && createdItem.id) {
+          // If the API returns the created object, inject it straight into the state
+          setAnnouncements(prev => {
+            // Check to prevent duplicates in case the Supabase realtime channel also catches it
+            if (prev.some(a => a.id === createdItem.id)) return prev;
+            return [{ ...createdItem, is_read: false, is_pinned: false }, ...prev];
+          });
+        } else {
+          // Fallback: If your API doesn't return the new object, re-fetch the whole list silently
+          fetch(`${import.meta.env.VITE_BACKEND_URL}/api/announcements`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then(r => r.json())
+            .then(data => setAnnouncements(Array.isArray(data) ? data : []));
+        }
       })
       .catch(() => toast({ title: 'Error', description: 'Failed to create announcement', variant: 'destructive' }));
   };
