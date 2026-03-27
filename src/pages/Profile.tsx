@@ -227,7 +227,15 @@ export default function Profile() {
         body: form,
       });
 
-      const data = await res.json();
+      // ✅ FIX: Safely parse the response to prevent the HTML crash
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Non-JSON response received:", text);
+        throw new Error(`Server returned an error (Status: ${res.status}). The file might be too large or the server timed out.`);
+      }
 
       if (!res.ok) {
         setProfileData((prev: any) => ({
