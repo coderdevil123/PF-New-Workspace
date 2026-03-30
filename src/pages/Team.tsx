@@ -398,7 +398,7 @@ function MemberCard({ member, index, onClick }: {
   member: TeamMember; index: number; onClick: () => void;
 }) {
   const handleMattermostClick = (mattermost: string) => {
-    window.open(`https://chat.pristineforests.com/pristine-forests/messages/${mattermost}`, '_blank');
+    window.open(`https://pfchat.growthsupercharged.com/pristine-forests/messages/${mattermost}`, '_blank');
   };
 
   return (
