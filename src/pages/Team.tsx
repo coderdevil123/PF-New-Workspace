@@ -142,7 +142,7 @@ export default function Team() {
     .sort((a: any, b: any) => a.position - b.position);
 
   const handleMattermostClick = (mattermost: string) => {
-    window.open(`https://chat.pristineforests.com/pristine-forests/messages/${mattermost}`, '_blank');
+    window.open(`https://pfchat.growthsupercharged.com/pristine-forests/messages/${mattermost}`, '_blank');
   };
 
   // ── Section renderer — shows skeletons while loading ─────────────────────
