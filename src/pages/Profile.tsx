@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../components/ui/dialog';
-// import { supabase } from '../lib/supabase';
 
 const mapProfile = (data: any) => ({
   name: data.name,
@@ -182,7 +181,6 @@ export default function Profile() {
       avatar: data.avatar_url,
     }));
 
-    // ✅ Only update version once
     setAvatarVersion(prev => prev + 1);
 
     toast({
@@ -210,7 +208,6 @@ export default function Profile() {
     const form = new FormData();
     form.append('voice', recording.blob, 'voice.webm');
 
-    // ⏳ Immediately show processing
     setVoiceProcessing(true);
 
     toast({
@@ -227,7 +224,6 @@ export default function Profile() {
         body: form,
       });
 
-      // ✅ FIX: Safely parse the response to prevent the HTML crash
       const text = await res.text();
       let data;
       try {
@@ -252,7 +248,6 @@ export default function Profile() {
         return;
       }
 
-      // ✅ Success
       setProfileData((prev: any) => ({
         ...prev,
         voice_status: true,
@@ -308,12 +303,6 @@ export default function Profile() {
     setShowDialog(false);
   };
 
-  const handleNavigateAway = () => {
-    if (hasUnsavedChanges) {
-      setShowDialog(true);
-    }
-  };
-
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -321,15 +310,16 @@ export default function Profile() {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 48000,
+          sampleRate: 16000, // ✅ FIX: Reduced from 48000 to 16000 for standard voice quality
           channelCount: 1
         }
       });
 
-      const options = {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 128000
-      };
+      // ✅ FIX: Reduced bitrate to shrink file size significantly and avoid Nginx 1MB limits
+      let options: MediaRecorderOptions = { audioBitsPerSecond: 32000 }; 
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          options.mimeType = 'audio/webm;codecs=opus';
+      }
 
       const recorder = new MediaRecorder(stream, options);
       const chunks: BlobPart[] = [];
@@ -360,6 +350,11 @@ export default function Profile() {
 
     } catch (err) {
       console.error("Mic error:", err);
+      toast({
+        title: 'Microphone Error',
+        description: 'Please ensure you have granted microphone permissions.',
+        variant: 'destructive'
+      })
     }
   };
 
@@ -367,28 +362,6 @@ export default function Profile() {
     mediaRecorder?.stop();
     setIsRecording(false);
   };
-
-  // const deleteRecording = async () => {
-  //   await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile/voice`, {
-  //     method: 'DELETE',
-  //     headers: {
-  //       Authorization: `Bearer ${localStorage.getItem('token')}`,
-  //     },
-  //   });
-
-  //   setVoiceFromServer(null);
-  //   setVoiceUploadedAt(null);
-  //   setAudioURL(null);
-
-  //   toast({
-  //     title: 'Recording deleted'
-  //   });
-  // };
-
-  // const retryRecording = () => {
-  //   setAudioURL(null);
-  //   startRecording();
-  // };
 
   const uploadsBase =
   import.meta.env.VITE_UPLOADS_URL ||
@@ -780,6 +753,7 @@ export default function Profile() {
             <p>
               Hello, this is my voice sample for identification and verification purposes.
               I am speaking in a calm, natural tone at a comfortable pace, similar to how I normally speak in everyday conversation.
+            </p>
             <p>
               I will continue speaking for about a minute so the system can capture the full range of my voice, including pitch, rhythm, pronunciation, and natural variation.
               Every person’s voice has subtle characteristics that make it unique, such as tone, pacing, breath control, and emphasis on certain words.
@@ -794,8 +768,10 @@ export default function Profile() {
               Unique New York, unique New York.
               Freshly fried flying fish.
             </p>
+            <p>
               Clear communication requires clarity, confidence, and consistency in delivery.
               Security systems should be reliable, robust, and resistant to impersonation attempts.
+            </p>
             <p>
               I am continuing to speak naturally without exaggerating my pronunciation or forcing any particular tone.
               This recording is being made in a quiet environment with minimal background noise.
@@ -803,7 +779,6 @@ export default function Profile() {
             <p>    
               I will now slightly vary my intonation while keeping my voice steady and relaxed.
               Thank you for listening. This concludes my voice enrollment sample. 
-            </p>
             </p>
           </div>
 
@@ -895,5 +870,3 @@ export default function Profile() {
     </div>
   );
 }
-
-
